@@ -1,0 +1,33 @@
+.header { text-align: center; padding: 32px 24px; }
+.avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin: 0 auto 12px; background: var(--color-border); border: 3px solid var(--color-border); }
+.username { font-family: var(--font-heading); font-size: 22px; margin-bottom: 4px; }
+.bio { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 16px; max-width: 400px; margin-left: auto; margin-right: auto; }
+.stats { display: flex; gap: 32px; justify-content: center; margin-bottom: 16px; }
+.stat { text-align: center; }
+.statCount { font-size: 18px; font-weight: 700; display: block; }
+.statLabel { font-size: 12px; color: var(--color-text-secondary); }
+.actions { display: flex; gap: 10px; justify-content: center; }
+.followBtn { padding: 8px 28px; border-radius: var(--radius-btn); font-size: 14px; font-weight: 600; border: 2px solid var(--color-primary); background: var(--color-primary); color: white; cursor: pointer; font-family: var(--font-body); }
+.unfollowBtn { composes: followBtn; background: transparent; color: var(--color-primary); }
+.editBtn { composes: followBtn; background: transparent; color: var(--color-text); border-color: var(--color-border); }
+.messageBtn { padding: 8px 28px; border-radius: var(--radius-btn); font-size: 14px; font-weight: 600; border: 2px solid var(--color-border); background: transparent; color: var(--color-text); cursor: pointer; font-family: var(--font-body); }
+.content { max-width: var(--max-width); margin: 0 auto; padding: 0 24px 40px; }
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--color-border); margin-bottom: 20px; }
+.tab { flex: 1; text-align: center; padding: 12px; font-size: 14px; font-weight: 500; color: var(--color-text-secondary); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: var(--font-body); }
+.tabActive { color: var(--color-primary); border-bottom-color: var(--color-primary); font-weight: 600; }
+.profileGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+.profileGridItem { aspect-ratio: 1; overflow: hidden; cursor: pointer; }
+.profileGridItem img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s; }
+.profileGridItem:hover img { opacity: 0.85; }
+.editModal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 300; }
+.editCard { background: var(--color-card); border-radius: var(--radius-card); padding: 28px; width: 100%; max-width: 420px; margin: 20px; }
+.editTitle { font-family: var(--font-heading); font-size: 22px; margin-bottom: 16px; }
+.field { margin-bottom: 14px; }
+.label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+.input { width: 100%; padding: 10px 14px; border: 1px solid var(--color-border); border-radius: var(--radius-card); font-size: 14px; outline: none; font-family: var(--font-body); }
+.editActions { display: flex; gap: 10px; margin-top: 8px; }
+.saveBtn { flex: 1; padding: 10px; background: var(--color-primary); color: white; border: none; border-radius: var(--radius-btn); font-weight: 600; cursor: pointer; font-family: var(--font-body); }
+.cancelBtn { flex: 1; padding: 10px; background: transparent; border: 1px solid var(--color-border); border-radius: var(--radius-btn); cursor: pointer; font-family: var(--font-body); }
+.loading { text-align: center; padding: 80px; color: var(--color-text-secondary); }
+.empty { text-align: center; padding: 40px; color: var(--color-text-secondary); }
+@media (min-width: 769px) { .profileGrid { grid-template-columns: repeat(3, 1fr); } }

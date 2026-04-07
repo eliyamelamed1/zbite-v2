@@ -1,0 +1,41 @@
+.page { position: relative; padding-bottom: 80px; }
+.coverImage { width: 100%; height: 350px; object-fit: cover; }
+.content { max-width: 800px; margin: 0 auto; padding: 20px 24px; }
+.title { font-family: var(--font-heading); font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+.badges { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.badge { padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.easy { background: #e8f5e9; color: #2e7d32; }
+.medium { background: #fff3e0; color: #e65100; }
+.hard { background: #fbe9e7; color: #c62828; }
+.metaChip { padding: 4px 12px; background: var(--color-bg); border-radius: 8px; font-size: 13px; color: var(--color-text-secondary); }
+.authorRow { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.authorAvatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: var(--color-border); cursor: pointer; }
+.authorName { font-weight: 600; font-size: 14px; cursor: pointer; }
+.authorName:hover { color: var(--color-primary); }
+.followBtn { margin-left: auto; padding: 6px 18px; border-radius: var(--radius-btn); font-size: 13px; font-weight: 600; border: 2px solid var(--color-primary); background: var(--color-primary); color: white; cursor: pointer; }
+.unfollowBtn { margin-left: auto; padding: 6px 18px; border-radius: var(--radius-btn); font-size: 13px; font-weight: 600; border: 2px solid var(--color-primary); background: transparent; color: var(--color-primary); cursor: pointer; }
+.rateSection { display: flex; align-items: center; gap: 12px; margin: 12px 0 20px; padding: 12px 16px; background: var(--color-bg); border-radius: var(--radius-card); }
+.rateLabel { font-size: 14px; color: var(--color-text-secondary); }
+.section { margin-bottom: 28px; }
+.sectionTitle { font-family: var(--font-heading); font-size: 20px; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid var(--color-border); }
+.nutritionGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.nutritionBox { background: var(--color-bg); border-radius: var(--radius-card); padding: 14px; text-align: center; }
+.nutritionValue { font-size: 18px; font-weight: 700; color: var(--color-primary); }
+.nutritionLabel { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+.ingredientList { list-style: none; }
+.ingredient { padding: 10px 0; border-bottom: 1px solid var(--color-border); font-size: 15px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: opacity 0.2s; }
+.ingredientChecked { opacity: 0.4; text-decoration: line-through; }
+.checkbox { font-size: 18px; flex-shrink: 0; }
+.step { display: flex; gap: 14px; margin-bottom: 20px; }
+.stepNumber { width: 32px; height: 32px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+.stepContent { flex: 1; }
+.stepText { font-size: 15px; line-height: 1.7; margin-bottom: 10px; }
+.stepImage { width: 100%; max-height: 250px; object-fit: cover; border-radius: var(--radius-card); }
+.ownerActions { display: flex; gap: 12px; margin-top: 20px; }
+.editBtn { padding: 8px 20px; border-radius: var(--radius-btn); font-size: 13px; font-weight: 600; border: 2px solid var(--color-text-secondary); background: transparent; color: var(--color-text-secondary); cursor: pointer; }
+.deleteBtn { padding: 8px 20px; border-radius: var(--radius-btn); font-size: 13px; font-weight: 600; border: 2px solid #c62828; background: transparent; color: #c62828; cursor: pointer; }
+.cookModeBar { position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 20px; background: var(--color-card); border-top: 1px solid var(--color-border); z-index: 50; display: flex; justify-content: center; }
+.cookModeBtn { width: 100%; max-width: 600px; padding: 14px; background: var(--color-primary); color: white; border: none; border-radius: var(--radius-btn); font-size: 16px; font-weight: 600; cursor: pointer; font-family: var(--font-body); transition: background 0.2s; }
+.cookModeBtn:hover { background: var(--color-primary-hover); }
+.loading { text-align: center; padding: 80px; color: var(--color-text-secondary); }
+@media (max-width: 768px) { .coverImage { height: 250px; } .title { font-size: 26px; } .nutritionGrid { grid-template-columns: repeat(2, 1fr); } .cookModeBar { bottom: 64px; } }

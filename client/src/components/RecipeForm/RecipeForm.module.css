@@ -1,0 +1,195 @@
+.form {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: var(--font-body);
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+}
+
+.textarea {
+  composes: input;
+  min-height: 80px;
+  resize: vertical;
+}
+
+.row {
+  display: flex;
+  gap: 16px;
+}
+
+.row > * {
+  flex: 1;
+}
+
+.difficultyOptions {
+  display: flex;
+  gap: 8px;
+}
+
+.difficultyOption {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.2s;
+  text-transform: capitalize;
+}
+
+.difficultyOption:hover {
+  border-color: var(--color-primary);
+}
+
+.difficultyActive {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+}
+
+.ingredientRow {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.ingredientAmount {
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.ingredientName {
+  flex: 1;
+}
+
+.removeBtn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #fbe9e7;
+  color: #c62828;
+  border-radius: 50%;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.removeBtn:hover {
+  background: #c62828;
+  color: white;
+}
+
+.addBtn {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+.stepBlock {
+  background: var(--color-bg);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.stepLabel {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 14px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-btn);
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.2s;
+  margin-top: 16px;
+}
+
+.submitBtn:hover {
+  background: var(--color-primary-hover);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  background: #fbe9e7;
+  color: #c62828;
+  padding: 10px 14px;
+  border-radius: var(--radius-card);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 640px) {
+  .row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .ingredientRow {
+    flex-wrap: wrap;
+  }
+
+  .ingredientAmount {
+    width: 100%;
+  }
+}

@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap');
+
+:root {
+  --color-primary: #E85D2C;
+  --color-primary-hover: #D14D1E;
+  --color-secondary: #F5A623;
+  --color-bg: #FFF8F0;
+  --color-card: #FFFFFF;
+  --color-text: #2D1810;
+  --color-text-secondary: #7A6558;
+  --color-border: #F0E0D0;
+  --color-success: #4CAF50;
+  --color-warning: #F5A623;
+  --color-danger: #E85D2C;
+
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+
+  --radius-card: 12px;
+  --radius-btn: 12px;
+  --radius-avatar: 50%;
+
+  --shadow-card: 0 2px 8px rgba(45, 24, 16, 0.08);
+  --shadow-hover: 0 4px 16px rgba(45, 24, 16, 0.12);
+
+  --max-width: 1200px;
+  --gap: 24px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}

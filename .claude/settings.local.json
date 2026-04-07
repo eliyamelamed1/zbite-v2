@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Bash(git init:*)",
+      "Bash(npm install:*)",
+      "Bash(npm create:*)",
+      "Bash(npx --yes create-vite@latest client --template react)",
+      "Bash(npx --yes create-vite@5.5.0 client --template react)",
+      "Bash(npx vite:*)",
+      "Bash(curl -s http://localhost:5000/api/health)",
+      "Bash(node -e \"console.log\\(require\\(''crypto''\\).randomBytes\\(32\\).toString\\(''hex''\\)\\)\")",
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(curl -s http://127.0.0.1:5000/api/health)",
+      "Bash(curl -s -X POST http://127.0.0.1:5000/api/auth/register -H \"Content-Type: application/json\" -d '{\"\"\"\"username\"\"\"\":\"\"\"\"testuser\"\"\"\",\"\"\"\"email\"\"\"\":\"\"\"\"test@test.com\"\"\"\",\"\"\"\"password\"\"\"\":\"\"\"\"test123\"\"\"\"}')",
+      "Bash(npx tsc:*)",
+      "Bash(npm test:*)",
+      "Bash(nvm install:*)",
+      "Bash(nvm use:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npx playwright:*)",
+      "Bash(node -e \":*)",
+      "Bash(npx tsx -e \":*)",
+      "Bash(npx tsx:*)",
+      "Bash(grep -rl \"from ''../types''\" /c/Users/eliyam/Desktop/zbite/server/src/models/)",
+      "Bash(for f:*)",
+      "Bash(do)",
+      "Bash(sed -i \"s|from ''../types''|from ''../shared/types''|g\" \"$f\")",
+      "Bash(done)",
+      "mcp__Claude_Preview__preview_start"
+    ],
+    "defaultMode": "bypassPermissions"
+  },
+  "defaultMode": "bypassPermissions"
+}

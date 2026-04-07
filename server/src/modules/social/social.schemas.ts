@@ -1,0 +1,62 @@
+import { z } from 'zod';
+
+// ---------------------------------------------------------------------------
+// Param schemas (route params)
+// ---------------------------------------------------------------------------
+
+/** Schema for routes that require a recipeId param. */
+export const RecipeIdParamsSchema = z.object({
+  recipeId: z.string().min(1),
+});
+export type RecipeIdParams = z.infer<typeof RecipeIdParamsSchema>;
+
+/** Schema for routes that require a userId param. */
+export const UserIdParamsSchema = z.object({
+  userId: z.string().min(1),
+});
+export type UserIdParams = z.infer<typeof UserIdParamsSchema>;
+
+// ---------------------------------------------------------------------------
+// Body schemas
+// ---------------------------------------------------------------------------
+
+/** Schema for creating a comment. */
+export const CreateCommentBodySchema = z.object({
+  text: z.string().trim().min(1, 'Comment text is required').max(1000),
+});
+export type CreateCommentBody = z.infer<typeof CreateCommentBodySchema>;
+
+/** Schema for submitting a rating (1-5 stars). */
+export const RatingBodySchema = z.object({
+  stars: z.number().int().min(1).max(5),
+});
+export type RatingBody = z.infer<typeof RatingBodySchema>;
+
+/** Schema for bulk-checking like/save status on a list of recipe IDs. */
+export const BulkStatusBodySchema = z.object({
+  recipeIds: z.array(z.string().min(1)).min(1).max(100),
+});
+export type BulkStatusBody = z.infer<typeof BulkStatusBodySchema>;
+
+/** Schema for marking notifications as read (specific IDs or all). */
+export const NotificationReadBodySchema = z.object({
+  ids: z.array(z.string().min(1)).optional(),
+});
+export type NotificationReadBody = z.infer<typeof NotificationReadBodySchema>;
+
+// ---------------------------------------------------------------------------
+// Query schemas
+// ---------------------------------------------------------------------------
+
+/** Schema for paginated queries. */
+export const PaginationQuerySchema = z.object({
+  page: z.string().optional(),
+  limit: z.string().optional(),
+});
+export type PaginationQuery = z.infer<typeof PaginationQuerySchema>;
+
+/** Schema for saved recipes query (with optional category filter). */
+export const SavedRecipesQuerySchema = PaginationQuerySchema.extend({
+  category: z.string().optional(),
+});
+export type SavedRecipesQuery = z.infer<typeof SavedRecipesQuerySchema>;

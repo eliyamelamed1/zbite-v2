@@ -1,0 +1,23 @@
+.page { max-width: var(--max-width); margin: 0 auto; padding: 24px; }
+.title { font-family: var(--font-heading); font-size: 36px; margin-bottom: 4px; }
+.subtitle { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 20px; line-height: 1.5; max-width: 600px; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.card { background: var(--color-card); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+.cardImage { width: 100%; height: 200px; object-fit: cover; position: relative; }
+.bookmarkIcon { position: absolute; top: 10px; right: 10px; font-size: 20px; }
+.diffBadge { position: absolute; bottom: 10px; left: 10px; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.easy { background: #e8f5e9; color: #2e7d32; }
+.medium { background: #fff3e0; color: #e65100; }
+.hard { background: #fbe9e7; color: #c62828; }
+.cardBody { padding: 12px; }
+.cardTitle { font-family: var(--font-heading); font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.cardAuthor { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; }
+.cardMeta { display: flex; gap: 8px; font-size: 12px; color: var(--color-text-secondary); }
+.stars { color: var(--color-secondary); }
+.emptyCard { background: var(--color-card); border-radius: var(--radius-card); border: 2px dashed var(--color-border); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 280px; cursor: pointer; color: var(--color-text-secondary); }
+.emptyIcon { font-size: 32px; margin-bottom: 8px; }
+.emptyText { font-size: 13px; }
+.loading { text-align: center; padding: 60px; color: var(--color-text-secondary); }
+@media (max-width: 1024px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .page { padding: 16px; } .grid { grid-template-columns: 1fr; } .title { font-size: 28px; } }

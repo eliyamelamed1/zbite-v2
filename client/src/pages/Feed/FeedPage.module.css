@@ -1,0 +1,155 @@
+.page {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0;
+}
+
+.desktopLayout {
+  display: flex;
+  gap: 28px;
+  padding: 24px;
+}
+
+.sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 84px;
+  align-self: flex-start;
+}
+
+.sidebarHeading {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+}
+
+.sidebarLink {
+  display: block;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+}
+
+.sidebarLink:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.sidebarLinkActive {
+  background: var(--color-bg);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.center {
+  flex: 1;
+  max-width: 600px;
+}
+
+.rightSidebar {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: 84px;
+  align-self: flex-start;
+}
+
+/* Mobile tabs */
+.mobileTabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-card);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobileTab {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+
+.mobileTabActive {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: 600;
+}
+
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--color-text-secondary);
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.emptyTitle {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.emptyText {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-bottom: 20px;
+}
+
+.emptyBtn {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: var(--radius-btn);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 768px) {
+  .desktopLayout {
+    display: none;
+  }
+
+  .page {
+    padding: 0;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobileTabs {
+    display: none;
+  }
+}

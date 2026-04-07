@@ -1,0 +1,133 @@
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.authorRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-border);
+  cursor: pointer;
+}
+
+.authorInfo {
+  flex: 1;
+}
+
+.authorName {
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.authorName:hover {
+  color: var(--color-primary);
+}
+
+.timeAgo {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+}
+
+.image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.heartOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 80px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.heartOverlayShow {
+  animation: heartBurst 0.8s ease forwards;
+}
+
+@keyframes heartBurst {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+  30% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  70% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+.body {
+  padding: 0 16px 16px;
+}
+
+.likesCount {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+.title:hover {
+  color: var(--color-primary);
+}
+
+.description {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  padding: 4px 10px;
+  border-radius: 16px;
+}
+
+@media (max-width: 768px) {
+  .card {
+    border-radius: 0;
+    box-shadow: none;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 0;
+  }
+}

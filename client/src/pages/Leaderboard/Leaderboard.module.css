@@ -1,0 +1,30 @@
+.page { max-width: var(--max-width); margin: 0 auto; padding: 32px 24px; }
+.header { text-align: center; margin-bottom: 32px; }
+.title { font-family: var(--font-heading); font-size: 36px; margin-bottom: 8px; }
+.subtitle { font-size: 14px; color: var(--color-text-secondary); max-width: 500px; margin: 0 auto 20px; line-height: 1.5; }
+.periodTabs { display: flex; gap: 8px; justify-content: center; }
+.periodTab { padding: 7px 20px; border-radius: 24px; border: 1.5px solid var(--color-border); background: transparent; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: var(--font-body); color: var(--color-text-secondary); }
+.periodTabActive { background: var(--color-primary); border-color: var(--color-primary); color: white; }
+.podium { display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-bottom: 40px; }
+.podiumItem { text-align: center; }
+.podiumAvatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background: var(--color-border); margin: 0 auto 8px; border: 3px solid var(--color-border); }
+.podiumFirst .podiumAvatar { width: 100px; height: 100px; border-color: var(--color-secondary); }
+.podiumRank { font-size: 18px; font-weight: 700; color: var(--color-secondary); margin-bottom: 4px; }
+.podiumName { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+.podiumBio { font-size: 12px; color: var(--color-text-secondary); max-width: 180px; margin: 0 auto 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.podiumStats { font-size: 12px; color: var(--color-text-secondary); }
+.podiumFollowBtn { margin-top: 8px; padding: 6px 20px; border-radius: var(--radius-btn); border: 1.5px solid var(--color-primary); background: transparent; color: var(--color-primary); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font-body); }
+.listTitle { font-family: var(--font-heading); font-size: 22px; margin-bottom: 16px; }
+.table { width: 100%; }
+.row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--color-border); }
+.rank { width: 30px; font-weight: 700; color: var(--color-text-secondary); font-size: 16px; }
+.rowAvatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: var(--color-border); }
+.rowInfo { flex: 1; min-width: 0; }
+.rowName { font-weight: 600; font-size: 14px; }
+.rowBio { font-size: 12px; color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rowStat { font-size: 13px; color: var(--color-text-secondary); text-align: center; width: 70px; flex-shrink: 0; }
+.rowFollowBtn { padding: 5px 16px; border-radius: var(--radius-btn); border: 1.5px solid var(--color-primary); background: transparent; color: var(--color-primary); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font-body); flex-shrink: 0; }
+.rowFollowingBtn { composes: rowFollowBtn; background: var(--color-primary); color: white; }
+.loadMore { display: block; margin: 24px auto; padding: 10px 28px; border: 2px solid var(--color-primary); background: transparent; color: var(--color-primary); border-radius: var(--radius-btn); font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font-body); }
+.loading { text-align: center; padding: 60px; color: var(--color-text-secondary); }
+@media (max-width: 768px) { .podium { gap: 12px; } .podiumAvatar { width: 60px; height: 60px; } .podiumFirst .podiumAvatar { width: 80px; height: 80px; } .rowStat { display: none; } }
