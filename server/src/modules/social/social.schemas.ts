@@ -16,6 +16,18 @@ export const UserIdParamsSchema = z.object({
 });
 export type UserIdParams = z.infer<typeof UserIdParamsSchema>;
 
+/** Schema for routes that require a commentId param. */
+export const CommentIdParamsSchema = z.object({
+  commentId: z.string().min(1),
+});
+export type CommentIdParams = z.infer<typeof CommentIdParamsSchema>;
+
+/** Schema for routes that require a notificationId param. */
+export const NotificationIdParamsSchema = z.object({
+  notificationId: z.string().min(1),
+});
+export type NotificationIdParams = z.infer<typeof NotificationIdParamsSchema>;
+
 // ---------------------------------------------------------------------------
 // Body schemas
 // ---------------------------------------------------------------------------
@@ -23,6 +35,7 @@ export type UserIdParams = z.infer<typeof UserIdParamsSchema>;
 /** Schema for creating a comment. */
 export const CreateCommentBodySchema = z.object({
   text: z.string().trim().min(1, 'Comment text is required').max(1000),
+  parentCommentId: z.string().min(1).optional(),
 });
 export type CreateCommentBody = z.infer<typeof CreateCommentBodySchema>;
 

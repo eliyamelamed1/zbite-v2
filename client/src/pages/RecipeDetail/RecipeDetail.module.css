@@ -37,5 +37,7 @@
 .cookModeBar { position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 20px; background: var(--color-card); border-top: 1px solid var(--color-border); z-index: 50; display: flex; justify-content: center; }
 .cookModeBtn { width: 100%; max-width: 600px; padding: 14px; background: var(--color-primary); color: white; border: none; border-radius: var(--radius-btn); font-size: 16px; font-weight: 600; cursor: pointer; font-family: var(--font-body); transition: background 0.2s; }
 .cookModeBtn:hover { background: var(--color-primary-hover); }
+.shoppingListBtn { display: block; width: 100%; padding: 10px; margin: 12px 0; background: transparent; border: 1.5px solid var(--color-primary); color: var(--color-primary); border-radius: var(--radius-btn); font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font-body); transition: all 0.2s; }
+.shoppingListBtn:hover { background: var(--color-primary); color: white; }
 .loading { text-align: center; padding: 80px; color: var(--color-text-secondary); }
 @media (max-width: 768px) { .coverImage { height: 250px; } .title { font-size: 26px; } .nutritionGrid { grid-template-columns: repeat(2, 1fr); } .cookModeBar { bottom: 64px; } }

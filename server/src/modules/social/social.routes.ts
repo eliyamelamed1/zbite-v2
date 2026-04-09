@@ -21,7 +21,9 @@ export async function likeRoutes(fastify: FastifyInstance): Promise<void> {
 /** Comment routes — mounted at /api/comments. */
 export async function commentRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get('/:recipeId', SocialController.getComments);
+  fastify.get('/:recipeId/:commentId/replies', SocialController.getCommentReplies);
   fastify.post('/:recipeId', { preHandler: [fastify.authenticate] }, SocialController.createComment);
+  fastify.delete('/:commentId', { preHandler: [fastify.authenticate] }, SocialController.deleteComment);
 }
 
 /** Follow routes — mounted at /api/follows. */
@@ -53,4 +55,5 @@ export async function notificationRoutes(fastify: FastifyInstance): Promise<void
   fastify.get('/', { preHandler: [fastify.authenticate] }, SocialController.getNotifications);
   fastify.get('/unread-count', { preHandler: [fastify.authenticate] }, SocialController.getUnreadCount);
   fastify.put('/read', { preHandler: [fastify.authenticate] }, SocialController.markRead);
+  fastify.delete('/:notificationId', { preHandler: [fastify.authenticate] }, SocialController.deleteNotification);
 }

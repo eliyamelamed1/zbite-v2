@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getExploreFeed } from '../../features/recipes/api/recipes';
+import toast from 'react-hot-toast';
+
+import { getExploreFeed, bulkSaveStatus, saveRecipe, unsaveRecipe } from '../../features/recipes/api/recipes';
+import { useAuth } from '../../features/auth/hooks/useAuth';
 import CategoryChips from '../../components/(ui)/forms/CategoryChips/CategoryChips';
 import ExploreCard from '../../features/recipes/components/ExploreCard/ExploreCard';
 import { Recipe } from '../../types';
@@ -8,34 +11,72 @@ import styles from './Explore.module.css';
 type SortOption = 'trending' | 'recent' | 'topRated' | 'quick';
 
 export default function Explore() {
+  const { user } = useAuth();
   const [sort, setSort] = useState<SortOption>('trending');
   const [category, setCategory] = useState('All');
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [savedMap, setSavedMap] = useState<Record<string, boolean>>({});
+
+  /** Fetch saved status for a batch of recipe IDs. */
+  const fetchSavedStatus = useCallback(async (recipeList: Recipe[]) => {
+    if (!user || recipeList.length === 0) return;
+    try {
+      const ids = recipeList.map((r) => r._id);
+      const res = await bulkSaveStatus(ids);
+      setSavedMap((prev) => ({ ...prev, ...res.data.savedMap }));
+    } catch {
+      // Saved status is non-critical — fail silently
+    }
+  }, [user]);
 
   const fetchRecipes = useCallback(async (pageNum: number) => {
     setLoading(true);
     try {
       const res = await getExploreFeed(pageNum, sort, category !== 'All' ? category : undefined);
+      const fetched = res.data.data;
       if (pageNum === 1) {
-        setRecipes(res.data.data);
+        setRecipes(fetched);
       } else {
-        setRecipes((prev) => [...prev, ...res.data.data]);
+        setRecipes((prev) => [...prev, ...fetched]);
       }
       setHasMore(pageNum < res.data.pagination.pages);
+      await fetchSavedStatus(fetched);
     } catch {
+      toast.error('Failed to load recipes');
     } finally {
       setLoading(false);
     }
-  }, [sort, category]);
+  }, [sort, category, fetchSavedStatus]);
 
   useEffect(() => {
     setPage(1);
     setRecipes([]);
     fetchRecipes(1);
   }, [fetchRecipes]);
+
+  const handleToggleSave = async (recipeId: string) => {
+    if (!user) {
+      toast.error('Log in to save recipes');
+      return;
+    }
+    const isCurrentlySaved = savedMap[recipeId] ?? false;
+    // Optimistic update
+    setSavedMap((prev) => ({ ...prev, [recipeId]: !isCurrentlySaved }));
+    try {
+      if (isCurrentlySaved) {
+        await unsaveRecipe(recipeId);
+      } else {
+        await saveRecipe(recipeId);
+      }
+    } catch {
+      // Revert on failure
+      setSavedMap((prev) => ({ ...prev, [recipeId]: isCurrentlySaved }));
+      toast.error('Failed to update save');
+    }
+  };
 
   const handleLoadMore = () => {
     const next = page + 1;
@@ -97,7 +138,12 @@ export default function Explore() {
 
       <div className={styles.masonry}>
         {recipes.map((recipe) => (
-          <ExploreCard key={recipe._id} recipe={recipe} />
+          <ExploreCard
+            key={recipe._id}
+            recipe={recipe}
+            isSaved={savedMap[recipe._id] ?? false}
+            onToggleSave={handleToggleSave}
+          />
         ))}
       </div>
 

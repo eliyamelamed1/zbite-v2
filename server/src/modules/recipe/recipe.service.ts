@@ -1,4 +1,5 @@
 import { RecipeDal } from './recipe.dal';
+import Recipe from '../../models/Recipe';
 import { NotFoundError, ForbiddenError, ValidationError } from '../../shared/errors';
 import { IRecipe, PaginatedResult } from '../../shared/types';
 import { saveFile } from '../../plugins/upload';
@@ -35,6 +36,7 @@ interface FeedOptions {
 interface ExploreFeedOptions extends FeedOptions {
   sort: string;
   category?: string;
+  userId?: string;
 }
 
 /** Uploads step images in-place, mutating the steps array with saved URLs. */
@@ -69,14 +71,19 @@ export const RecipeService = {
       coverImage,
     });
 
-    await RecipeDal.incrementRecipesCount(authorId);
+    // Only increment public recipe count for published recipes (not drafts)
+    if (!body.status || body.status === 'published') {
+      await RecipeDal.incrementRecipesCount(authorId);
+    }
     return recipe;
   },
 
-  /** Get a single recipe by ID. Throws NotFoundError when missing. */
+  /** Get a single recipe by ID. Increments viewsCount. Throws NotFoundError when missing. */
   async getRecipe(recipeId: string): Promise<IRecipe> {
     const recipe = await RecipeDal.findById(recipeId);
     if (!recipe) throw new NotFoundError('Recipe', recipeId);
+    // Fire-and-forget view count increment — non-blocking
+    Recipe.findByIdAndUpdate(recipeId, { $inc: { viewsCount: 1 } }).catch(() => {});
     return recipe;
   },
 
@@ -117,8 +124,15 @@ export const RecipeService = {
     await RecipeDal.decrementRecipesCount(authorId);
   },
 
-  /** Get the explore feed with optional category and sort filters. */
+  /** Get the explore feed with optional category, sort filters, and interest personalization. */
   async getExploreFeed(options: ExploreFeedOptions): Promise<PaginatedResult<IRecipe>> {
+    // If authenticated, fetch user interests for personalization
+    if (options.userId) {
+      const interests = await RecipeDal.getUserInterests(options.userId);
+      if (interests.length > 0) {
+        return RecipeDal.personalizedExploreFeed({ ...options, interests });
+      }
+    }
     return RecipeDal.exploreFeed(options);
   },
 
@@ -128,6 +142,14 @@ export const RecipeService = {
     options: FeedOptions,
   ): Promise<PaginatedResult<IRecipe>> {
     return RecipeDal.followingFeed(userId, options);
+  },
+
+  /** Get draft recipes for the authenticated user. */
+  async getDrafts(
+    userId: string,
+    options: FeedOptions,
+  ): Promise<PaginatedResult<IRecipe>> {
+    return RecipeDal.findDraftsByAuthor(userId, options);
   },
 
   /** Get all recipes authored by a specific user. */

@@ -36,6 +36,7 @@ export const CreateRecipeBodySchema = z.object({
   ingredients: z.array(IngredientSchema).min(1),
   steps: z.array(StepSchema).min(1),
   nutrition: NutritionSchema.optional(),
+  status: z.enum(['draft', 'published']).optional().default('published'),
 });
 export type CreateRecipeBody = z.infer<typeof CreateRecipeBodySchema>;
 

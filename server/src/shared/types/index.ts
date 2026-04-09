@@ -34,6 +34,7 @@ export interface IRecipe extends Document {
   likesCount: number;
   commentsCount: number;
   savesCount: number;
+  reportsCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -66,6 +67,8 @@ export interface IComment extends Document {
   user: Types.ObjectId | IUser;
   recipe: Types.ObjectId;
   text: string;
+  parentComment?: Types.ObjectId;
+  repliesCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -73,7 +76,7 @@ export interface IComment extends Document {
 export interface INotification extends Document {
   recipient: Types.ObjectId;
   sender: Types.ObjectId | IUser;
-  type: 'like' | 'follow' | 'save' | 'rate' | 'comment' | 'mention';
+  type: 'like' | 'follow' | 'save' | 'rate' | 'comment' | 'mention' | 'cooking_report';
   recipe?: Types.ObjectId | IRecipe;
   read: boolean;
   createdAt: Date;

@@ -3,7 +3,7 @@ import Notification from '../../models/Notification';
 interface NotifyParams {
   recipient: string;
   sender: string;
-  type: 'like' | 'follow' | 'save' | 'rate' | 'comment' | 'mention';
+  type: 'like' | 'follow' | 'save' | 'rate' | 'comment' | 'mention' | 'cooking_report';
   recipe?: string;
 }
 

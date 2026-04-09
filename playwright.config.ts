@@ -1,11 +1,12 @@
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './e2e/tests',
+  testDir: './client/src',
+  testMatch: '**/e2e/**/*.spec.ts',
   timeout: 60_000,
   expect: { timeout: 10_000 },
   fullyParallel: true,
-  workers: process.env.CI ? 2 : 4,
+  workers: process.env.CI ? 1 : 4,
   retries: process.env.CI ? 1 : 0,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
@@ -17,10 +18,18 @@ export default defineConfig({
   projects: [
     { name: 'chromium', use: { browserName: 'chromium' } },
   ],
-  webServer: {
-    command: 'npm run dev',
-    port: 5173,
-    reuseExistingServer: true,
-    timeout: 30_000,
-  },
+  webServer: [
+    {
+      command: 'npm run server',
+      url: 'http://localhost:5000/api/health',
+      reuseExistingServer: true,
+      timeout: 30_000,
+    },
+    {
+      command: 'npm run client',
+      port: 5173,
+      reuseExistingServer: true,
+      timeout: 30_000,
+    },
+  ],
 });

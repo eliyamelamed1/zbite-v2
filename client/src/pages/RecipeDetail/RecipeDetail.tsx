@@ -13,7 +13,11 @@ import NutritionSection from '../../features/recipes/components/NutritionSection
 import IngredientsSection from '../../features/recipes/components/IngredientsSection/IngredientsSection';
 import StepsSection from '../../features/recipes/components/StepsSection/StepsSection';
 import CookMode from '../../features/recipes/components/CookMode/CookMode';
+import ServingsAdjuster from '../../features/recipes/components/ServingsAdjuster/ServingsAdjuster';
+import { scaleIngredients } from '../../features/recipes/utils/scale-ingredients';
+import { addRecipeToShoppingList } from '../../features/shopping-list/api/shopping-list';
 import { Recipe } from '../../types';
+import toast from 'react-hot-toast';
 import styles from './RecipeDetail.module.css';
 
 export default function RecipeDetail(): JSX.Element | null {
@@ -26,6 +30,7 @@ export default function RecipeDetail(): JSX.Element | null {
   const [saved, setSaved] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [cookMode, setCookMode] = useState(false);
+  const [targetServings, setTargetServings] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,6 +39,7 @@ export default function RecipeDetail(): JSX.Element | null {
       try {
         const res = await getRecipe(id);
         setRecipe(res.data.recipe);
+        setTargetServings(res.data.recipe.servings);
         if (user) {
           const [ratingRes, likeRes, saveRes] = await Promise.all([
             getMyRating(id).catch(() => ({ data: { rating: 0 } })),
@@ -48,7 +54,7 @@ export default function RecipeDetail(): JSX.Element | null {
             setIsFollowing(followRes.data.following);
           }
         }
-      } catch (err) { console.error(err); navigate('/explore'); }
+      } catch { toast.error('Recipe not found'); navigate('/explore'); }
       finally { setLoading(false); }
     };
     load();
@@ -105,7 +111,25 @@ export default function RecipeDetail(): JSX.Element | null {
           </div>
         )}
         <NutritionSection nutrition={recipe.nutrition} />
-        <IngredientsSection ingredients={recipe.ingredients} />
+        <ServingsAdjuster servings={targetServings} onChange={setTargetServings} />
+        <IngredientsSection
+          ingredients={scaleIngredients(recipe.ingredients, recipe.servings, targetServings)}
+        />
+        {user && (
+          <button
+            className={styles.shoppingListBtn}
+            onClick={async () => {
+              try {
+                await addRecipeToShoppingList(recipe._id);
+                toast.success('Added to shopping list!');
+              } catch {
+                toast.error('Failed to add to shopping list');
+              }
+            }}
+          >
+            🛒 Add to Shopping List
+          </button>
+        )}
         <StepsSection steps={recipe.steps} />
         <CommentSection recipeId={recipe._id} />
         {isOwner && (

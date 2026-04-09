@@ -1,0 +1,52 @@
+.adjuster {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border);
+  background: transparent;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  font-family: var(--font-body);
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.count {
+  font-size: 18px;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+}

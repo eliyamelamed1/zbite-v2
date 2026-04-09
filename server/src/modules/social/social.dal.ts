@@ -48,8 +48,13 @@ export const SocialDal = {
   // ---- Comments ----
 
   /** Create a comment on a recipe. */
-  async createComment(userId: string, recipeId: string, text: string): Promise<IComment> {
-    const comment = await Comment.create({ user: userId, recipe: recipeId, text });
+  async createComment(userId: string, recipeId: string, text: string, parentCommentId?: string): Promise<IComment> {
+    const comment = await Comment.create({
+      user: userId,
+      recipe: recipeId,
+      text,
+      ...(parentCommentId ? { parentComment: parentCommentId } : {}),
+    });
     await comment.populate('user', 'username avatar');
     return comment;
   },
@@ -69,6 +74,38 @@ export const SocialDal = {
       Comment.countDocuments({ recipe: recipeId }),
     ]);
     return { data, total };
+  },
+
+  /** Find a comment by ID. */
+  async findCommentById(commentId: string): Promise<IComment | null> {
+    return Comment.findById(commentId);
+  },
+
+  /** Delete a comment by ID. Returns the deleted doc or null. */
+  async deleteComment(commentId: string): Promise<IComment | null> {
+    return Comment.findByIdAndDelete(commentId);
+  },
+
+  /** Find replies to a specific comment (paginated, oldest first). */
+  async findRepliesByComment(
+    commentId: string,
+    skip: number,
+    limit: number,
+  ): Promise<{ data: IComment[]; total: number }> {
+    const [data, total] = await Promise.all([
+      Comment.find({ parentComment: commentId })
+        .sort({ createdAt: 1 })
+        .skip(skip)
+        .limit(limit)
+        .populate('user', 'username avatar'),
+      Comment.countDocuments({ parentComment: commentId }),
+    ]);
+    return { data, total };
+  },
+
+  /** Increment repliesCount on a comment. */
+  async incrementCommentRepliesCount(commentId: string): Promise<void> {
+    await Comment.findByIdAndUpdate(commentId, { $inc: { repliesCount: 1 } });
   },
 
   // ---- Follows ----
@@ -226,6 +263,16 @@ export const SocialDal = {
     );
   },
 
+  /** Find a notification by ID. */
+  async findNotificationById(notificationId: string): Promise<INotification | null> {
+    return Notification.findById(notificationId);
+  },
+
+  /** Delete a notification by ID. Returns the deleted doc or null. */
+  async deleteNotification(notificationId: string): Promise<INotification | null> {
+    return Notification.findByIdAndDelete(notificationId);
+  },
+
   // ---- Recipe count helpers ----
 
   /** Increment or decrement a counter field on a Recipe. Returns the updated recipe. */
@@ -248,5 +295,10 @@ export const SocialDal = {
   /** Increment or decrement a counter field on a User. */
   async incrementUserCounter(userId: string, field: string, amount: number): Promise<IUser | null> {
     return User.findByIdAndUpdate(userId, { $inc: { [field]: amount } }, { new: true });
+  },
+
+  /** Find a user by their username (case-insensitive). */
+  async findUserByUsername(username: string): Promise<IUser | null> {
+    return User.findOne({ username: new RegExp(`^${username}$`, 'i') });
   },
 };

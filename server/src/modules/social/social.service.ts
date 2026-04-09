@@ -1,6 +1,6 @@
 import { SocialDal } from './social.dal';
 import { createNotification } from '../../shared/utils/notify';
-import { ConflictError, ValidationError } from '../../shared/errors';
+import { ConflictError, ForbiddenError, NotFoundError, ValidationError } from '../../shared/errors';
 import { buildPagination } from '../../shared/utils/pagination';
 
 import type { IComment, INotification, PaginatedResult } from '../../shared/types';
@@ -65,12 +65,18 @@ export const SocialService = {
 
   // ---- Comments ----
 
-  /** Create a comment on a recipe. */
-  async createComment(userId: string, recipeId: string, text: string): Promise<{ comment: IComment }> {
+  /** Create a comment on a recipe, optionally as a reply to another comment. */
+  async createComment(userId: string, recipeId: string, text: string, parentCommentId?: string): Promise<{ comment: IComment }> {
     const trimmedText = text.trim();
     if (!trimmedText) throw new ValidationError('Comment text is required');
 
-    const comment = await SocialDal.createComment(userId, recipeId, trimmedText);
+    // Validate parent comment exists when replying
+    if (parentCommentId) {
+      const parentComment = await SocialDal.findCommentById(parentCommentId);
+      if (!parentComment) throw new NotFoundError('Comment', parentCommentId);
+    }
+
+    const comment = await SocialDal.createComment(userId, recipeId, trimmedText, parentCommentId);
     const recipe = await SocialDal.incrementRecipeCounter(recipeId, 'commentsCount', 1);
 
     if (recipe) {
@@ -82,13 +88,84 @@ export const SocialService = {
       });
     }
 
+    // Notify parent comment author when replying
+    if (parentCommentId) {
+      await SocialDal.incrementCommentRepliesCount(parentCommentId);
+
+      const parentComment = await SocialDal.findCommentById(parentCommentId);
+      if (parentComment) {
+        const parentAuthorId = parentComment.user.toString();
+        // Skip notification if replying to own comment
+        if (parentAuthorId !== userId) {
+          await createNotification({
+            recipient: parentAuthorId,
+            sender: userId,
+            type: 'comment',
+            recipe: recipeId,
+          });
+        }
+      }
+    }
+
+    // Parse @mentions from comment text
+    const mentionPattern = /@(\w+)/g;
+    const mentionedUsernames = [...new Set(
+      Array.from(trimmedText.matchAll(mentionPattern), (match) => match[1]),
+    )];
+
+    if (mentionedUsernames.length > 0) {
+      await this.notifyMentionedUsers(userId, recipeId, mentionedUsernames);
+    }
+
     return { comment };
+  },
+
+  /** Send mention notifications to all valid @mentioned users in a comment. */
+  async notifyMentionedUsers(
+    senderId: string,
+    recipeId: string,
+    usernames: readonly string[],
+  ): Promise<void> {
+    for (const username of usernames) {
+      const mentionedUser = await SocialDal.findUserByUsername(username);
+      if (!mentionedUser) continue;
+
+      const mentionedUserId = mentionedUser._id.toString();
+      // Skip self-mentions
+      if (mentionedUserId === senderId) continue;
+
+      await createNotification({
+        recipient: mentionedUserId,
+        sender: senderId,
+        type: 'mention',
+        recipe: recipeId,
+      });
+    }
+  },
+
+  /** Get paginated replies for a comment. */
+  async getCommentReplies(commentId: string, page: number, limit: number, skip: number): Promise<PaginatedResult<IComment>> {
+    const { data, total } = await SocialDal.findRepliesByComment(commentId, skip, limit);
+    return { data, pagination: buildPagination(page, limit, total) };
   },
 
   /** Get paginated comments for a recipe. */
   async getComments(recipeId: string, page: number, limit: number, skip: number): Promise<PaginatedResult<IComment>> {
     const { data, total } = await SocialDal.findCommentsByRecipe(recipeId, skip, limit);
     return { data, pagination: buildPagination(page, limit, total) };
+  },
+
+  /** Delete a comment. Only the comment author may delete it. */
+  async deleteComment(userId: string, commentId: string): Promise<{ deleted: boolean }> {
+    const comment = await SocialDal.findCommentById(commentId);
+    if (!comment) throw new NotFoundError('Comment', commentId);
+    if (comment.user.toString() !== userId) {
+      throw new ForbiddenError('Cannot delete another user\'s comment');
+    }
+
+    await SocialDal.deleteComment(commentId);
+    await SocialDal.incrementRecipeCounter(comment.recipe.toString(), 'commentsCount', -1);
+    return { deleted: true };
   },
 
   // ---- Follows ----
@@ -281,5 +358,17 @@ export const SocialService = {
   async markRead(recipientId: string, ids?: readonly string[]): Promise<{ success: boolean }> {
     await SocialDal.markNotificationsRead(recipientId, ids);
     return { success: true };
+  },
+
+  /** Delete a notification. Only the recipient may delete it. */
+  async deleteNotification(recipientId: string, notificationId: string): Promise<{ deleted: boolean }> {
+    const notification = await SocialDal.findNotificationById(notificationId);
+    if (!notification) throw new NotFoundError('Notification', notificationId);
+    if (notification.recipient.toString() !== recipientId) {
+      throw new ForbiddenError('Cannot delete another user\'s notification');
+    }
+
+    await SocialDal.deleteNotification(notificationId);
+    return { deleted: true };
   },
 };

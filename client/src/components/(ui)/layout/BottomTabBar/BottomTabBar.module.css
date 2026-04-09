@@ -1,0 +1,88 @@
+.tabBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--color-card);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 64px;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: color 0.2s;
+  position: relative;
+}
+
+.tabActive {
+  color: var(--color-primary);
+}
+
+.tabIcon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.createTab {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  top: -12px;
+}
+
+.createCircle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(232, 93, 44, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.createCircle:active {
+  transform: scale(0.95);
+}
+
+.createIcon {
+  font-size: 28px;
+  color: white;
+  line-height: 1;
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+@media (min-width: 769px) {
+  .tabBar {
+    display: none;
+  }
+}

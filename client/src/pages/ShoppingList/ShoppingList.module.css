@@ -1,0 +1,141 @@
+.page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  text-decoration: underline;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--radius-card);
+  transition: background 0.15s;
+}
+
+.item:hover {
+  background: var(--color-hover);
+}
+
+.itemChecked {
+  opacity: 0.5;
+}
+
+.itemChecked .itemName,
+.itemChecked .itemAmount {
+  text-decoration: line-through;
+}
+
+.checkbox {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  min-width: 28px;
+  color: var(--color-text);
+}
+
+.itemInfo {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.itemAmount {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.itemName {
+  font-size: 14px;
+}
+
+.itemSource {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  width: 100%;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.item:hover .removeBtn {
+  opacity: 1;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 16px 12px 8px;
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.emptyText {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.emptyHint {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.loading {
+  text-align: center;
+  padding: 60px;
+  color: var(--color-text-secondary);
+}

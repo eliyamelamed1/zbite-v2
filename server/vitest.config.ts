@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     globals: true,
     root: './src',
-    fileParallelism: false,
+    fileParallelism: true,
     testTimeout: 30000,
     hookTimeout: 30000,
   },

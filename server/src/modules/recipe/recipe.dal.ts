@@ -28,6 +28,10 @@ interface ExploreFeedOptions {
   category?: string;
 }
 
+interface PersonalizedExploreFeedOptions extends ExploreFeedOptions {
+  interests: readonly string[];
+}
+
 interface PaginatedFeedOptions {
   page: number;
   limit: number;
@@ -75,10 +79,10 @@ export const RecipeDal = {
     return { data, pagination: buildPagination(page, limit, total) };
   },
 
-  /** Fetch the explore feed with optional category and sort filters. */
+  /** Fetch the explore feed with optional category and sort filters. Only published recipes. */
   async exploreFeed(options: ExploreFeedOptions): Promise<PaginatedResult<IRecipe>> {
     const { page, limit, skip, sort, category } = options;
-    const filter: Record<string, unknown> = {};
+    const filter: Record<string, unknown> = { status: { $ne: 'draft' } };
 
     if (category && category !== 'All') {
       filter.category = category;
@@ -111,7 +115,7 @@ export const RecipeDal = {
     const follows = await Follow.find({ follower: userId }).select('following');
     const followingIds = follows.map((follow) => follow.following);
 
-    const filter = { author: { $in: followingIds } };
+    const filter = { author: { $in: followingIds }, status: { $ne: 'draft' } };
 
     const [data, total] = await Promise.all([
       Recipe.find(filter)
@@ -147,5 +151,93 @@ export const RecipeDal = {
   /** Decrement the recipesCount on the author's User document. */
   async decrementRecipesCount(userId: string): Promise<void> {
     await User.findByIdAndUpdate(userId, { $inc: { recipesCount: -1 } });
+  },
+
+  /** Find draft recipes by a specific author. */
+  async findDraftsByAuthor(
+    userId: string,
+    options: PaginatedFeedOptions,
+  ): Promise<PaginatedResult<IRecipe>> {
+    const { page, limit, skip } = options;
+    const filter = { author: userId, status: 'draft' };
+
+    const [data, total] = await Promise.all([
+      Recipe.find(filter)
+        .sort({ updatedAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate('author', AUTHOR_SUMMARY_FIELDS),
+      Recipe.countDocuments(filter),
+    ]);
+
+    return { data, pagination: buildPagination(page, limit, total) };
+  },
+
+  /** Fetch user interests for personalization. Returns empty array if none. */
+  async getUserInterests(userId: string): Promise<string[]> {
+    const user = await User.findById(userId).select('interests');
+    return user?.interests ?? [];
+  },
+
+  /**
+   * Personalized explore feed — shows interest-matching recipes first,
+   * then backfills with non-matching recipes to fill the page.
+   */
+  async personalizedExploreFeed(
+    options: PersonalizedExploreFeedOptions,
+  ): Promise<PaginatedResult<IRecipe>> {
+    const { page, limit, skip, sort, category, interests } = options;
+    const baseFilter: Record<string, unknown> = {};
+
+    if (category && category !== 'All') {
+      baseFilter.category = category;
+    }
+    if (sort === 'quick') {
+      baseFilter.cookingTime = { $lte: QUICK_MEAL_MAX_MINUTES };
+    }
+
+    const sortOption = SORT_OPTIONS[sort] ?? SORT_OPTIONS.recent;
+
+    // If a specific category is selected, interests don't matter — just use that category
+    if (category && category !== 'All') {
+      return this.exploreFeed(options);
+    }
+
+    // Fetch interest-matching recipes first, then non-matching
+    const interestFilter = { ...baseFilter, category: { $in: interests } };
+    const nonInterestFilter = { ...baseFilter, category: { $nin: interests } };
+
+    const [interestCount, nonInterestCount] = await Promise.all([
+      Recipe.countDocuments(interestFilter),
+      Recipe.countDocuments(nonInterestFilter),
+    ]);
+
+    const total = interestCount + nonInterestCount;
+
+    // Determine how many interest-matching recipes to show on this page
+    const interestSkip = Math.min(skip, interestCount);
+    const interestLimit = Math.min(limit, Math.max(0, interestCount - interestSkip));
+    const nonInterestSkip = Math.max(0, skip - interestCount);
+    const nonInterestLimit = limit - interestLimit;
+
+    const [interestRecipes, nonInterestRecipes] = await Promise.all([
+      interestLimit > 0
+        ? Recipe.find(interestFilter)
+            .sort(sortOption)
+            .skip(interestSkip)
+            .limit(interestLimit)
+            .populate('author', AUTHOR_SUMMARY_FIELDS)
+        : Promise.resolve([]),
+      nonInterestLimit > 0
+        ? Recipe.find(nonInterestFilter)
+            .sort(sortOption)
+            .skip(nonInterestSkip)
+            .limit(nonInterestLimit)
+            .populate('author', AUTHOR_SUMMARY_FIELDS)
+        : Promise.resolve([]),
+    ]);
+
+    const data = [...interestRecipes, ...nonInterestRecipes];
+    return { data, pagination: buildPagination(page, limit, total) };
   },
 };

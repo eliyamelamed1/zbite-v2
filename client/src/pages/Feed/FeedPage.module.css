@@ -1,82 +1,25 @@
+/* ========================================
+   FeedPage — Mobile-first styles
+   ======================================== */
+
 .page {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0;
 }
 
-.desktopLayout {
+/* ---------- Horizontal tabs (shared mobile + desktop) ---------- */
+
+.tabs {
   display: flex;
-  gap: 28px;
-  padding: 24px;
-}
-
-.sidebar {
-  width: 200px;
-  flex-shrink: 0;
-  position: sticky;
-  top: 84px;
-  align-self: flex-start;
-}
-
-.sidebarHeading {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--color-text-secondary);
-  margin-bottom: 12px;
-}
-
-.sidebarLink {
-  display: block;
-  padding: 8px 12px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s;
-  margin-bottom: 2px;
-}
-
-.sidebarLink:hover {
-  background: var(--color-bg);
-  color: var(--color-text);
-}
-
-.sidebarLinkActive {
-  background: var(--color-bg);
-  color: var(--color-primary);
-  font-weight: 600;
-}
-
-.center {
-  flex: 1;
-  max-width: 600px;
-}
-
-.rightSidebar {
-  width: 280px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  position: sticky;
-  top: 84px;
-  align-self: flex-start;
-}
-
-/* Mobile tabs */
-.mobileTabs {
-  display: flex;
-  gap: 0;
   border-bottom: 1px solid var(--color-border);
   background: var(--color-card);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.mobileTab {
+.tab {
   flex: 1;
   padding: 12px 16px;
   font-size: 13px;
@@ -91,11 +34,198 @@
   font-family: var(--font-body);
 }
 
-.mobileTabActive {
+.tabActive {
   color: var(--color-primary);
   border-bottom-color: var(--color-primary);
   font-weight: 600;
 }
+
+/* ---------- Mobile content ---------- */
+
+.mobileContent {
+  padding: 16px;
+}
+
+/* ---------- Desktop layout ---------- */
+
+.desktopLayout {
+  display: none;
+}
+
+/* ---------- Feed tab ---------- */
+
+.feedList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ---------- Explore tab ---------- */
+
+.searchBar {
+  margin-bottom: 12px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  font-size: 14px;
+  background: var(--color-bg);
+  outline: none;
+  font-family: var(--font-body);
+}
+
+.searchInput:focus {
+  border-color: var(--color-primary);
+}
+
+.sortPills {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  padding: 7px 18px;
+  border-radius: 24px;
+  border: 1.5px solid var(--color-border);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+
+.pill:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.pillActive {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.chipsWrap {
+  margin-bottom: 16px;
+}
+
+.masonry {
+  columns: 2;
+  column-gap: 12px;
+}
+
+/* ---------- Saved tab ---------- */
+
+.savedGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.savedCard {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.savedCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.savedImageWrap {
+  position: relative;
+}
+
+.savedImage {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.savedBookmark {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+}
+
+.savedBadge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.easy { background: #e8f5e9; color: #2e7d32; }
+.medium { background: #fff3e0; color: #e65100; }
+.hard { background: #fbe9e7; color: #c62828; }
+
+.savedBody {
+  padding: 12px;
+}
+
+.savedTitle {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.savedAuthor {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+
+.savedMeta {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.savedStars {
+  color: var(--color-secondary);
+}
+
+.savedEmptyCard {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  border: 2px dashed var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+}
+
+.savedEmptyIcon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.savedEmptyText {
+  font-size: 13px;
+}
+
+/* ---------- Shared states ---------- */
 
 .loading {
   text-align: center;
@@ -120,7 +250,7 @@
   margin-bottom: 20px;
 }
 
-.emptyBtn {
+.primaryBtn {
   background: var(--color-primary);
   color: white;
   border: none;
@@ -129,27 +259,96 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  font-family: var(--font-body);
 }
 
-.footer {
+.outlineBtn {
+  display: block;
+  margin: 0 auto;
+  padding: 10px 32px;
+  border: 2px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+  border-radius: var(--radius-btn);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all 0.2s;
+}
+
+.outlineBtn:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+.loadMoreWrap {
   text-align: center;
   padding: 20px;
-  font-size: 12px;
-  color: var(--color-text-secondary);
 }
 
-@media (max-width: 768px) {
-  .desktopLayout {
-    display: none;
-  }
-
-  .page {
-    padding: 0;
-  }
-}
+/* ========================================
+   Desktop enhancements (min-width: 769px)
+   ======================================== */
 
 @media (min-width: 769px) {
-  .mobileTabs {
+  .tabs {
+    position: static;
+    max-width: 600px;
+    margin: 0 auto;
+    background: transparent;
+  }
+
+  .mobileContent {
     display: none;
+  }
+
+  .desktopLayout {
+    display: flex;
+    gap: 28px;
+    padding: 24px;
+  }
+
+  .mainContent {
+    flex: 1;
+    max-width: 700px;
+  }
+
+  .rightSidebar {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 84px;
+    align-self: flex-start;
+  }
+
+  .masonry {
+    columns: 3;
+    column-gap: 20px;
+  }
+
+  .savedGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .savedImage {
+    height: 200px;
+  }
+}
+
+/* Tablet tweaks */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .masonry {
+    columns: 2;
+  }
+}
+
+@media (min-width: 1025px) {
+  .savedGrid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

@@ -25,11 +25,14 @@ const recipeSchema = new Schema<IRecipe>(
       fat: { type: Number, default: 0 },
     },
     coverImage: { type: String, required: true },
+    status: { type: String, enum: ['draft', 'published'], default: 'published' },
     averageRating: { type: Number, default: 0 },
     ratingsCount: { type: Number, default: 0 },
     likesCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
     savesCount: { type: Number, default: 0 },
+    reportsCount: { type: Number, default: 0 },
+    viewsCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

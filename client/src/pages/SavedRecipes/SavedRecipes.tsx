@@ -4,6 +4,7 @@ import { getSavedRecipes } from '../../features/recipes/api/recipes';
 import { imageUrl } from '../../utils/imageUrl';
 import CategoryChips from '../../components/(ui)/forms/CategoryChips/CategoryChips';
 import { Recipe } from '../../types';
+import toast from 'react-hot-toast';
 import styles from './SavedRecipes.module.css';
 
 export default function SavedRecipes() {
@@ -17,7 +18,7 @@ export default function SavedRecipes() {
     try {
       const res = await getSavedRecipes(1, category !== 'All' ? category : undefined);
       setRecipes(res.data.data);
-    } catch (err) { console.error(err); } finally { setLoading(false); }
+    } catch { toast.error('Failed to load saved recipes'); } finally { setLoading(false); }
   }, [category]);
 
   useEffect(() => { fetchSaved(); }, [fetchSaved]);

@@ -82,7 +82,7 @@ export const RecipeController = {
     return reply.status(201).send({ recipe });
   },
 
-  /** Handle GET /explore -- public explore feed with filters. */
+  /** Handle GET /explore -- public explore feed with optional personalization. */
   async explore(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const query = ExploreFeedQuerySchema.parse(request.query);
     const { sort, category } = query;
@@ -94,6 +94,7 @@ export const RecipeController = {
       skip,
       sort: sort ?? 'recent',
       category,
+      userId: request.authUser?.id,
     });
 
     return reply.send(result);
@@ -111,6 +112,15 @@ export const RecipeController = {
       paginationOptions,
     );
 
+    return reply.send(result);
+  },
+
+  /** Handle GET /drafts -- draft recipes for the authenticated user. */
+  async drafts(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const paginationOptions = parsePaginationQuery(
+      request.query as { page?: string; limit?: string },
+    );
+    const result = await RecipeService.getDrafts(request.authUser!.id, paginationOptions);
     return reply.send(result);
   },
 

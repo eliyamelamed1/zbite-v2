@@ -8,6 +8,8 @@ import {
   CreateCommentBodySchema,
   RatingBodySchema,
   BulkStatusBodySchema,
+  CommentIdParamsSchema,
+  NotificationIdParamsSchema,
   NotificationReadBodySchema,
   SavedRecipesQuerySchema,
 } from './social.schemas';
@@ -69,12 +71,30 @@ export const SocialController = {
     return reply.send(result);
   },
 
-  /** POST /:recipeId — create a comment on a recipe. */
+  /** POST /:recipeId — create a comment on a recipe (optionally a reply). */
   async createComment(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { recipeId } = request.params as { recipeId: string };
-    const { text } = request.body as { text: string };
-    const result = await SocialService.createComment(request.authUser!.id, recipeId, text);
+    const { text, parentCommentId } = CreateCommentBodySchema.parse(request.body);
+    const result = await SocialService.createComment(request.authUser!.id, recipeId, text, parentCommentId);
     return reply.status(201).send(result);
+  },
+
+  /** GET /:recipeId/:commentId/replies — get replies for a comment. */
+  async getCommentReplies(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { commentId } = CommentIdParamsSchema.parse(request.params);
+    const { page, limit, skip } = parsePaginationQuery(
+      request.query as { page?: string; limit?: string },
+      DEFAULT_COMMENTS_LIMIT,
+    );
+    const result = await SocialService.getCommentReplies(commentId, page, limit, skip);
+    return reply.send(result);
+  },
+
+  /** DELETE /:commentId — delete a comment. */
+  async deleteComment(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { commentId } = CommentIdParamsSchema.parse(request.params);
+    const result = await SocialService.deleteComment(request.authUser!.id, commentId);
+    return reply.send(result);
   },
 
   // ---- Follows ----
@@ -205,6 +225,13 @@ export const SocialController = {
   async markRead(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { ids } = NotificationReadBodySchema.parse(request.body);
     const result = await SocialService.markRead(request.authUser!.id, ids);
+    return reply.send(result);
+  },
+
+  /** DELETE /:notificationId — delete a notification. */
+  async deleteNotification(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { notificationId } = NotificationIdParamsSchema.parse(request.params);
+    const result = await SocialService.deleteNotification(request.authUser!.id, notificationId);
     return reply.send(result);
   },
 };

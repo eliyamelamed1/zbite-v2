@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth';
-import { getProfile, updateProfile, followUser, unfollowUser, getFollowStatus } from '../../features/social/api/users';
+import { getProfile, updateProfile } from '../../features/profile/api/profile';
+import { followUser, unfollowUser, getFollowStatus } from '../../features/social/api/users';
 import { getUserRecipes, getSavedRecipes } from '../../features/recipes/api/recipes';
 import { imageUrl } from '../../utils/imageUrl';
 import ImageUpload from '../../components/(ui)/forms/ImageUpload/ImageUpload';
 import { User, Recipe } from '../../types';
+import toast from 'react-hot-toast';
 import styles from './UserProfile.module.css';
 
 export default function UserProfile() {
@@ -39,9 +41,9 @@ export default function UserProfile() {
           setIsFollowing(f.data.following);
         }
         if (me && me._id === id) {
-          getSavedRecipes(1).then((r) => setSavedRecipes(r.data.data)).catch((err) => console.error(err));
+          getSavedRecipes(1).then((r) => setSavedRecipes(r.data.data)).catch(() => { /* Non-critical */ });
         }
-      } catch (err) { console.error(err); setProfile(null); }
+      } catch { toast.error('Failed to load profile'); setProfile(null); }
       finally { setLoading(false); }
     };
     load();
@@ -76,8 +78,8 @@ export default function UserProfile() {
         {profile.bio && <p className={styles.bio}>{profile.bio}</p>}
         <div className={styles.stats}>
           <div className={styles.stat}><span className={styles.statCount}>{profile.recipesCount || recipes.length}</span><span className={styles.statLabel}>Recipes</span></div>
-          <div className={styles.stat}><span className={styles.statCount}>{profile.followersCount}</span><span className={styles.statLabel}>Followers</span></div>
-          <div className={styles.stat}><span className={styles.statCount}>{profile.followingCount}</span><span className={styles.statLabel}>Following</span></div>
+          <div className={`${styles.stat} ${styles.statClickable}`} onClick={() => navigate(`/user/${id}/followers`)}><span className={styles.statCount}>{profile.followersCount}</span><span className={styles.statLabel}>Followers</span></div>
+          <div className={`${styles.stat} ${styles.statClickable}`} onClick={() => navigate(`/user/${id}/following`)}><span className={styles.statCount}>{profile.followingCount}</span><span className={styles.statLabel}>Following</span></div>
         </div>
         <div className={styles.actions}>
           {isOwner ? (

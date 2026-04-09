@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ONE_DAY_HOURS, ONE_WEEK_HOURS } from '../../utils/constants';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { getNotifications, markNotificationsRead } from '../../features/social/api/notifications';
 import { imageUrl } from '../../utils/imageUrl';
 import { timeAgo } from '../../utils/timeAgo';
@@ -49,9 +50,9 @@ export default function Activity() {
     getNotifications()
       .then((res) => {
         setNotifications(res.data.data);
-        markNotificationsRead().catch((err) => console.error(err));
+        markNotificationsRead().catch(() => { /* Non-critical */ });
       })
-      .catch((err) => console.error(err))
+      .catch(() => toast.error('Failed to load notifications'))
       .finally(() => setLoading(false));
   }, []);
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { getLeaderboard } from '../../features/leaderboard/api/leaderboard';
 import { followUser } from '../../features/social/api/users';
 import { imageUrl } from '../../utils/imageUrl';
@@ -17,11 +18,11 @@ export default function Leaderboard() {
 
   useEffect(() => {
     setLoading(true);
-    getLeaderboard(period).then((res) => setEntries(res.data.data)).catch((err) => console.error(err)).finally(() => setLoading(false));
+    getLeaderboard(period).then((res) => setEntries(res.data.data)).catch(() => toast.error('Failed to load leaderboard')).finally(() => setLoading(false));
   }, [period]);
 
   const handleFollow = async (userId: string) => {
-    try { await followUser(userId); setFollowedIds((prev) => new Set(prev).add(userId)); } catch (err) { console.error(err); }
+    try { await followUser(userId); setFollowedIds((prev) => new Set(prev).add(userId)); } catch { toast.error('Failed to follow user'); }
   };
 
   const top3 = entries.slice(0, 3);
