@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { getProfile, updateProfile, followUser, unfollowUser, getFollowStatus } from '../../api/users';
-import { getUserRecipes, getSavedRecipes } from '../../api/recipes';
+import { useAuth } from '../../features/auth';
+import { getProfile, updateProfile, followUser, unfollowUser, getFollowStatus } from '../../features/social/api/users';
+import { getUserRecipes, getSavedRecipes } from '../../features/recipes/api/recipes';
 import { imageUrl } from '../../utils/imageUrl';
-import ImageUpload from '../../components/ImageUpload/ImageUpload';
+import ImageUpload from '../../components/(ui)/forms/ImageUpload/ImageUpload';
 import { User, Recipe } from '../../types';
 import styles from './UserProfile.module.css';
 

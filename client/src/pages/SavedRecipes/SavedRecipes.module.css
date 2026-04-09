@@ -21,3 +21,5 @@
 .loading { text-align: center; padding: 60px; color: var(--color-text-secondary); }
 @media (max-width: 1024px) { .grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px) { .page { padding: 16px; } .grid { grid-template-columns: 1fr; } .title { font-size: 28px; } }
+.chipsWrap { margin-bottom: 20px; }
+.cardImageWrap { position: relative; }

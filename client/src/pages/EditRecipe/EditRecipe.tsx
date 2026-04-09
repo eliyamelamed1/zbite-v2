@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getRecipe, updateRecipe } from '../../api/recipes';
-import { useAuth } from '../../hooks/useAuth';
-import RecipeForm from '../../components/RecipeForm/RecipeForm';
+import { getRecipe, updateRecipe } from '../../features/recipes/api/recipes';
+import { useAuth } from '../../features/auth';
+import RecipeForm from '../../features/recipes/components/RecipeForm/RecipeForm';
 import { Recipe } from '../../types';
 import styles from '../Explore/Explore.module.css';
 
@@ -29,12 +29,12 @@ export default function EditRecipe() {
     navigate(`/recipe/${id}`);
   };
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 80 }}>Loading...</div>;
+  if (loading) return <div className={styles.loading}>Loading...</div>;
   if (!recipe) return null;
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.title} style={{ marginBottom: 32 }}>Edit Recipe</h1>
+      <h1 className={styles.title} >Edit Recipe</h1>
       <RecipeForm initialData={recipe} onSubmit={handleSubmit} submitLabel="Save Changes" />
     </div>
   );

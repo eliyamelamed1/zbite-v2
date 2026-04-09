@@ -8,17 +8,17 @@ Inherits all rules from the root `CLAUDE.md`. This file adds client-specific con
 
 ```
 src/
-├── (ui)/                     # Grouped reusable UI primitives (listed first)
-│   ├── button/
-│   │   ├── PrimaryButton.tsx
-│   │   └── IconButton.tsx
-│   ├── forms/
-│   │   ├── TextInput.tsx
-│   │   └── SelectBox.tsx
-│   └── layout/
-│       ├── Navbar.tsx
-│       └── Footer.tsx
 ├── components/               # Reusable non-feature-specific components
+  ├── (ui)/                     # Grouped reusable UI primitives (listed first)
+  │   ├── button/
+  │   │   ├── PrimaryButton.tsx
+  │   │   └── IconButton.tsx
+  │   ├── forms/
+  │   │   ├── TextInput.tsx
+  │   │   └── SelectBox.tsx
+  │   └── layout/
+  │       ├── Navbar.tsx
+  │       └── Footer.tsx
 ├── hooks/                    # Shared custom hooks
 ├── utils/                    # Shared utility functions
 ├── features/                 # Shared feature modules
@@ -34,11 +34,13 @@ src/
 ```
 
 ### Groups `(ui)/`
+
 - Parentheses-prefix directories are **groups** — purely organizational, not importable as modules.
 - They sort first in the file tree, making the most reused code immediately visible.
 - Contents should be broadly reusable with no feature-specific logic.
 
 ### Features
+
 - A feature is a **self-contained module**: its own `components/`, `hooks/`, `utils/`, and `index.ts`.
 - `index.ts` is the **public API** — all external consumers import only from here.
 - Within the feature, import directly from the source file (not via `index.ts`) to avoid circular dependencies.
@@ -60,26 +62,36 @@ src/
 - Define props with an `interface`, named `<ComponentName>Props`:
   ```ts
   interface UserCardProps {
-    name: string;
-    avatarUrl: string;
-    onClick: () => void;
+    name: string
+    avatarUrl: string
+    onClick: () => void
   }
   ```
 - Use `React.FC` only if you need the implicit `children` type; otherwise type the function directly.
 - Avoid inline styles — use CSS modules, Tailwind classes, or the design system.
 - Never put business logic inside JSX event handlers — extract to a named handler:
+
   ```tsx
   // ❌ bad
-  <button onClick={() => { validate(); save(); navigate('/'); }}>Save</button>
+  ;<button
+    onClick={() => {
+      validate()
+      save()
+      navigate("/")
+    }}
+  >
+    Save
+  </button>
 
   // ✅ good
   const handleSave = () => {
-    validate();
-    save();
-    navigate('/');
-  };
-  <button onClick={handleSave}>Save</button>
+    validate()
+    save()
+    navigate("/")
+  }
+  ;<button onClick={handleSave}>Save</button>
   ```
+
 - No component should exceed **~150 lines** — split into sub-components if it does.
 
 ---
@@ -93,10 +105,10 @@ src/
 - Custom hooks that fetch data must expose a consistent shape:
   ```ts
   interface UseProfileDataReturn {
-    data: UserProfile | null;
-    isLoading: boolean;
-    error: Error | null;
-    refetch: () => void;
+    data: UserProfile | null
+    isLoading: boolean
+    error: Error | null
+    refetch: () => void
   }
   ```
 - Never put a `useEffect` inside a condition or loop.
@@ -111,6 +123,7 @@ src/
 - Use a state library (Zustand / Redux Toolkit) only for high-frequency or complex shared state.
 - Co-locate state as close to its consumer as possible.
 - **Never store derived data in state** — compute it with `useMemo`:
+
   ```ts
   // ❌ bad — derived state causes sync bugs
   const [fullName, setFullName] = useState(`${firstName} ${lastName}`);
@@ -128,8 +141,8 @@ src/
 - Always handle all three states in the UI: loading, error, success.
 - Type all API responses — parse and validate with **Zod** before trusting the shape:
   ```ts
-  const UserSchema = z.object({ id: z.string(), name: z.string() });
-  type User = z.infer<typeof UserSchema>;
+  const UserSchema = z.object({ id: z.string(), name: z.string() })
+  type User = z.infer<typeof UserSchema>
   ```
 - Never cast an API response with `as SomeType` — parse it instead.
 
@@ -137,33 +150,34 @@ src/
 
 ## File Subtype Usage (Client)
 
-| Subtype file               | What goes inside                                      |
-|----------------------------|-------------------------------------------------------|
-| `Component.tsx`            | JSX, component logic, local state                     |
-| `Component.types.ts`       | Props interfaces, local domain types                  |
-| `Component.utils.ts`       | Pure helper functions used only by this component     |
-| `Component.consts.ts`      | Constants, static config, default prop values         |
-| `Component.schemas.ts`     | Zod schemas for form or API validation                |
+| Subtype file           | What goes inside                                  |
+| ---------------------- | ------------------------------------------------- |
+| `Component.tsx`        | JSX, component logic, local state                 |
+| `Component.types.ts`   | Props interfaces, local domain types              |
+| `Component.utils.ts`   | Pure helper functions used only by this component |
+| `Component.consts.ts`  | Constants, static config, default prop values     |
+| `Component.schemas.ts` | Zod schemas for form or API validation            |
 
 ---
 
 ## ESLint (Client Additions)
 
 Extend the root config with:
+
 - `eslint-config-airbnb` (includes React + JSX rules)
 - `eslint-plugin-react`, `eslint-plugin-react-hooks`
 - `eslint-plugin-jsx-a11y`
 
-| Rule | Level |
-|------|-------|
-| `react-hooks/rules-of-hooks` | error |
-| `react-hooks/exhaustive-deps` | error |
-| `jsx-a11y/alt-text` | error |
-| `jsx-a11y/interactive-supports-focus` | error |
-| `react/self-closing-comp` | error |
-| `react/jsx-no-useless-fragment` | error |
-| `react/no-array-index-key` | warn |
-| `react/jsx-curly-brace-presence` | error (never for strings) |
+| Rule                                  | Level                     |
+| ------------------------------------- | ------------------------- |
+| `react-hooks/rules-of-hooks`          | error                     |
+| `react-hooks/exhaustive-deps`         | error                     |
+| `jsx-a11y/alt-text`                   | error                     |
+| `jsx-a11y/interactive-supports-focus` | error                     |
+| `react/self-closing-comp`             | error                     |
+| `react/jsx-no-useless-fragment`       | error                     |
+| `react/no-array-index-key`            | warn                      |
+| `react/jsx-curly-brace-presence`      | error (never for strings) |
 
 ---
 

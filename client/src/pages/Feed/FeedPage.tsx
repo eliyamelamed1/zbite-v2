@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getFollowingFeed, getExploreFeed } from '../../api/recipes';
-import { bulkLikeStatus } from '../../api/likes';
-import { bulkSaveStatus } from '../../api/recipes';
+import { getFollowingFeed, getExploreFeed } from '../../features/recipes/api/recipes';
+import { bulkLikeStatus } from '../../features/social/api/likes';
+import { bulkSaveStatus } from '../../features/recipes/api/recipes';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-import FeedCard from '../../components/FeedCard/FeedCard';
-import SuggestedUsers from '../../components/SuggestedUsers/SuggestedUsers';
-import TrendingRecipes from '../../components/TrendingRecipes/TrendingRecipes';
+import FeedCard from '../../features/recipes/components/FeedCard/FeedCard';
+import SuggestedUsers from '../../features/social/components/SuggestedUsers/SuggestedUsers';
+import TrendingRecipes from '../../features/social/components/TrendingRecipes/TrendingRecipes';
 import { Recipe } from '../../types';
 import styles from './FeedPage.module.css';
 

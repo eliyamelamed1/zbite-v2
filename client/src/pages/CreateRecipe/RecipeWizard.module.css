@@ -51,3 +51,9 @@
 .nextBtn { padding: 12px 32px; background: var(--color-primary); color: white; border: none; border-radius: var(--radius-btn); font-size: 15px; font-weight: 600; cursor: pointer; font-family: var(--font-body); }
 .nextBtn:disabled { opacity: 0.5; cursor: not-allowed; }
 @media (max-width: 640px) { .row { flex-direction: column; gap: 0; } }
+.error { background: #fbe9e7; color: #c62828; padding: 10px 14px; border-radius: var(--radius-card); font-size: 13px; margin-bottom: 16px; }
+.stepHeaderLeft { display: flex; align-items: center; gap: 8px; }
+.stepTitleInput { font-weight: 600; }
+.stepImageUpload { margin-top: 8px; }
+.nutritionSection { margin-top: 20px; }
+.nutritionHeading { font-size: 16px; font-weight: 600; margin-bottom: 8px; }

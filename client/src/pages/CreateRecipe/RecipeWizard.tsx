@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import { createRecipe } from '../../api/recipes';
+import { createRecipe } from '../../features/recipes/api/recipes';
 import { CONFETTI_CONFIG } from '../../utils/constants';
 import { Recipe } from '../../types';
-import PhotoStep from './steps/PhotoStep';
-import BasicsStep from './steps/BasicsStep';
-import IngredientsStep from './steps/IngredientsStep';
-import StepsStep from './steps/StepsStep';
-import SuccessStep from './steps/SuccessStep';
+import PhotoStep from '../../features/recipes/components/wizard-steps/PhotoStep';
+import BasicsStep from '../../features/recipes/components/wizard-steps/BasicsStep';
+import IngredientsStep from '../../features/recipes/components/wizard-steps/IngredientsStep';
+import StepsStep from '../../features/recipes/components/wizard-steps/StepsStep';
+import SuccessStep from '../../features/recipes/components/wizard-steps/SuccessStep';
 import styles from './RecipeWizard.module.css';
 
 interface StepData { title: string; instruction: string; imageFile: File | null; }

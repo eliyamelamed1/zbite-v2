@@ -1,9 +1,0 @@
-.main {
-  min-height: 100vh;
-}
-
-@media (max-width: 768px) {
-  .main {
-    padding-bottom: 72px; /* space for bottom tab bar */
-  }
-}

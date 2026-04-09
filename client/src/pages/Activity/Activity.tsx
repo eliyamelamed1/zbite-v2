@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ONE_DAY_HOURS, ONE_WEEK_HOURS } from '../../utils/constants';
 import { useNavigate } from 'react-router-dom';
-import { getNotifications, markNotificationsRead } from '../../api/notifications';
+import { getNotifications, markNotificationsRead } from '../../features/social/api/notifications';
 import { imageUrl } from '../../utils/imageUrl';
 import { timeAgo } from '../../utils/timeAgo';
 import { Notification } from '../../types';
@@ -67,7 +67,7 @@ export default function Activity() {
         <div key={group.label} className={styles.group}>
           <div className={styles.groupTitle}>{group.label}</div>
           {group.items.map((n) => (
-            <div key={n._id} className={styles.item} onClick={() => n.recipe && navigate(`/recipe/${n.recipe._id}`)} style={{ cursor: n.recipe ? 'pointer' : 'default' }}>
+            <div key={n._id} className={`${styles.item} ${n.recipe ? styles.itemClickable : ''}`} onClick={() => n.recipe && navigate(`/recipe/${n.recipe._id}`)}>
               <img className={styles.avatar} src={imageUrl(n.sender.avatar) || `https://ui-avatars.com/api/?name=${n.sender.username}&background=F0E0D0&color=2D1810`} alt={n.sender.username} />
               <div className={styles.text}><strong>@{n.sender.username}</strong> {getActionText(n)}</div>
               <span className={styles.time}>{timeAgo(n.createdAt)}</span>

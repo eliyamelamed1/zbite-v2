@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getExploreFeed } from '../../api/recipes';
-import CategoryChips from '../../components/CategoryChips/CategoryChips';
-import ExploreCard from '../../components/ExploreCard/ExploreCard';
+import { getExploreFeed } from '../../features/recipes/api/recipes';
+import CategoryChips from '../../components/(ui)/forms/CategoryChips/CategoryChips';
+import ExploreCard from '../../features/recipes/components/ExploreCard/ExploreCard';
 import { Recipe } from '../../types';
 import styles from './Explore.module.css';
 

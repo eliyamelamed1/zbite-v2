@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSavedRecipes } from '../../api/recipes';
+import { getSavedRecipes } from '../../features/recipes/api/recipes';
 import { imageUrl } from '../../utils/imageUrl';
-import CategoryChips from '../../components/CategoryChips/CategoryChips';
+import CategoryChips from '../../components/(ui)/forms/CategoryChips/CategoryChips';
 import { Recipe } from '../../types';
 import styles from './SavedRecipes.module.css';
 
@@ -26,7 +26,7 @@ export default function SavedRecipes() {
     <div className={styles.page}>
       <h1 className={styles.title}>Your Culinary Library</h1>
       <p className={styles.subtitle}>A curated collection of your most cherished recipes and future experiments.</p>
-      <div style={{ marginBottom: 20 }}>
+      <div className={styles.chipsWrap}>
         <CategoryChips selected={category} onChange={setCategory} />
       </div>
       {loading ? (
@@ -35,7 +35,7 @@ export default function SavedRecipes() {
         <div className={styles.grid}>
           {recipes.map((r) => (
             <div key={r._id} className={styles.card} onClick={() => navigate(`/recipe/${r._id}`)}>
-              <div style={{ position: 'relative' }}>
+              <div className={styles.cardImageWrap}>
                 <img className={styles.cardImage} src={imageUrl(r.coverImage)} alt={r.title} />
                 <span className={styles.bookmarkIcon}>🔖</span>
                 <span className={`${styles.diffBadge} ${styles[r.difficulty]}`}>{r.difficulty}</span>

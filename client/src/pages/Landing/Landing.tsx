@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../features/auth';
 import styles from './Landing.module.css';
 
 export default function Landing() {
@@ -34,10 +34,10 @@ export default function Landing() {
       <div className={styles.mobileSplash}>
         <div className={styles.mobileLogo}>zbite</div>
         <div className={styles.mobileTagline}>Cook. Share. Inspire.</div>
-        <Link to="/register" style={{ width: '100%', maxWidth: 320 }}>
+        <Link to="/register" className={styles.mobileLinkWrap}>
           <button className={`${styles.mobileBtn} ${styles.mobileBtnPrimary}`}>Get Started</button>
         </Link>
-        <Link to="/explore" style={{ width: '100%', maxWidth: 320 }}>
+        <Link to="/explore" className={styles.mobileLinkWrap}>
           <button className={`${styles.mobileBtn} ${styles.mobileBtnGhost}`}>Explore Recipes</button>
         </Link>
         <div className={styles.mobileLink}>

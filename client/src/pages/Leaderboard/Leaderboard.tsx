@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getLeaderboard } from '../../api/leaderboard';
-import { followUser } from '../../api/users';
+import { getLeaderboard } from '../../features/leaderboard/api/leaderboard';
+import { followUser } from '../../features/social/api/users';
 import { imageUrl } from '../../utils/imageUrl';
 import { LeaderboardEntry } from '../../types';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../features/auth';
 import styles from './Leaderboard.module.css';
 
 export default function Leaderboard() {
@@ -81,7 +81,7 @@ export default function Leaderboard() {
                 {rest.map((entry) => (
                   <div key={entry.user._id} className={styles.row}>
                     <span className={styles.rank}>{entry.rank}</span>
-                    <img className={styles.rowAvatar} src={imageUrl(entry.user.avatar) || `https://ui-avatars.com/api/?name=${entry.user.username}&background=F0E0D0&color=2D1810`} alt="" onClick={() => navigate(`/user/${entry.user._id}`)} style={{ cursor: 'pointer' }} />
+                    <img className={`${styles.rowAvatar} ${styles.clickable}`} src={imageUrl(entry.user.avatar) || `https://ui-avatars.com/api/?name=${entry.user.username}&background=F0E0D0&color=2D1810`} alt="" onClick={() => navigate(`/user/${entry.user._id}`)} />
                     <div className={styles.rowInfo}>
                       <div className={styles.rowName}>{entry.user.username}</div>
                       {entry.user.bio && <div className={styles.rowBio}>{entry.user.bio}</div>}

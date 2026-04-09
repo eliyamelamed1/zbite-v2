@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import * as authApi from '../../api/auth';
+import { useAuth } from '../../features/auth';
+import * as authApi from '../../features/auth/api/auth';
 import { CATEGORIES } from '../../types';
 import styles from './SignUpWizard.module.css';
 

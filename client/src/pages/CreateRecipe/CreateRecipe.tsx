@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { createRecipe } from '../../api/recipes';
-import RecipeForm from '../../components/RecipeForm/RecipeForm';
+import { createRecipe } from '../../features/recipes/api/recipes';
+import RecipeForm from '../../features/recipes/components/RecipeForm/RecipeForm';
 import styles from '../Explore/Explore.module.css';
 
 export default function CreateRecipe() {
@@ -13,7 +13,7 @@ export default function CreateRecipe() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.title} style={{ marginBottom: 32 }}>Create a Recipe</h1>
+      <h1 className={styles.title} >Create a Recipe</h1>
       <RecipeForm onSubmit={handleSubmit} />
     </div>
   );

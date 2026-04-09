@@ -28,3 +28,4 @@
 .loadMore { display: block; margin: 24px auto; padding: 10px 28px; border: 2px solid var(--color-primary); background: transparent; color: var(--color-primary); border-radius: var(--radius-btn); font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font-body); }
 .loading { text-align: center; padding: 60px; color: var(--color-text-secondary); }
 @media (max-width: 768px) { .podium { gap: 12px; } .podiumAvatar { width: 60px; height: 60px; } .podiumFirst .podiumAvatar { width: 80px; height: 80px; } .rowStat { display: none; } }
+.clickable { cursor: pointer; }
