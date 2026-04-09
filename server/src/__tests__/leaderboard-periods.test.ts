@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import Recipe from '../models/Recipe';
-import { setupTestEnvironment, teardownTestEnvironment, cleanDatabase, registerAndLogin, createTestRecipe } from './setup';
+import { setupTestEnvironment, teardownTestEnvironment, cleanDatabase, registerAndLogin, authHeader, createTestRecipe } from './setup';
 
 let app: FastifyInstance;
 
@@ -48,11 +48,82 @@ describe('Leaderboard Periods', () => {
     await createTestRecipe(app, recent.token);
     const { recipe: oldRecipe } = await createTestRecipe(app, old.token);
     // Push the old recipe's createdAt to 45 days ago
-    await Recipe.collection.updateOne({ _id: oldRecipe._id }, { $set: { createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000) } });
+    const DAYS_AGO_45 = 45;
+    await Recipe.collection.updateOne({ _id: oldRecipe._id }, { $set: { createdAt: new Date(Date.now() - DAYS_AGO_45 * 24 * 60 * 60 * 1000) } });
     const res = await app.inject({ method: 'GET', url: '/api/leaderboard?period=monthly' });
     const data = JSON.parse(res.body).data;
     const usernames = data.map((entry: { user: { username: string } }) => entry.user.username);
     expect(usernames).toContain('monthlychef');
     expect(usernames).not.toContain('ancientchef');
+  });
+});
+
+describe('Leaderboard Score Ranking', () => {
+  it('alltime ranks users by chefScore (highest first)', async () => {
+    const chef1 = await registerAndLogin(app, { username: 'topchef' });
+    const chef2 = await registerAndLogin(app, { username: 'midchef' });
+    const { recipe: recipe1 } = await createTestRecipe(app, chef1.token);
+    const { recipe: recipe2 } = await createTestRecipe(app, chef2.token);
+
+    // Create 3 raters to meet threshold
+    const raters = await Promise.all(
+      ['lr1', 'lr2', 'lr3'].map((u) => registerAndLogin(app, { username: u })),
+    );
+
+    const FIVE_STARS = 5;
+    const THREE_STARS = 3;
+
+    // Rate chef1's recipe 5 stars (high score)
+    for (const rater of raters) {
+      await app.inject({
+        method: 'POST',
+        url: `/api/ratings/${recipe1._id}`,
+        headers: authHeader(rater.token),
+        payload: { stars: FIVE_STARS },
+      });
+    }
+
+    // Rate chef2's recipe 3 stars (neutral, score = 0)
+    for (const rater of raters) {
+      await app.inject({
+        method: 'POST',
+        url: `/api/ratings/${recipe2._id}`,
+        headers: authHeader(rater.token),
+        payload: { stars: THREE_STARS },
+      });
+    }
+
+    const res = await app.inject({ method: 'GET', url: '/api/leaderboard?period=alltime' });
+    const body = JSON.parse(res.body);
+    const entries = body.data;
+
+    // topchef should be ranked first (higher chefScore)
+    expect(entries[0].user.username).toBe('topchef');
+    expect(entries[0].score).toBeGreaterThan(0);
+  });
+
+  it('leaderboard entries include score field', async () => {
+    const chef = await registerAndLogin(app, { username: 'scorechef' });
+    await createTestRecipe(app, chef.token);
+
+    const res = await app.inject({ method: 'GET', url: '/api/leaderboard?period=alltime' });
+    const body = JSON.parse(res.body);
+
+    expect(body.data[0]).toHaveProperty('score');
+    expect(body.data[0]).toHaveProperty('rank');
+    expect(body.data[0]).toHaveProperty('user');
+  });
+
+  it('leaderboard entries include rank starting from 1', async () => {
+    const chef1 = await registerAndLogin(app, { username: 'rankchef1' });
+    const chef2 = await registerAndLogin(app, { username: 'rankchef2' });
+    await createTestRecipe(app, chef1.token);
+    await createTestRecipe(app, chef2.token);
+
+    const res = await app.inject({ method: 'GET', url: '/api/leaderboard?period=alltime' });
+    const body = JSON.parse(res.body);
+
+    expect(body.data[0].rank).toBe(1);
+    expect(body.data[1].rank).toBe(2);
   });
 });

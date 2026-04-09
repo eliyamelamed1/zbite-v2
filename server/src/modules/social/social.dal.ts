@@ -1,3 +1,5 @@
+import mongoose from 'mongoose';
+
 import Like from '../../models/Like';
 import Comment from '../../models/Comment';
 import Follow from '../../models/Follow';
@@ -300,5 +302,26 @@ export const SocialDal = {
   /** Find a user by their username (case-insensitive). */
   async findUserByUsername(username: string): Promise<IUser | null> {
     return User.findOne({ username: new RegExp(`^${username}$`, 'i') });
+  },
+
+  // ---- Score helpers ----
+
+  /** Update a recipe's computed score. */
+  async updateRecipeScore(recipeId: string, recipeScore: number): Promise<void> {
+    await Recipe.findByIdAndUpdate(recipeId, { recipeScore });
+  },
+
+  /** Sum all recipeScores for a given author. */
+  async sumRecipeScoresByAuthor(authorId: string): Promise<number> {
+    const result = await Recipe.aggregate([
+      { $match: { author: new mongoose.Types.ObjectId(authorId) } },
+      { $group: { _id: null, total: { $sum: '$recipeScore' } } },
+    ]);
+    return result[0]?.total ?? 0;
+  },
+
+  /** Update a user's chefScore. */
+  async updateUserChefScore(userId: string, chefScore: number): Promise<void> {
+    await User.findByIdAndUpdate(userId, { chefScore });
   },
 };

@@ -12,6 +12,7 @@
 .podiumRank { font-size: 18px; font-weight: 700; color: var(--color-secondary); margin-bottom: 4px; }
 .podiumName { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
 .podiumBio { font-size: 12px; color: var(--color-text-secondary); max-width: 180px; margin: 0 auto 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.podiumScore { font-size: 13px; font-weight: 700; color: var(--color-secondary); margin-bottom: 2px; }
 .podiumStats { font-size: 12px; color: var(--color-text-secondary); }
 .podiumFollowBtn { margin-top: 8px; padding: 6px 20px; border-radius: var(--radius-btn); border: 1.5px solid var(--color-primary); background: transparent; color: var(--color-primary); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font-body); }
 .listTitle { font-family: var(--font-heading); font-size: 22px; margin-bottom: 16px; }
@@ -22,6 +23,7 @@
 .rowInfo { flex: 1; min-width: 0; }
 .rowName { font-weight: 600; font-size: 14px; }
 .rowBio { font-size: 12px; color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rowScore { font-size: 13px; font-weight: 700; color: var(--color-secondary); text-align: center; width: 80px; flex-shrink: 0; }
 .rowStat { font-size: 13px; color: var(--color-text-secondary); text-align: center; width: 70px; flex-shrink: 0; }
 .rowFollowBtn { padding: 5px 16px; border-radius: var(--radius-btn); border: 1.5px solid var(--color-primary); background: transparent; color: var(--color-primary); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font-body); flex-shrink: 0; }
 .rowFollowingBtn { composes: rowFollowBtn; background: var(--color-primary); color: white; }

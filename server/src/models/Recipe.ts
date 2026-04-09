@@ -33,6 +33,7 @@ const recipeSchema = new Schema<IRecipe>(
     savesCount: { type: Number, default: 0 },
     reportsCount: { type: Number, default: 0 },
     viewsCount: { type: Number, default: 0 },
+    recipeScore: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

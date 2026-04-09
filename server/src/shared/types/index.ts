@@ -11,6 +11,7 @@ export interface IUser extends Document {
   recipesCount: number;
   followersCount: number;
   followingCount: number;
+  chefScore: number;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(password: string): Promise<boolean>;
@@ -35,6 +36,7 @@ export interface IRecipe extends Document {
   commentsCount: number;
   savesCount: number;
   reportsCount: number;
+  recipeScore: number;
   createdAt: Date;
   updatedAt: Date;
 }

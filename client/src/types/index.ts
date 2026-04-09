@@ -56,6 +56,7 @@ export interface Notification {
 export interface LeaderboardEntry {
   rank: number;
   user: User;
+  score: number;
 }
 
 export interface Pagination {

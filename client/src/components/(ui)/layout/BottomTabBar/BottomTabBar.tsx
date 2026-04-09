@@ -28,6 +28,14 @@ export default function BottomTabBar() {
         <span>Home</span>
       </button>
 
+      <button
+        className={`${styles.tab} ${isActive('/leaderboard') ? styles.tabActive : ''}`}
+        onClick={() => navigate('/leaderboard')}
+      >
+        <span className={styles.tabIcon}>&#127942;</span>
+        <span>Leaders</span>
+      </button>
+
       <button className={styles.createTab} onClick={() => navigate('/recipe/new')}>
         <div className={styles.createCircle}>
           <span className={styles.createIcon}>+</span>

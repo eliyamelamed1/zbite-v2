@@ -1,4 +1,5 @@
 import { SocialDal } from './social.dal';
+import { computeRecipeScore } from './social.utils';
 import { createNotification } from '../../shared/utils/notify';
 import { ConflictError, ForbiddenError, NotFoundError, ValidationError } from '../../shared/errors';
 import { buildPagination } from '../../shared/utils/pagination';
@@ -316,10 +317,18 @@ export const SocialService = {
 
     await SocialDal.updateRecipeRatingStats(recipeId, averageRating, ratingsCount);
 
+    // Recompute recipe score and author's chef score
+    const newRecipeScore = computeRecipeScore(averageRating, ratingsCount);
+    await SocialDal.updateRecipeScore(recipeId, newRecipeScore);
+
     const recipe = await SocialDal.findRecipeById(recipeId);
     if (recipe) {
+      const authorId = recipe.author.toString();
+      const totalChefScore = await SocialDal.sumRecipeScoresByAuthor(authorId);
+      await SocialDal.updateUserChefScore(authorId, totalChefScore);
+
       await createNotification({
-        recipient: recipe.author.toString(),
+        recipient: authorId,
         sender: userId,
         type: 'rate',
         recipe: recipeId,

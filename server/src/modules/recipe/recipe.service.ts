@@ -1,4 +1,5 @@
 import { RecipeDal } from './recipe.dal';
+import { SocialDal } from '../social/social.dal';
 import Recipe from '../../models/Recipe';
 import { NotFoundError, ForbiddenError, ValidationError } from '../../shared/errors';
 import { IRecipe, PaginatedResult } from '../../shared/types';
@@ -122,6 +123,10 @@ export const RecipeService = {
 
     await RecipeDal.deleteById(recipeId);
     await RecipeDal.decrementRecipesCount(authorId);
+
+    // Recalculate author's chef score after removing a recipe
+    const totalChefScore = await SocialDal.sumRecipeScoresByAuthor(authorId);
+    await SocialDal.updateUserChefScore(authorId, totalChefScore);
   },
 
   /** Get the explore feed with optional category, sort filters, and interest personalization. */

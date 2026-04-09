@@ -91,6 +91,9 @@ export default function DesktopNavbar() {
           <Link to={user ? '/feed' : '/'} className={`${styles.navLink} ${isActive('/feed') ? styles.navLinkActive : ''}`}>
             Home
           </Link>
+          <Link to="/leaderboard" className={`${styles.navLink} ${isActive('/leaderboard') ? styles.navLinkActive : ''}`}>
+            Leaderboard
+          </Link>
 
           {user && (
             <>
@@ -115,7 +118,6 @@ export default function DesktopNavbar() {
               {showMenu && (
                 <div className={styles.avatarMenu}>
                   <button className={styles.avatarMenuItem} onClick={() => { setShowMenu(false); navigate(`/user/${user._id}`); }}>Profile</button>
-                  <button className={styles.avatarMenuItem} onClick={() => { setShowMenu(false); navigate('/leaderboard'); }}>Leaderboard</button>
                   <button className={styles.avatarMenuItem} onClick={() => { setShowMenu(false); logout(); navigate('/'); }}>Logout</button>
                 </div>
               )}

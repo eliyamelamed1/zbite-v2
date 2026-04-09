@@ -51,6 +51,7 @@ export default function Leaderboard() {
                   <div className={styles.podiumRank}>2</div>
                   <img className={styles.podiumAvatar} src={imageUrl(top3[1].user.avatar) || `https://ui-avatars.com/api/?name=${top3[1].user.username}&background=F0E0D0&color=2D1810`} alt="" />
                   <div className={styles.podiumName}>{top3[1].user.username}</div>
+                  <div className={styles.podiumScore}>{Math.round(top3[1].score).toLocaleString()} pts</div>
                   <div className={styles.podiumStats}>{top3[1].user.recipesCount} recipes</div>
                   <button className={styles.podiumFollowBtn} onClick={() => navigate(`/user/${top3[1].user._id}`)}>View</button>
                 </div>
@@ -59,6 +60,7 @@ export default function Leaderboard() {
                 <div className={styles.podiumRank}>👑 1</div>
                 <img className={styles.podiumAvatar} src={imageUrl(top3[0].user.avatar) || `https://ui-avatars.com/api/?name=${top3[0].user.username}&background=F0E0D0&color=2D1810`} alt="" />
                 <div className={styles.podiumName}>{top3[0].user.username}</div>
+                <div className={styles.podiumScore}>{Math.round(top3[0].score).toLocaleString()} pts</div>
                 <div className={styles.podiumBio}>{top3[0].user.bio}</div>
                 <div className={styles.podiumStats}>{top3[0].user.followersCount} followers · {top3[0].user.recipesCount} recipes</div>
                 <button className={styles.podiumFollowBtn} onClick={() => navigate(`/user/${top3[0].user._id}`)}>View Creator</button>
@@ -68,6 +70,7 @@ export default function Leaderboard() {
                   <div className={styles.podiumRank}>3</div>
                   <img className={styles.podiumAvatar} src={imageUrl(top3[2].user.avatar) || `https://ui-avatars.com/api/?name=${top3[2].user.username}&background=F0E0D0&color=2D1810`} alt="" />
                   <div className={styles.podiumName}>{top3[2].user.username}</div>
+                  <div className={styles.podiumScore}>{Math.round(top3[2].score).toLocaleString()} pts</div>
                   <div className={styles.podiumStats}>{top3[2].user.recipesCount} recipes</div>
                   <button className={styles.podiumFollowBtn} onClick={() => navigate(`/user/${top3[2].user._id}`)}>View</button>
                 </div>
@@ -87,6 +90,7 @@ export default function Leaderboard() {
                       <div className={styles.rowName}>{entry.user.username}</div>
                       {entry.user.bio && <div className={styles.rowBio}>{entry.user.bio}</div>}
                     </div>
+                    <div className={styles.rowScore}>{Math.round(entry.score).toLocaleString()} pts</div>
                     <div className={styles.rowStat}>{entry.user.recipesCount} recipes</div>
                     <div className={styles.rowStat}>{entry.user.followersCount} followers</div>
                     {me && me._id !== entry.user._id && (

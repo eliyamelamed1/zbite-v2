@@ -13,9 +13,12 @@ const userSchema = new Schema<IUser>(
     recipesCount: { type: Number, default: 0 },
     followersCount: { type: Number, default: 0 },
     followingCount: { type: Number, default: 0 },
+    chefScore: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
+
+userSchema.index({ chefScore: -1 });
 
 userSchema.pre('save', async function (next) {
   if (!this.isModified('passwordHash')) return next();
