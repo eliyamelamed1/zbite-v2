@@ -114,3 +114,11 @@ export const RecommendQuerySchema = z.discriminatedUnion('mode', [
   PantryRecommendQuerySchema,
 ]);
 export type RecommendQuery = z.infer<typeof RecommendQuerySchema>;
+
+const MEAL_TYPES = ['Breakfast', 'Brunch', 'Lunch', 'Dinner', 'Snack'] as const;
+
+/** Schema for the meal suggestion query param. */
+export const MealSuggestionQuerySchema = z.object({
+  mealType: z.enum(MEAL_TYPES),
+});
+export type MealSuggestionQuery = z.infer<typeof MealSuggestionQuerySchema>;

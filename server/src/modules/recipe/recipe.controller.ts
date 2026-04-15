@@ -13,6 +13,7 @@ import {
   SearchRecipesQuerySchema,
   PickRecommendQuerySchema,
   PantryRecommendQuerySchema,
+  MealSuggestionQuerySchema,
 } from './recipe.schemas';
 import { RECOMMEND_PAGE_SIZE } from './recipe.consts';
 
@@ -235,5 +236,12 @@ export const RecipeController = {
       skip,
     });
     return reply.send(result);
+  },
+
+  /** Handle GET /meal-suggestion — time-aware meal suggestions. */
+  async mealSuggestion(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { mealType } = MealSuggestionQuerySchema.parse(request.query);
+    const suggestions = await RecipeService.getMealSuggestions(mealType, request.authUser?.id);
+    return reply.send({ suggestions });
   },
 };

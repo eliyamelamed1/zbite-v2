@@ -12,17 +12,22 @@ const WEBSITE_JSON_LD = {
     'query-input': 'required name=search_term_string',
   },
 };
+import { useAuth } from '../../features/auth';
 import HeroSection from './components/HeroSection/HeroSection';
+import MealSuggestion from './components/MealSuggestion/MealSuggestion';
 import LeaderboardRow from './components/LeaderboardRow/LeaderboardRow';
 import SkeletonRow from './components/SkeletonRow/SkeletonRow';
 import { useHomeData } from './hooks/useHomeData';
+import { useMealSuggestion } from './hooks/useMealSuggestion';
 import styles from './Home.module.css';
 
 const SKELETON_ROW_COUNT = 3;
 
 /** Home page -- personalized recipe rows for logged-in users, generic rows for guests. */
 export default function Home() {
+  const { user } = useAuth();
   const { data, isLoading } = useHomeData();
+  const { suggestions, mealType } = useMealSuggestion();
 
   return (
     <>
@@ -33,6 +38,10 @@ export default function Home() {
       {isLoading && Array.from({ length: SKELETON_ROW_COUNT }, (_, i) => (
         <SkeletonRow key={i} />
       ))}
+
+      {user && suggestions.length > 0 && (
+        <MealSuggestion mealType={mealType} suggestions={suggestions} />
+      )}
 
       {data.recentlyViewed.length > 0 && (
         <LeaderboardRow title="Recently Viewed" recipes={data.recentlyViewed} />

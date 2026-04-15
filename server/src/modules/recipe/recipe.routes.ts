@@ -9,6 +9,7 @@ export default async function recipeRoutes(fastify: FastifyInstance): Promise<vo
   fastify.get('/explore', { preHandler: [fastify.optionalAuth] }, RecipeController.explore);
   fastify.get('/search', RecipeController.search);
   fastify.get('/recommend', { preHandler: [fastify.optionalAuth] }, RecipeController.recommend);
+  fastify.get('/meal-suggestion', { preHandler: [fastify.optionalAuth] }, RecipeController.mealSuggestion);
   fastify.get('/user/:userId', RecipeController.userRecipes);
   fastify.get('/:id', { preHandler: [fastify.optionalAuth] }, RecipeController.getById);
   fastify.get('/:id/related', RecipeController.related);

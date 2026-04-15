@@ -544,6 +544,47 @@ export const RecipeDal = {
     }, []).slice(0, limit);
   },
 
+  /** Find user's saved recipes that match a specific meal tag. */
+  async findSavedByMealType(userId: string, mealType: string, limit: number): Promise<IRecipe[]> {
+    const savedDocs = await SavedRecipe.find({ user: userId })
+      .sort({ savedAt: -1 })
+      .populate({
+        path: 'recipe',
+        populate: { path: 'author', select: AUTHOR_SUMMARY_FIELDS },
+      });
+
+    return savedDocs
+      .map((doc) => doc.recipe as unknown as IRecipe)
+      .filter((recipe) => recipe && recipe.tags?.includes(mealType))
+      .slice(0, limit);
+  },
+
+  /** Find recipes matching a meal tag and the user's interests. */
+  async findByMealTypeAndInterests(mealType: string, interests: string[], excludeIds: string[], limit: number): Promise<IRecipe[]> {
+    const filter: Record<string, unknown> = {
+      tags: { $all: [mealType], $in: interests },
+      status: { $ne: 'draft' },
+      _id: { $nin: excludeIds },
+    };
+
+    return Recipe.find(filter)
+      .sort({ recipeScore: -1, createdAt: -1 })
+      .limit(limit)
+      .populate('author', AUTHOR_SUMMARY_FIELDS);
+  },
+
+  /** Find popular recipes matching a meal tag (fallback when no personalization data). */
+  async findPopularByMealType(mealType: string, excludeIds: string[], limit: number): Promise<IRecipe[]> {
+    return Recipe.find({
+      tags: mealType,
+      status: { $ne: 'draft' },
+      _id: { $nin: excludeIds },
+    })
+      .sort({ recipeScore: -1, createdAt: -1 })
+      .limit(limit)
+      .populate('author', AUTHOR_SUMMARY_FIELDS);
+  },
+
   /** Find recipes the user has cooked, deduplicated by recipe, most recently cooked first. */
   async findCookedBefore(userId: string, excludeIds: string[], limit: number): Promise<IRecipe[]> {
     const activities = await UserActivity.aggregate([

@@ -26,6 +26,21 @@ interface HomeData {
   newThisWeek: IRecipe[];
 }
 
+interface MealSuggestion {
+  recipe: IRecipe;
+  source: 'saved' | 'interest' | 'popular';
+}
+
+/** Fisher-Yates shuffle a copy of the array and return the first `count` items. */
+function shuffleAndPick<T>(items: T[], count: number): T[] {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, count);
+}
+
 const RECIPES_UPLOAD_FOLDER = 'recipes';
 const STEP_IMAGES_UPLOAD_FOLDER = 'recipes/steps';
 
@@ -279,6 +294,52 @@ export const RecipeService = {
     if (!recipe) throw new NotFoundError('Recipe', recipeId);
     if (!recipe.tags || recipe.tags.length === 0) return [];
     return RecipeDal.findRelatedRecipes(recipeId, recipe.tags, limit);
+  },
+
+  /**
+   * Get meal suggestions based on time of day. Returns 3 recipes with source labels.
+   * Priority: saved > interest-matched > popular fallback.
+   * Shuffles top candidates to avoid repetitive suggestions.
+   */
+  async getMealSuggestions(mealType: string, userId?: string): Promise<MealSuggestion[]> {
+    const CANDIDATE_POOL_SIZE = 20;
+    const RESULT_COUNT = 3;
+    const candidates: MealSuggestion[] = [];
+    const shownIds: string[] = [];
+
+    // Tier 1: user's saved recipes matching meal type
+    if (userId) {
+      const saved = await RecipeDal.findSavedByMealType(userId, mealType, CANDIDATE_POOL_SIZE);
+      for (const recipe of saved) {
+        candidates.push({ recipe, source: 'saved' });
+        shownIds.push(recipe._id.toString());
+      }
+    }
+
+    // Tier 2: interest-matched recipes
+    if (userId && candidates.length < CANDIDATE_POOL_SIZE) {
+      const interests = await RecipeDal.getUserInterests(userId);
+      if (interests.length > 0) {
+        const remaining = CANDIDATE_POOL_SIZE - candidates.length;
+        const interestMatches = await RecipeDal.findByMealTypeAndInterests(mealType, interests, shownIds, remaining);
+        for (const recipe of interestMatches) {
+          candidates.push({ recipe, source: 'interest' });
+          shownIds.push(recipe._id.toString());
+        }
+      }
+    }
+
+    // Tier 3: popular fallback
+    if (candidates.length < CANDIDATE_POOL_SIZE) {
+      const remaining = CANDIDATE_POOL_SIZE - candidates.length;
+      const popular = await RecipeDal.findPopularByMealType(mealType, shownIds, remaining);
+      for (const recipe of popular) {
+        candidates.push({ recipe, source: 'popular' });
+      }
+    }
+
+    // Shuffle and pick top 3
+    return shuffleAndPick(candidates, RESULT_COUNT);
   },
 
   /** Build personalized home page data. Falls back to generic sections for guests. */
