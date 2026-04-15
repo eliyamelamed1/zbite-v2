@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 import { useAuth } from '../../../auth';
 import { recordCook } from '../../../gamification';
@@ -15,6 +16,7 @@ interface CookModeProps {
 export default function CookMode({ recipe, onExit }: CookModeProps) {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
+  const [isIngredientsOpen, setIsIngredientsOpen] = useState(false);
   const steps = recipe.steps.sort((a, b) => a.order - b.order);
   const step = steps[currentStep];
   const total = steps.length;
@@ -23,24 +25,26 @@ export default function CookMode({ recipe, onExit }: CookModeProps) {
   const handleFinishCooking = () => {
     if (user) {
       recordCook(recipe._id).then(() => {
-        toast.success('Nice cook! Added to your streak 🔥');
+        toast.success('Nice cook! Added to your streak');
       }).catch(() => { /* Non-blocking — CookMode exits regardless */ });
     }
     onExit();
   };
 
+  const toggleIngredients = () => setIsIngredientsOpen((prev) => !prev);
+
   // Keep screen awake
   useEffect(() => {
-    let wakeLock: any = null;
+    let wakeLock: unknown = null;
     const requestWake = async () => {
       try {
         if ('wakeLock' in navigator) {
-          wakeLock = await (navigator as any).wakeLock.request('screen');
+          wakeLock = await (navigator as { wakeLock: { request: (type: string) => Promise<unknown> } }).wakeLock.request('screen');
         }
       } catch { /* Wake lock not supported */ }
     };
     requestWake();
-    return () => { wakeLock?.release(); };
+    return () => { (wakeLock as { release?: () => void })?.release?.(); };
   }, []);
 
   if (!step) return null;
@@ -64,17 +68,16 @@ export default function CookMode({ recipe, onExit }: CookModeProps) {
 
         <div className={styles.stepText}>{step.instruction}</div>
 
-        <div className={styles.tip}>
-          <div className={styles.tipLabel}>Kitchen Tip</div>
-          <div className={styles.tipText}>
-            Take your time with this step. Good cooking is never rushed.
+        <button className={styles.ingredientToggle} onClick={toggleIngredients}>
+          {isIngredientsOpen ? 'Hide Ingredients' : 'Show Ingredients'}
+          {isIngredientsOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        </button>
+        <div className={`${styles.ingredientDrawer} ${isIngredientsOpen ? styles.ingredientDrawerOpen : ''}`}>
+          <div className={styles.ingredientDrawerInner}>
+            {recipe.ingredients.map((ing, i) => (
+              <span key={i} className={styles.ingredientChip}>{ing.amount} {ing.name}</span>
+            ))}
           </div>
-        </div>
-
-        <div className={styles.ingredients}>
-          {recipe.ingredients.map((ing, i) => (
-            <span key={i} className={styles.ingredientChip}>{ing.amount} {ing.name}</span>
-          ))}
         </div>
       </div>
 

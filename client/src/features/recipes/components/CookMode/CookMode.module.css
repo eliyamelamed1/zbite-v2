@@ -34,6 +34,7 @@
   cursor: pointer;
   font-family: var(--font-body);
   color: var(--color-text);
+  min-height: 44px;
 }
 
 .progressBar {
@@ -66,49 +67,50 @@
 
 .stepTitle {
   font-family: var(--font-heading);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--color-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .stepText {
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.5;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.6;
   margin-bottom: 24px;
 }
 
-.tip {
-  background: #fff3e0;
-  border-left: 3px solid var(--color-secondary);
-  padding: 12px 16px;
-  border-radius: 0 var(--radius-card) var(--radius-card) 0;
-  margin-bottom: 24px;
-}
-
-.tipLabel {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--color-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
-}
-
-.tipText {
+/* Collapsible ingredient drawer */
+.ingredientToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--color-primary);
   font-size: 14px;
-  color: var(--color-text-secondary);
-  line-height: 1.5;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 0;
+  font-family: var(--font-body);
+  min-height: 44px;
 }
 
-.ingredients {
+.ingredientDrawer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.ingredientDrawerOpen {
+  max-height: 400px;
+}
+
+.ingredientDrawerInner {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 24px;
+  padding: 12px 0 24px;
 }
 
 .ingredientChip {
@@ -116,7 +118,7 @@
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: 20px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--color-text-secondary);
 }
 
@@ -135,11 +137,12 @@
   border: 1.5px solid var(--color-border);
   background: transparent;
   border-radius: var(--radius-btn);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-body);
   color: var(--color-text);
+  min-height: 44px;
 }
 
 .nextBtn {
@@ -149,11 +152,12 @@
   color: white;
   border: none;
   border-radius: var(--radius-btn);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-body);
   transition: background 0.2s;
+  min-height: 44px;
 }
 
 .nextBtn:hover {
