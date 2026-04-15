@@ -1,6 +1,7 @@
 import { SocialDal } from './social.dal';
 import { computeRecipeScore } from './social.utils';
 import { createNotification } from '../../shared/utils/notify';
+import { trackActivity } from '../../shared/utils/track-activity';
 import { ConflictError, ForbiddenError, NotFoundError, ValidationError } from '../../shared/errors';
 import { buildPagination } from '../../shared/utils/pagination';
 
@@ -211,6 +212,7 @@ export const SocialService = {
     if (existing) throw new ConflictError('SavedRecipe', recipeId);
 
     await SocialDal.createSavedRecipe(userId, recipeId);
+    trackActivity(userId, 'save', recipeId);
     const recipe = await SocialDal.incrementRecipeCounter(recipeId, 'savesCount', 1);
     await recomputeRecipeScore(recipeId);
 

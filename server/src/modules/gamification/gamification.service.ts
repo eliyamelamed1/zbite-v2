@@ -1,4 +1,5 @@
 import { GamificationDal } from './gamification.dal';
+import { trackActivity } from '../../shared/utils/track-activity';
 
 import type { ICookingStreak } from '../../models/CookingStreak';
 import type { IAchievement } from '../../models/Achievement';
@@ -61,8 +62,8 @@ export const GamificationService = {
     return GamificationDal.findAchievementsByUser(userId);
   },
 
-  /** Record a cook: increment total, update streak, and check achievements. */
-  async recordCook(userId: string): Promise<ICookingStreak> {
+  /** Record a cook: increment total, update streak, track activity, and check achievements. */
+  async recordCook(userId: string, recipeId: string): Promise<ICookingStreak> {
     const streak = await GamificationDal.findOrCreateStreak(userId);
     const now = new Date();
 
@@ -86,6 +87,7 @@ export const GamificationService = {
     // safe: we just created/updated this document
     const updatedStreak = updated!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
 
+    trackActivity(userId, 'cook', recipeId);
     await evaluateAchievements(userId, updatedStreak);
 
     return updatedStreak;

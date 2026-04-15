@@ -4,6 +4,7 @@ import Recipe from '../../models/Recipe';
 import { NotFoundError, ForbiddenError, ValidationError } from '../../shared/errors';
 import { IRecipe, PaginatedResult } from '../../shared/types';
 import { saveFile } from '../../plugins/upload';
+import { trackActivity } from '../../shared/utils/track-activity';
 
 import type { MultipartFile } from '@fastify/multipart';
 import type { RecipeCategory, Preference } from './recipe.consts';
@@ -109,11 +110,14 @@ export const RecipeService = {
   },
 
   /** Get a single recipe by ID. Increments viewsCount. Throws NotFoundError when missing. */
-  async getRecipe(recipeId: string): Promise<IRecipe> {
+  async getRecipe(recipeId: string, userId?: string): Promise<IRecipe> {
     const recipe = await RecipeDal.findById(recipeId);
     if (!recipe) throw new NotFoundError('Recipe', recipeId);
     // Fire-and-forget view count increment — non-blocking
     Recipe.findByIdAndUpdate(recipeId, { $inc: { viewsCount: 1 } }).catch(() => {});
+    if (userId) {
+      trackActivity(userId, 'view', recipeId);
+    }
     return recipe;
   },
 

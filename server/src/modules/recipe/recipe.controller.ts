@@ -151,7 +151,7 @@ export const RecipeController = {
   /** Handle GET /:id -- get a single recipe by ID. */
   async getById(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = RecipeIdParamsSchema.parse(request.params);
-    const recipe = await RecipeService.getRecipe(id);
+    const recipe = await RecipeService.getRecipe(id, request.authUser?.id);
     return reply.send({ recipe });
   },
 

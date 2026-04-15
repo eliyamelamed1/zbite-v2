@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 
 import { GamificationService } from './gamification.service';
+import { RecordCookBodySchema } from './gamification.schemas';
 
 // ---------------------------------------------------------------------------
 // Controller — parses requests, calls service, shapes responses.
@@ -33,7 +34,8 @@ export const GamificationController = {
 
   /** POST /cook — record a cook event for the current user. */
   async recordCook(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const result = await GamificationService.recordCook(request.authUser!.id);
+    const { recipeId } = RecordCookBodySchema.parse(request.body);
+    const result = await GamificationService.recordCook(request.authUser!.id, recipeId);
     return reply.send(result);
   },
 };

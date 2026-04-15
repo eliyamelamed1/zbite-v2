@@ -235,10 +235,11 @@ export async function createCollectionViaApi(
 }
 
 /** Record a cook via the gamification API. */
-export async function recordCookViaApi(token: string): Promise<void> {
+export async function recordCookViaApi(token: string, recipeId: string): Promise<void> {
   const response = await fetchWithRetry(`${API_BASE_URL}/gamification/cook`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ recipeId }),
   });
 
   if (!response.ok) {
