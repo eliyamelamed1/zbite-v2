@@ -22,6 +22,7 @@ import cookingReportRoutes from './modules/cooking-report/cooking-report.routes'
 import analyticsRoutes from './modules/analytics/analytics.routes';
 import collectionRoutes from './modules/collection/collection.routes';
 import gamificationRoutes from './modules/gamification/gamification.routes';
+import feedbackRoutes from './modules/feedback/feedback.routes';
 import seoRoutes from './modules/seo/seo.routes';
 
 const FILE_SIZE_LIMIT = 5 * 1024 * 1024; // 5MB
@@ -97,6 +98,7 @@ export async function buildApp() {
   await app.register(analyticsRoutes, { prefix: '/api/analytics' });
   await app.register(collectionRoutes, { prefix: '/api/collections' });
   await app.register(gamificationRoutes, { prefix: '/api/gamification' });
+  await app.register(feedbackRoutes, { prefix: '/api/feedback' });
 
   await app.register(seoRoutes);
   app.get('/api/health', async () => ({ status: 'ok' }));

@@ -1,0 +1,34 @@
+.page { max-width: 640px; margin: 0 auto; padding: 24px 16px 80px; }
+.header { margin-bottom: 24px; }
+.title { font-family: var(--font-heading); font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+.subtitle { font-size: 14px; color: var(--color-text-secondary); line-height: 1.5; }
+
+/* Form */
+.form { margin-bottom: 32px; }
+.field { margin-bottom: 14px; }
+.label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.input { width: 100%; padding: 10px 14px; border: 1px solid var(--color-border); border-radius: var(--radius-card); font-size: 14px; outline: none; background: var(--color-card); font-family: var(--font-body); }
+.input:focus { border-color: var(--color-primary); }
+.textarea { composes: input; min-height: 80px; resize: vertical; }
+.select { composes: input; appearance: none; cursor: pointer; }
+.submitBtn { width: 100%; padding: 12px; background: var(--color-primary); color: white; border: none; border-radius: var(--radius-btn); font-size: 15px; font-weight: 600; cursor: pointer; font-family: var(--font-body); }
+.submitBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+.error { background: #fbe9e7; color: #c62828; padding: 10px 14px; border-radius: var(--radius-card); font-size: 13px; margin-bottom: 14px; }
+.success { background: #e8f5e9; color: #2e7d32; padding: 10px 14px; border-radius: var(--radius-card); font-size: 13px; margin-bottom: 14px; }
+
+/* Board */
+.boardTitle { font-family: var(--font-heading); font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+.tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab { padding: 6px 16px; border: 1.5px solid var(--color-border); background: transparent; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-body); color: var(--color-text-secondary); }
+.tabActive { border-color: var(--color-primary); background: var(--color-primary); color: white; }
+.card { background: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-card); padding: 14px; margin-bottom: 10px; }
+.cardTitle { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+.cardMeta { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--color-text-secondary); }
+.statusBadge { padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+.statusNew { background: #e3f2fd; color: #1565c0; }
+.statusPlanned { background: #fff3e0; color: #e65100; }
+.statusInProgress { background: #fce4ec; color: #c62828; }
+.statusShipped { background: #e8f5e9; color: #2e7d32; }
+.statusNotPlanned { background: #f5f5f5; color: #757575; }
+.adminResponse { margin-top: 8px; padding: 8px 12px; background: var(--color-bg); border-radius: var(--radius-card); font-size: 13px; color: var(--color-text-secondary); border-left: 3px solid var(--color-primary); }
+.emptyState { text-align: center; padding: 32px; color: var(--color-text-secondary); font-size: 14px; }
