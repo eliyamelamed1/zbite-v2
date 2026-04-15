@@ -30,7 +30,7 @@ const NutritionSchema = z.object({
 export const CreateRecipeBodySchema = z.object({
   title: z.string().min(1).max(TITLE_MAX_LENGTH),
   description: z.string().min(1).max(DESCRIPTION_MAX_LENGTH),
-  tags: z.array(z.string().refine((t) => (ALL_TAGS as readonly string[]).includes(t))).min(1).max(5),
+  tags: z.array(z.string().refine((t) => (ALL_TAGS as readonly string[]).includes(t))).min(1).max(7),
   difficulty: z.enum(['easy', 'medium', 'hard']),
   cookingTime: z.number().int().positive(),
   servings: z.number().int().min(MIN_SERVINGS),

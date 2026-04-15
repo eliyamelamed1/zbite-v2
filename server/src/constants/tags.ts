@@ -16,8 +16,11 @@ export const DIETARY_TAGS = [
   'Low-Carb', 'High-Protein', 'Budget-Friendly', 'Meal Prep',
 ] as const;
 
+/** Meal-type tags — when you'd eat it. Optional, 0-2 per recipe. */
+export const MEAL_TYPE_TAGS = ['Breakfast', 'Brunch', 'Lunch', 'Dinner', 'Snack'] as const;
+
 /** All predefined user tags combined. */
-export const ALL_TAGS = [...CUISINE_TAGS, ...DISH_TYPE_TAGS, ...DIETARY_TAGS] as const;
+export const ALL_TAGS = [...CUISINE_TAGS, ...DISH_TYPE_TAGS, ...DIETARY_TAGS, ...MEAL_TYPE_TAGS] as const;
 
 export type Tag = (typeof ALL_TAGS)[number];
 

@@ -55,5 +55,8 @@
 .stepHeaderLeft { display: flex; align-items: center; gap: 8px; }
 .stepTitleInput { font-weight: 600; }
 .stepImageUpload { margin-top: 8px; }
+.tagSection { margin-bottom: 12px; }
+.tagSectionLabel { display: block; font-size: 12px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.tagSectionSubtitle { display: block; font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; }
 .nutritionSection { margin-top: 20px; }
 .nutritionHeading { font-size: 16px; font-weight: 600; margin-bottom: 8px; }

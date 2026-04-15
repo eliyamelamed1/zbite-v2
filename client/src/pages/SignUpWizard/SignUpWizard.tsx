@@ -5,7 +5,7 @@ import { Check, X } from 'lucide-react';
 import { useAuth } from '../../features/auth';
 import GoogleLoginButton from '../../features/auth/components/GoogleLoginButton/GoogleLoginButton';
 import * as authApi from '../../features/auth/api/auth';
-import { CUISINE_TAGS, DISH_TYPE_TAGS, DIETARY_TAGS } from '../../types';
+import { CUISINE_TAGS, DISH_TYPE_TAGS, DIETARY_TAGS, MEAL_TYPE_TAGS } from '../../types';
 import SEO from '../../components/(ui)/seo/SEO/SEO';
 import styles from './SignUpWizard.module.css';
 
@@ -13,6 +13,7 @@ const TAG_SECTIONS = [
   { label: 'Cuisine', tags: CUISINE_TAGS },
   { label: 'Dish Type', tags: DISH_TYPE_TAGS },
   { label: 'Dietary & Lifestyle', tags: DIETARY_TAGS },
+  { label: 'Meal Type', tags: MEAL_TYPE_TAGS },
 ] as const;
 
 const MIN_USERNAME_LENGTH = 3;

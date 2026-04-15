@@ -1,5 +1,17 @@
 import TagChips from '../../../../components/(ui)/forms/CategoryChips/CategoryChips';
+import { CUISINE_TAGS, DISH_TYPE_TAGS, DIETARY_TAGS, MEAL_TYPE_TAGS } from '../../../../types';
 import styles from '../../../../pages/CreateRecipe/RecipeWizard.module.css';
+
+const MAX_REGULAR_TAGS = 5;
+const MAX_MEAL_TAGS = 2;
+
+const MEAL_TAG_SET = new Set<string>(MEAL_TYPE_TAGS);
+
+const TAG_SECTIONS = [
+  { label: 'Cuisine', tags: CUISINE_TAGS },
+  { label: 'Dish Type', tags: DISH_TYPE_TAGS },
+  { label: 'Dietary & Lifestyle', tags: DIETARY_TAGS },
+] as const;
 
 interface BasicsStepProps {
   title: string;
@@ -18,6 +30,17 @@ interface BasicsStepProps {
 
 export default function BasicsStep(props: BasicsStepProps): JSX.Element {
   const { title, description, difficulty, cookingTime, servings, tags } = props;
+
+  const regularTags = tags.filter((t) => !MEAL_TAG_SET.has(t));
+  const mealTags = tags.filter((t) => MEAL_TAG_SET.has(t));
+
+  const handleRegularChange = (updated: string[]): void => {
+    props.onTagsChange([...updated, ...mealTags]);
+  };
+
+  const handleMealChange = (updated: string[]): void => {
+    props.onTagsChange([...regularTags, ...updated]);
+  };
 
   return (
     <>
@@ -53,9 +76,35 @@ export default function BasicsStep(props: BasicsStepProps): JSX.Element {
           </div>
         </div>
       </div>
+
       <div className={styles.field}>
-        <label className={styles.label}>Tags (1-5)</label>
-        <TagChips multi selected={tags} onChange={props.onTagsChange} showAll={false} />
+        <label className={styles.label}>Tags (1–5)</label>
+        {TAG_SECTIONS.map((section) => (
+          <div key={section.label} className={styles.tagSection}>
+            <span className={styles.tagSectionLabel}>{section.label}</span>
+            <TagChips
+              multi
+              tags={section.tags}
+              selected={regularTags}
+              onChange={handleRegularChange}
+              maxSelections={MAX_REGULAR_TAGS}
+              showAll={false}
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className={styles.field}>
+        <label className={styles.label}>Best for</label>
+        <span className={styles.tagSectionSubtitle}>When would someone usually eat this?</span>
+        <TagChips
+          multi
+          tags={MEAL_TYPE_TAGS}
+          selected={mealTags}
+          onChange={handleMealChange}
+          maxSelections={MAX_MEAL_TAGS}
+          showAll={false}
+        />
       </div>
     </>
   );

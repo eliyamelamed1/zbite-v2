@@ -103,6 +103,8 @@ export const DIETARY_TAGS = [
   'Low-Carb', 'High-Protein', 'Budget-Friendly', 'Meal Prep',
 ] as const;
 
-export const ALL_TAGS = [...CUISINE_TAGS, ...DISH_TYPE_TAGS, ...DIETARY_TAGS] as const;
+export const MEAL_TYPE_TAGS = ['Breakfast', 'Brunch', 'Lunch', 'Dinner', 'Snack'] as const;
+
+export const ALL_TAGS = [...CUISINE_TAGS, ...DISH_TYPE_TAGS, ...DIETARY_TAGS, ...MEAL_TYPE_TAGS] as const;
 
 export type Tag = (typeof ALL_TAGS)[number];
