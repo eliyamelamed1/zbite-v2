@@ -24,8 +24,9 @@ describe('Gamification', () => {
     const res = await app.inject({ method: 'POST', url: '/api/gamification/cook', headers: authHeader(token), payload: { recipeId: recipe._id } });
     expect(res.statusCode).toBe(200);
     const body = JSON.parse(res.body);
-    expect(body.totalCooked).toBe(1);
-    expect(body.currentStreak).toBe(1);
+    expect(body.streak.totalCooked).toBe(1);
+    expect(body.streak.currentStreak).toBe(1);
+    expect(body.newAchievements).toContain('first_cook');
   });
 
   it('prevents double counting same day', async () => {
@@ -34,13 +35,16 @@ describe('Gamification', () => {
     await app.inject({ method: 'POST', url: '/api/gamification/cook', headers: authHeader(token), payload: { recipeId: recipe._id } });
     const res = await app.inject({ method: 'POST', url: '/api/gamification/cook', headers: authHeader(token), payload: { recipeId: recipe._id } });
     const body = JSON.parse(res.body);
-    expect(body.totalCooked).toBe(1);
+    expect(body.streak.totalCooked).toBe(1);
   });
 
   it('unlocks first_cook achievement', async () => {
     const { token } = await registerAndLogin(app);
     const { recipe } = await createTestRecipe(app, token);
-    await app.inject({ method: 'POST', url: '/api/gamification/cook', headers: authHeader(token), payload: { recipeId: recipe._id } });
+    const cookRes = await app.inject({ method: 'POST', url: '/api/gamification/cook', headers: authHeader(token), payload: { recipeId: recipe._id } });
+    const cookBody = JSON.parse(cookRes.body);
+    expect(cookBody.newAchievements).toContain('first_cook');
+
     const res = await app.inject({ method: 'GET', url: '/api/gamification/achievements/me', headers: authHeader(token) });
     const achievements = JSON.parse(res.body);
     const types = achievements.map((a: { type: string }) => a.type);
@@ -70,7 +74,7 @@ describe('Gamification', () => {
     // Cook again — streak should reset to 1
     const res = await app.inject({ method: 'POST', url: '/api/gamification/cook', headers: authHeader(token), payload: { recipeId: recipe._id } });
     const body = JSON.parse(res.body);
-    expect(body.currentStreak).toBe(1);
+    expect(body.streak.currentStreak).toBe(1);
   });
 
   it('tracks longestStreak', async () => {

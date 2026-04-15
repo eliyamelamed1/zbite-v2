@@ -8,6 +8,11 @@ import type { IAchievement } from '../../models/Achievement';
 // Service — business logic with NO HTTP concerns
 // ---------------------------------------------------------------------------
 
+interface RecordCookResult {
+  streak: ICookingStreak;
+  newAchievements: string[];
+}
+
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const TWO_DAYS_MS = 2 * ONE_DAY_MS;
 
@@ -33,8 +38,8 @@ function isSameDay(dateA: Date, dateB: Date): boolean {
   );
 }
 
-/** Evaluate which achievements the user has earned and unlock any new ones. */
-async function evaluateAchievements(userId: string, streak: ICookingStreak): Promise<void> {
+/** Evaluate which achievements the user has earned and unlock any new ones. Returns newly unlocked types. */
+async function evaluateAchievements(userId: string, streak: ICookingStreak): Promise<string[]> {
   const checks: Array<{ type: string; isEarned: boolean }> = [
     { type: 'first_cook', isEarned: streak.totalCooked >= FIRST_COOK_THRESHOLD },
     { type: '10_recipes', isEarned: streak.totalCooked >= RECIPES_10_THRESHOLD },
@@ -43,11 +48,17 @@ async function evaluateAchievements(userId: string, streak: ICookingStreak): Pro
     { type: 'month_streak', isEarned: streak.currentStreak >= MONTH_STREAK_THRESHOLD },
   ];
 
-  const unlockPromises = checks
-    .filter((check) => check.isEarned)
-    .map((check) => GamificationDal.createAchievement(userId, check.type));
+  const results = await Promise.all(
+    checks
+      .filter((check) => check.isEarned)
+      .map(async (check) => {
+        const created = await GamificationDal.createAchievement(userId, check.type);
+        // createAchievement returns null when the achievement already exists (duplicate key)
+        return created ? check.type : null;
+      }),
+  );
 
-  await Promise.all(unlockPromises);
+  return results.filter((type): type is string => type !== null);
 }
 
 /** Gamification service — orchestrates streak tracking and achievement unlocking. */
@@ -63,13 +74,13 @@ export const GamificationService = {
   },
 
   /** Record a cook: increment total, update streak, track activity, and check achievements. */
-  async recordCook(userId: string, recipeId: string): Promise<ICookingStreak> {
+  async recordCook(userId: string, recipeId: string): Promise<RecordCookResult> {
     const streak = await GamificationDal.findOrCreateStreak(userId);
     const now = new Date();
 
     // If already cooked today, return existing streak without double-counting
     if (streak.lastCookDate && isSameDay(streak.lastCookDate, now)) {
-      return streak;
+      return { streak, newAchievements: [] };
     }
 
     const newTotalCooked = streak.totalCooked + 1;
@@ -88,8 +99,8 @@ export const GamificationService = {
     const updatedStreak = updated!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
 
     trackActivity(userId, 'cook', recipeId);
-    await evaluateAchievements(userId, updatedStreak);
+    const newAchievements = await evaluateAchievements(userId, updatedStreak);
 
-    return updatedStreak;
+    return { streak: updatedStreak, newAchievements };
   },
 };

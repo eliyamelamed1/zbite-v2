@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 import { useAuth } from '../../../auth';
 import { recordCook } from '../../../gamification';
 import { imageUrl } from '../../../../utils/imageUrl';
 import { Recipe } from '../../../../types';
+import CompletionScreen from './CompletionScreen';
 import styles from './CookMode.module.css';
 
 interface CookModeProps {
@@ -17,18 +17,27 @@ export default function CookMode({ recipe, onExit }: CookModeProps) {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [isIngredientsOpen, setIsIngredientsOpen] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isFinishing, setIsFinishing] = useState(false);
+  const [currentStreak, setCurrentStreak] = useState<number | null>(null);
+  const [newAchievements, setNewAchievements] = useState<string[]>([]);
   const steps = recipe.steps.sort((a, b) => a.order - b.order);
   const step = steps[currentStep];
   const total = steps.length;
 
-  /** Record the cook and exit — fire-and-forget for logged-in users. */
-  const handleFinishCooking = () => {
+  const handleFinishCooking = async () => {
+    setIsFinishing(true);
     if (user) {
-      recordCook(recipe._id).then(() => {
-        toast.success('Nice cook! Added to your streak');
-      }).catch(() => { /* Non-blocking — CookMode exits regardless */ });
+      try {
+        const result = await recordCook(recipe._id);
+        setCurrentStreak(result.streak.currentStreak);
+        setNewAchievements(result.newAchievements);
+      } catch {
+        // Graceful degradation — show completion screen without streak data
+      }
     }
-    onExit();
+    setIsFinishing(false);
+    setIsCompleted(true);
   };
 
   const toggleIngredients = () => setIsIngredientsOpen((prev) => !prev);
@@ -47,7 +56,20 @@ export default function CookMode({ recipe, onExit }: CookModeProps) {
     return () => { (wakeLock as { release?: () => void })?.release?.(); };
   }, []);
 
-  if (!step) return null;
+  if (!step && !isCompleted) return null;
+
+  if (isCompleted) {
+    return (
+      <div className={styles.overlay}>
+        <CompletionScreen
+          currentStreak={currentStreak}
+          newAchievements={newAchievements}
+          isGuest={!user}
+          onDone={onExit}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.overlay}>
@@ -89,12 +111,13 @@ export default function CookMode({ recipe, onExit }: CookModeProps) {
         )}
         <button
           className={styles.nextBtn}
+          disabled={isFinishing}
           onClick={() => {
             if (currentStep < total - 1) setCurrentStep(currentStep + 1);
             else handleFinishCooking();
           }}
         >
-          {currentStep < total - 1 ? 'Next Step' : 'Finish Cooking'}
+          {isFinishing ? 'Finishing...' : currentStep < total - 1 ? 'Next Step' : 'Finish Cooking'}
         </button>
       </div>
     </div>
