@@ -1,7 +1,10 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
+import jwt from 'jsonwebtoken';
 
 import { SocialService } from './social.service';
 import { parsePaginationQuery } from '../../shared/utils/pagination';
+import { addConnection } from '../../shared/utils/sse-connections';
+import { env } from '../../config/env';
 import {
   RecipeIdParamsSchema,
   UserIdParamsSchema,
@@ -12,6 +15,7 @@ import {
   NotificationReadBodySchema,
   SavedRecipesQuerySchema,
 } from './social.schemas';
+import { AuthUser } from '../../shared/types';
 
 const DEFAULT_COMMENTS_LIMIT = 20;
 const DEFAULT_FOLLOWS_LIMIT = 20;
@@ -155,6 +159,31 @@ export const SocialController = {
   },
 
   // ---- Notifications ----
+
+  /** GET /stream — SSE stream for real-time notification delivery. */
+  async notificationStream(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { token } = request.query as { token?: string };
+    if (!token) {
+      return reply.status(401).send({ error: { message: 'Not authenticated', status: 401 } });
+    }
+
+    let userId: string;
+    try {
+      const decoded = jwt.verify(token, env.JWT_SECRET) as AuthUser;
+      userId = decoded.id;
+    } catch {
+      return reply.status(401).send({ error: { message: 'Invalid token', status: 401 } });
+    }
+
+    reply.raw.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+    });
+    reply.raw.write('\n');
+
+    addConnection(userId, reply);
+  },
 
   /** GET / — get paginated notifications for the current user. */
   async getNotifications(request: FastifyRequest, reply: FastifyReply): Promise<void> {

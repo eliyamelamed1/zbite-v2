@@ -38,6 +38,8 @@ export async function savedRoutes(fastify: FastifyInstance): Promise<void> {
 
 /** Notification routes — mounted at /api/notifications. */
 export async function notificationRoutes(fastify: FastifyInstance): Promise<void> {
+  // SSE — token passed as query param since EventSource can't set headers
+  fastify.get('/stream', SocialController.notificationStream);
   fastify.get('/', { preHandler: [fastify.authenticate] }, SocialController.getNotifications);
   fastify.get('/unread-count', { preHandler: [fastify.authenticate] }, SocialController.getUnreadCount);
   fastify.put('/read', { preHandler: [fastify.authenticate] }, SocialController.markRead);
