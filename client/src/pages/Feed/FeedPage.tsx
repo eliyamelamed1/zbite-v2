@@ -1,180 +1,87 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
-import { getFollowingFeed, getExploreFeed, getSavedRecipes, bulkSaveStatus, saveRecipe, unsaveRecipe } from '../../features/recipes/api/recipes';
-import { bulkLikeStatus } from '../../features/social/api/likes';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { useDebounce } from '../../hooks/useDebounce';
-import { imageUrl } from '../../utils/imageUrl';
-import FeedCard from '../../features/recipes/components/FeedCard/FeedCard';
+import { getFollowingFeed, getExploreFeed, bulkSaveStatus, saveRecipe, unsaveRecipe } from '../../features/recipes/api/recipes';
+import { useAuth } from '../../features/auth';
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import ExploreCard from '../../features/recipes/components/ExploreCard/ExploreCard';
-import CategoryChips from '../../components/(ui)/forms/CategoryChips/CategoryChips';
-import SuggestedUsers from '../../features/social/components/SuggestedUsers/SuggestedUsers';
-import TrendingRecipes from '../../features/social/components/TrendingRecipes/TrendingRecipes';
+import SkeletonGrid from '../../components/(ui)/feedback/Skeleton/Skeleton';
+import FilterBar from './components/FilterBar/FilterBar';
+import TopChefsRow from './components/TopChefsRow/TopChefsRow';
 import { Recipe } from '../../types';
+import SEO from '../../components/(ui)/seo/SEO/SEO';
 import styles from './FeedPage.module.css';
 
-type MainTab = 'feed' | 'explore' | 'saved';
-type SortOption = 'trending' | 'recent' | 'topRated' | 'quick';
+import type { FeedSortKey } from './components/FilterBar/FilterBar';
 
-const SORT_OPTIONS: ReadonlyArray<{ key: SortOption; label: string }> = [
-  { key: 'trending', label: 'Trending' },
-  { key: 'recent', label: 'Recent' },
-  { key: 'topRated', label: 'Top Rated' },
-  { key: 'quick', label: 'Quick (<30min)' },
-];
-
-export default function FeedPage() {
+export default function FeedPage(): JSX.Element {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const isDesktop = useMediaQuery('(min-width: 769px)');
 
-  // Tab state — read from URL param for deep linking
-  const initialTab = (searchParams.get('tab') as MainTab) || 'feed';
-  const [tab, setTab] = useState<MainTab>(initialTab);
+  const [sort, setSort] = useState<FeedSortKey>(
+    (searchParams.get('sort') as FeedSortKey) || 'trending',
+  );
+  const [tag, setTag] = useState(searchParams.get('tag') ?? 'All');
 
-  // Feed tab state
-  const [feedRecipes, setFeedRecipes] = useState<Recipe[]>([]);
-  const [feedPage, setFeedPage] = useState(1);
-  const [feedHasMore, setFeedHasMore] = useState(true);
-  const [feedLoading, setFeedLoading] = useState(false);
-  const [likedMap, setLikedMap] = useState<Record<string, boolean>>({});
-  const [feedSavedMap, setFeedSavedMap] = useState<Record<string, boolean>>({});
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [savedMap, setSavedMap] = useState<Record<string, boolean>>({});
 
-  // Explore tab state
-  const [exploreRecipes, setExploreRecipes] = useState<Recipe[]>([]);
-  const [explorePage, setExplorePage] = useState(1);
-  const [exploreHasMore, setExploreHasMore] = useState(true);
-  const [exploreLoading, setExploreLoading] = useState(false);
-  const [sort, setSort] = useState<SortOption>('trending');
-  const [category, setCategory] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearch = useDebounce(searchQuery, 300);
-  const [exploreSavedMap, setExploreSavedMap] = useState<Record<string, boolean>>({});
-
-  // Saved tab state
-  const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
-  const [savedCategory, setSavedCategory] = useState('All');
-  const [savedLoading, setSavedLoading] = useState(false);
-
-  // ---------- Tab switching ----------
-
-  const handleTabChange = (newTab: MainTab) => {
-    setTab(newTab);
-    setSearchParams(newTab === 'feed' ? {} : { tab: newTab });
-  };
-
-  // ---------- Feed tab fetching ----------
-
-  const fetchFeed = useCallback(async (pageNum: number) => {
-    setFeedLoading(true);
+  const fetchSavedStatus = useCallback(async (recipeList: Recipe[]) => {
+    if (!user || recipeList.length === 0) return;
     try {
-      const res = await getFollowingFeed(pageNum);
-      const fetched = res.data.data;
-      setFeedRecipes((prev) => (pageNum === 1 ? fetched : [...prev, ...fetched]));
-      setFeedHasMore(pageNum < res.data.pagination.pages);
-
-      if (fetched.length > 0) {
-        const ids = fetched.map((r: Recipe) => r._id);
-        const [likes, saves] = await Promise.all([
-          bulkLikeStatus(ids).catch(() => ({ data: { likedMap: {} } })),
-          bulkSaveStatus(ids).catch(() => ({ data: { savedMap: {} } })),
-        ]);
-        setLikedMap((prev) => ({ ...prev, ...likes.data.likedMap }));
-        setFeedSavedMap((prev) => ({ ...prev, ...saves.data.savedMap }));
-      }
+      const ids = recipeList.map((r) => r._id);
+      const res = await bulkSaveStatus(ids);
+      setSavedMap((prev) => ({ ...prev, ...res.data.savedMap }));
     } catch {
-      toast.error('Failed to load feed');
-    } finally {
-      setFeedLoading(false);
+      // Saved status is non-critical
     }
-  }, []);
+  }, [user]);
 
-  // ---------- Explore tab fetching ----------
-
-  const fetchExplore = useCallback(async (pageNum: number) => {
-    setExploreLoading(true);
+  const fetchRecipes = useCallback(async (pageNum: number) => {
+    setIsLoading(true);
     try {
-      const res = await getExploreFeed(pageNum, sort, category !== 'All' ? category : undefined);
-      const fetched = res.data.data;
-      setExploreRecipes((prev) => (pageNum === 1 ? fetched : [...prev, ...fetched]));
-      setExploreHasMore(pageNum < res.data.pagination.pages);
+      const isFollowing = sort === 'following';
+      const res = isFollowing
+        ? await getFollowingFeed(pageNum)
+        : await getExploreFeed(pageNum, sort, tag !== 'All' ? tag : undefined);
 
-      if (fetched.length > 0) {
-        const ids = fetched.map((r: Recipe) => r._id);
-        const saves = await bulkSaveStatus(ids).catch(() => ({ data: { savedMap: {} } }));
-        setExploreSavedMap((prev) => ({ ...prev, ...saves.data.savedMap }));
-      }
+      const fetched = res.data.data;
+      setRecipes((prev) => (pageNum === 1 ? fetched : [...prev, ...fetched]));
+      setHasMore(pageNum < res.data.pagination.pages);
+      await fetchSavedStatus(fetched);
     } catch {
       toast.error('Failed to load recipes');
     } finally {
-      setExploreLoading(false);
+      setIsLoading(false);
     }
-  }, [sort, category]);
-
-  // ---------- Saved tab fetching ----------
-
-  const fetchSaved = useCallback(async () => {
-    setSavedLoading(true);
-    try {
-      const res = await getSavedRecipes(1, savedCategory !== 'All' ? savedCategory : undefined);
-      setSavedRecipes(res.data.data);
-    } catch {
-      toast.error('Failed to load saved recipes');
-    } finally {
-      setSavedLoading(false);
-    }
-  }, [savedCategory]);
-
-  // ---------- Effects ----------
+  }, [sort, tag, fetchSavedStatus]);
 
   useEffect(() => {
-    if (tab === 'feed' && feedRecipes.length === 0) {
-      setFeedPage(1);
-      fetchFeed(1);
-    }
-  }, [tab, fetchFeed, feedRecipes.length]);
+    setPage(1);
+    setRecipes([]);
+    fetchRecipes(1);
+  }, [fetchRecipes]);
 
+  /** Keep URL search params in sync with active filters. */
   useEffect(() => {
-    if (tab === 'explore') {
-      setExplorePage(1);
-      setExploreRecipes([]);
-      fetchExplore(1);
+    const params: Record<string, string> = {};
+    if (sort !== 'trending') params.sort = sort;
+    if (tag !== 'All') params.tag = tag;
+    setSearchParams(params, { replace: true });
+  }, [sort, tag, setSearchParams]);
+
+  const handleToggleSave = async (recipeId: string) => {
+    if (!user) {
+      navigate('/login');
+      return;
     }
-  }, [tab, sort, category, fetchExplore]);
-
-  useEffect(() => {
-    if (tab === 'saved') {
-      fetchSaved();
-    }
-  }, [tab, savedCategory, fetchSaved]);
-
-  // ---------- Handlers ----------
-
-  const handleFeedLoadMore = () => {
-    const next = feedPage + 1;
-    setFeedPage(next);
-    fetchFeed(next);
-  };
-
-  const handleExploreLoadMore = () => {
-    const next = explorePage + 1;
-    setExplorePage(next);
-    fetchExplore(next);
-  };
-
-  const handleFeedCardUpdate = (id: string, updates: Partial<{ liked: boolean; likesCount: number; saved: boolean }>) => {
-    if (updates.liked !== undefined) setLikedMap((prev) => ({ ...prev, [id]: updates.liked! }));
-    if (updates.saved !== undefined) setFeedSavedMap((prev) => ({ ...prev, [id]: updates.saved! }));
-    if (updates.likesCount !== undefined) {
-      setFeedRecipes((prev) => prev.map((r) => (r._id === id ? { ...r, likesCount: updates.likesCount! } : r)));
-    }
-  };
-
-  const handleExploreToggleSave = async (recipeId: string) => {
-    const isCurrentlySaved = exploreSavedMap[recipeId] ?? false;
-    setExploreSavedMap((prev) => ({ ...prev, [recipeId]: !isCurrentlySaved }));
+    const isCurrentlySaved = savedMap[recipeId] ?? false;
+    setSavedMap((prev) => ({ ...prev, [recipeId]: !isCurrentlySaved }));
     try {
       if (isCurrentlySaved) {
         await unsaveRecipe(recipeId);
@@ -182,180 +89,75 @@ export default function FeedPage() {
         await saveRecipe(recipeId);
       }
     } catch {
-      setExploreSavedMap((prev) => ({ ...prev, [recipeId]: isCurrentlySaved }));
+      setSavedMap((prev) => ({ ...prev, [recipeId]: isCurrentlySaved }));
       toast.error('Failed to update save');
     }
   };
 
-  // Filter explore recipes by search query (client-side)
-  const filteredExploreRecipes = debouncedSearch.trim()
-    ? exploreRecipes.filter((r) => r.title.toLowerCase().includes(debouncedSearch.toLowerCase()))
-    : exploreRecipes;
-
-  // ---------- Tab content renderers ----------
-
-  const renderFeedTab = () => {
-    if (feedLoading && feedRecipes.length === 0) {
-      return <div className={styles.loading}>Loading your feed...</div>;
-    }
-    if (!feedLoading && feedRecipes.length === 0) {
-      return (
-        <div className={styles.empty}>
-          <div className={styles.emptyTitle}>Your feed is empty</div>
-          <div className={styles.emptyText}>Follow some chefs to see their recipes here</div>
-          <button className={styles.primaryBtn} onClick={() => handleTabChange('explore')}>Explore Recipes</button>
-        </div>
-      );
-    }
-    return (
-      <div className={styles.feedList}>
-        {feedRecipes.map((recipe) => (
-          <FeedCard
-            key={recipe._id}
-            recipe={recipe}
-            liked={likedMap[recipe._id] || false}
-            saved={feedSavedMap[recipe._id] || false}
-            onUpdate={handleFeedCardUpdate}
-          />
-        ))}
-        {feedHasMore && (
-          <div className={styles.loadMoreWrap}>
-            <button className={styles.primaryBtn} onClick={handleFeedLoadMore} disabled={feedLoading}>
-              {feedLoading ? 'Loading...' : 'Load more'}
-            </button>
-          </div>
-        )}
-      </div>
-    );
+  const handleLoadMore = () => {
+    const next = page + 1;
+    setPage(next);
+    fetchRecipes(next);
   };
 
-  const renderExploreTab = () => (
-    <>
-      {/* Search input */}
-      <div className={styles.searchBar}>
-        <input
-          className={styles.searchInput}
-          type="text"
-          placeholder="Search recipes..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
+  const handleSortChange = (newSort: FeedSortKey) => {
+    if (newSort === 'following' && !user) {
+      toast.error('Log in to see recipes from chefs you follow');
+      return;
+    }
+    setSort(newSort);
+  };
 
-      {/* Sort pills */}
-      <div className={styles.sortPills}>
-        {SORT_OPTIONS.map((opt) => (
-          <button
-            key={opt.key}
-            className={`${styles.pill} ${sort === opt.key ? styles.pillActive : ''}`}
-            onClick={() => setSort(opt.key)}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
+  const sentinelRef = useInfiniteScroll({
+    onLoadMore: handleLoadMore,
+    hasMore,
+    isLoading,
+  });
 
-      {/* Category chips */}
-      <div className={styles.chipsWrap}>
-        <CategoryChips selected={category} onChange={setCategory} />
-      </div>
-
-      {exploreLoading && exploreRecipes.length === 0 && (
-        <div className={styles.loading}>Loading recipes...</div>
-      )}
-
-      {!exploreLoading && filteredExploreRecipes.length === 0 && (
-        <div className={styles.empty}>
-          <div className={styles.emptyText}>No recipes found. Try a different filter!</div>
-        </div>
-      )}
-
-      <div className={styles.masonry}>
-        {filteredExploreRecipes.map((recipe) => (
-          <ExploreCard
-            key={recipe._id}
-            recipe={recipe}
-            isSaved={exploreSavedMap[recipe._id] ?? false}
-            onToggleSave={handleExploreToggleSave}
-          />
-        ))}
-      </div>
-
-      {exploreHasMore && filteredExploreRecipes.length > 0 && !debouncedSearch.trim() && (
-        <div className={styles.loadMoreWrap}>
-          <button className={styles.outlineBtn} onClick={handleExploreLoadMore} disabled={exploreLoading}>
-            {exploreLoading ? 'Loading...' : 'Load more'}
-          </button>
-        </div>
-      )}
-    </>
-  );
-
-  const renderSavedTab = () => (
-    <>
-      <div className={styles.chipsWrap}>
-        <CategoryChips selected={savedCategory} onChange={setSavedCategory} />
-      </div>
-
-      {savedLoading ? (
-        <div className={styles.loading}>Loading saved recipes...</div>
-      ) : (
-        <div className={styles.savedGrid}>
-          {savedRecipes.map((r) => (
-            <div key={r._id} className={styles.savedCard} onClick={() => navigate(`/recipe/${r._id}`)}>
-              <div className={styles.savedImageWrap}>
-                <img className={styles.savedImage} src={imageUrl(r.coverImage)} alt={r.title} />
-                <span className={styles.savedBookmark}>🔖</span>
-                <span className={`${styles.savedBadge} ${styles[r.difficulty]}`}>{r.difficulty}</span>
-              </div>
-              <div className={styles.savedBody}>
-                <div className={styles.savedTitle}>{r.title}</div>
-                <div className={styles.savedAuthor}>By {r.author?.username}</div>
-                <div className={styles.savedMeta}>
-                  <span className={styles.savedStars}>★ {r.averageRating > 0 ? r.averageRating : '—'}</span>
-                  <span>⏱ {r.cookingTime} min</span>
-                </div>
-              </div>
-            </div>
-          ))}
-          <div className={styles.savedEmptyCard} onClick={() => handleTabChange('explore')}>
-            <span className={styles.savedEmptyIcon}>+</span>
-            <span className={styles.savedEmptyText}>Save more recipes</span>
-          </div>
-        </div>
-      )}
-    </>
-  );
-
-  // ---------- Render ----------
-
-  const tabContent = tab === 'feed' ? renderFeedTab() : tab === 'explore' ? renderExploreTab() : renderSavedTab();
+  const emptyMessage = sort === 'following'
+    ? 'No recipes yet. Follow some chefs to see their recipes here!'
+    : 'No recipes found. Try a different filter!';
 
   return (
     <div className={styles.page}>
-      {/* Horizontal tabs — shared between mobile and desktop */}
-      <div className={styles.tabs}>
-        <button className={`${styles.tab} ${tab === 'feed' ? styles.tabActive : ''}`} onClick={() => handleTabChange('feed')}>Feed</button>
-        <button className={`${styles.tab} ${tab === 'explore' ? styles.tabActive : ''}`} onClick={() => handleTabChange('explore')}>Explore</button>
-        <button className={`${styles.tab} ${tab === 'saved' ? styles.tabActive : ''}`} onClick={() => handleTabChange('saved')}>Saved</button>
-      </div>
+      <SEO title="Your Feed" description="Recipes from chefs you follow." />
+      <div className={styles.content}>
+        <FilterBar
+          sort={sort}
+          tag={tag}
+          onSortChange={handleSortChange}
+          onTagChange={setTag}
+        />
 
-      {/* Desktop: 2-column (content + right sidebar) */}
-      {isDesktop ? (
-        <div className={styles.desktopLayout}>
-          <div className={styles.mainContent}>
-            {tabContent}
+        <TopChefsRow />
+
+        {isLoading && recipes.length === 0 && (
+          <div className={styles.masonry}>
+            <SkeletonGrid />
           </div>
-          <div className={styles.rightSidebar}>
-            <SuggestedUsers />
-            <TrendingRecipes />
+        )}
+
+        {!isLoading && recipes.length === 0 && (
+          <div className={styles.empty}>
+            <div className={styles.emptyText}>{emptyMessage}</div>
           </div>
+        )}
+
+        <div className={styles.masonry}>
+          {recipes.map((recipe) => (
+            <ExploreCard
+              key={recipe._id}
+              recipe={recipe}
+            />
+          ))}
         </div>
-      ) : (
-        <div className={styles.mobileContent}>
-          {tabContent}
-        </div>
-      )}
+
+        {hasMore && recipes.length > 0 && (
+          <div ref={sentinelRef} className={styles.sentinel}>
+            {isLoading && <div className={styles.loadingMore}>Loading more...</div>}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

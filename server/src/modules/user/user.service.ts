@@ -36,13 +36,16 @@ export const UserService = {
     };
   },
 
-  /** Get a user profile along with their recent recipes. */
+  /** Get a user profile along with their recent recipes and total recipe score. */
   async getProfile(
     userId: string,
-  ): Promise<{ user: IUser; recipes: IRecipe[] }> {
-    const { user, recipes } = await UserDal.findByIdWithRecipes(userId);
-    if (!user) throw new NotFoundError('User', userId);
-    return { user, recipes };
+  ): Promise<{ user: IUser; recipes: IRecipe[]; totalRecipeScore: number }> {
+    const [profileData, totalRecipeScore] = await Promise.all([
+      UserDal.findByIdWithRecipes(userId),
+      UserDal.getTotalRecipeScore(userId),
+    ]);
+    if (!profileData.user) throw new NotFoundError('User', userId);
+    return { user: profileData.user, recipes: profileData.recipes, totalRecipeScore };
   },
 
   /** Update the authenticated user's profile (bio and/or avatar). */

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getExploreFeed } from '../../../../features/recipes/api/recipes';
+import { Clock } from 'lucide-react';
 import { imageUrl } from '../../../../utils/imageUrl';
 import { Recipe } from '../../../../types';
 import styles from './TrendingRecipes.module.css';
@@ -26,8 +27,7 @@ export default function TrendingRecipes() {
           <div className={styles.info}>
             <div className={styles.title}>{r.title}</div>
             <div className={styles.meta}>
-              <span className={styles.stars}>★ {r.averageRating > 0 ? r.averageRating : '—'}</span>
-              {' · '}{r.cookingTime} min
+              <Clock size={12} /> {r.cookingTime} min
             </div>
           </div>
         </div>

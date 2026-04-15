@@ -1,56 +1,58 @@
 import { useNavigate } from 'react-router-dom';
-import { imageUrl } from '../../../../utils/imageUrl';
+import { Clock, Bookmark } from 'lucide-react';
+import { imageUrl, handleImageError } from '../../../../utils/imageUrl';
+import { getAvatarUrl } from '../../../../utils/getAvatarUrl';
 import { Recipe } from '../../../../types';
 import styles from './ExploreCard.module.css';
 
 interface ExploreCardProps {
   recipe: Recipe;
-  isSaved?: boolean;
-  onToggleSave?: (recipeId: string) => void;
+  variant?: 'full' | 'minimal';
 }
 
-export default function ExploreCard({ recipe, isSaved = false, onToggleSave }: ExploreCardProps) {
+export default function ExploreCard({ recipe, variant = 'full' }: ExploreCardProps) {
   const navigate = useNavigate();
-
-  const handleHeartClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onToggleSave?.(recipe._id);
-  };
+  const isMinimal = variant === 'minimal';
 
   return (
-    <div className={styles.card} onClick={() => navigate(`/recipe/${recipe._id}`)}>
+    <div
+      className={`${styles.card} ${isMinimal ? styles.cardMinimal : ''}`}
+      onClick={() => navigate(`/recipe/${recipe._id}`)}
+    >
       <div className={styles.imageWrapper}>
-        <img className={styles.image} src={imageUrl(recipe.coverImage)} alt={recipe.title} />
-        <span className={`${styles.difficultyBadge} ${styles[recipe.difficulty]}`}>
-          {recipe.difficulty}
-        </span>
-        <button
-          className={`${styles.heartBtn} ${isSaved ? styles.heartBtnSaved : ''}`}
-          onClick={handleHeartClick}
-          aria-label={isSaved ? 'Unsave recipe' : 'Save recipe'}
-        >
-          {isSaved ? '♥' : '♡'}
-        </button>
+        <img className={styles.image} src={imageUrl(recipe.coverImage)} alt={recipe.title} onError={handleImageError} loading="lazy" />
+        {!isMinimal && (
+          <span className={`${styles.difficultyBadge} ${styles[recipe.difficulty]}`}>
+            {recipe.difficulty}
+          </span>
+        )}
       </div>
       <div className={styles.body}>
-        <div className={styles.rating}>
-          <span className={styles.star}>★</span>
-          {recipe.averageRating > 0 ? recipe.averageRating : '—'}
-          {recipe.ratingsCount > 0 && <span>({recipe.ratingsCount})</span>}
-        </div>
         <div className={styles.title}>{recipe.title}</div>
-        <div className={styles.authorRow}>
-          <img
-            className={styles.authorAvatar}
-            src={imageUrl(recipe.author?.avatar) || `https://ui-avatars.com/api/?name=${recipe.author?.username}&size=20&background=F0E0D0&color=2D1810`}
-            alt={recipe.author?.username}
-          />
-          <span className={styles.authorName}>{recipe.author?.username}</span>
-        </div>
+        {!isMinimal && (
+          <div className={styles.authorRow}>
+            <img
+              className={styles.authorAvatar}
+              src={getAvatarUrl(recipe.author?.avatar, recipe.author?.username ?? '')}
+              alt={recipe.author?.username}
+            />
+            <span className={styles.authorName}>@{recipe.author?.username}</span>
+          </div>
+        )}
         <div className={styles.meta}>
-          <span>⏱ {recipe.cookingTime} min</span>
-          <span>🍽 {recipe.servings} srv</span>
+          <span className={styles.metaBold}><Clock size={12} /> {recipe.cookingTime} min</span>
+          {!isMinimal && <span><Bookmark size={12} /> {recipe.savesCount}</span>}
         </div>
+        {!isMinimal && recipe.tags.length > 0 && (
+          <div className={styles.tags}>
+            {recipe.tags.slice(0, 2).map((tag) => (
+              <span key={tag} className={styles.tag}>{tag}</span>
+            ))}
+            {recipe.tags.length > 2 && (
+              <span className={styles.tag}>+{recipe.tags.length - 2}</span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import Recipe from '../models/Recipe';
+import User from '../models/User';
 import { setupTestEnvironment, teardownTestEnvironment, cleanDatabase, registerAndLogin, authHeader, createTestRecipe } from './setup';
 
 let app: FastifyInstance;
@@ -65,33 +66,13 @@ describe('Leaderboard Score Ranking', () => {
     const { recipe: recipe1 } = await createTestRecipe(app, chef1.token);
     const { recipe: recipe2 } = await createTestRecipe(app, chef2.token);
 
-    // Create 3 raters to meet threshold
-    const raters = await Promise.all(
-      ['lr1', 'lr2', 'lr3'].map((u) => registerAndLogin(app, { username: u })),
-    );
-
-    const FIVE_STARS = 5;
-    const THREE_STARS = 3;
-
-    // Rate chef1's recipe 5 stars (high score)
-    for (const rater of raters) {
-      await app.inject({
-        method: 'POST',
-        url: `/api/ratings/${recipe1._id}`,
-        headers: authHeader(rater.token),
-        payload: { stars: FIVE_STARS },
-      });
-    }
-
-    // Rate chef2's recipe 3 stars (neutral, score = 0)
-    for (const rater of raters) {
-      await app.inject({
-        method: 'POST',
-        url: `/api/ratings/${recipe2._id}`,
-        headers: authHeader(rater.token),
-        payload: { stars: THREE_STARS },
-      });
-    }
+    // Directly set recipe scores and chefScores to test leaderboard ranking
+    const HIGH_SCORE = 12;
+    const LOW_SCORE = 4;
+    await Recipe.findByIdAndUpdate(recipe1._id, { recipeScore: HIGH_SCORE, savesCount: 3 });
+    await Recipe.findByIdAndUpdate(recipe2._id, { recipeScore: LOW_SCORE, savesCount: 1 });
+    await User.findByIdAndUpdate(chef1.user._id, { chefScore: HIGH_SCORE });
+    await User.findByIdAndUpdate(chef2.user._id, { chefScore: LOW_SCORE });
 
     const res = await app.inject({ method: 'GET', url: '/api/leaderboard?period=alltime' });
     const body = JSON.parse(res.body);

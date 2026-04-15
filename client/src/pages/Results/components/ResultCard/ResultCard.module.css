@@ -1,0 +1,119 @@
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.imageWrapper {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.difficultyBadge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.easy {
+  background: var(--color-easy-bg);
+  color: var(--color-easy-text);
+}
+
+.medium {
+  background: var(--color-medium-bg);
+  color: var(--color-medium-text);
+}
+
+.hard {
+  background: var(--color-hard-bg);
+  color: var(--color-hard-text);
+}
+
+.categoryTag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--color-text);
+}
+
+.body {
+  padding: 14px;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+}
+
+.authorRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.authorAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-border);
+}
+
+.authorName {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.cardCompact {
+  display: flex;
+  flex-direction: row;
+}
+
+.imageCompact {
+  width: 100px;
+  min-width: 100px;
+  aspect-ratio: 1;
+}
+
+.titleCompact {
+  font-size: 15px;
+  margin-bottom: 4px;
+}

@@ -19,7 +19,7 @@ test.describe('Recipe CRUD', () => {
       description: 'A recipe created through the full wizard flow.',
       difficulty: 'medium',
       cookingTime: 30,
-      category: 'Italian',
+      tags: ['Italian'],
     });
     await wizard.addIngredient('400g', 'Spaghetti', 0);
     await wizard.clickAddIngredient();

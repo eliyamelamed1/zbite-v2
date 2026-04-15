@@ -1,6 +1,8 @@
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
+  globalSetup: './client/src/e2e/global-cleanup.ts',
+  globalTeardown: './client/src/e2e/global-cleanup.ts',
   testDir: './client/src',
   testMatch: '**/e2e/**/*.spec.ts',
   timeout: 60_000,

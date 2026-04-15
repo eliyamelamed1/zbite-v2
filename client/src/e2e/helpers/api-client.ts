@@ -37,7 +37,7 @@ interface TestUserWithToken extends TestUserCredentials {
 interface CreateRecipeOptions {
   title: string;
   description: string;
-  category: string;
+  tags: string[];
   difficulty: string;
   cookingTime: number;
   servings: number;
@@ -164,19 +164,6 @@ export async function followUserViaApi(token: string, targetUserId: string): Pro
   }
 }
 
-/** Like a recipe via the API. */
-export async function likeRecipeViaApi(token: string, recipeId: string): Promise<void> {
-  const response = await fetchWithRetry(`${API_BASE_URL}/likes/${recipeId}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to like recipe ${recipeId}: ${error}`);
-  }
-}
-
 /** Comment on a recipe via the API. */
 export async function commentOnRecipeViaApi(
   token: string,
@@ -195,27 +182,6 @@ export async function commentOnRecipeViaApi(
   if (!response.ok) {
     const error = await response.text();
     throw new Error(`Failed to comment on recipe ${recipeId}: ${error}`);
-  }
-}
-
-/** Rate a recipe via the API. */
-export async function rateRecipeViaApi(
-  token: string,
-  recipeId: string,
-  stars: number,
-): Promise<void> {
-  const response = await fetchWithRetry(`${API_BASE_URL}/ratings/${recipeId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ stars }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to rate recipe ${recipeId}: ${error}`);
   }
 }
 

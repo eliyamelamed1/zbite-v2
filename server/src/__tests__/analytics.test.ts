@@ -17,9 +17,9 @@ describe('Analytics', () => {
     expect(res.statusCode).toBe(200);
     const body = JSON.parse(res.body);
     expect(body.totalRecipes).toBe(2);
-    expect(body).toHaveProperty('totalLikes');
     expect(body).toHaveProperty('totalComments');
     expect(body).toHaveProperty('totalSaves');
+    expect(body).toHaveProperty('totalCooks');
   });
 
   it('returns empty stats for user with no recipes', async () => {
@@ -30,18 +30,17 @@ describe('Analytics', () => {
     expect(body.totalRecipes).toBe(0);
   });
 
-  it('returns per-recipe performance sorted by likes', async () => {
+  it('returns per-recipe performance sorted by score', async () => {
     const { token } = await registerAndLogin(app);
-    const { recipe: r1 } = await createTestRecipe(app, token, { title: 'Low Likes' });
-    const { recipe: r2 } = await createTestRecipe(app, token, { title: 'High Likes' });
-    // Manually set likesCount to control sort order
-    await Recipe.findByIdAndUpdate(r1._id, { likesCount: 1 });
-    await Recipe.findByIdAndUpdate(r2._id, { likesCount: 10 });
+    const { recipe: r1 } = await createTestRecipe(app, token, { title: 'Low Score' });
+    const { recipe: r2 } = await createTestRecipe(app, token, { title: 'High Score' });
+    await Recipe.findByIdAndUpdate(r1._id, { recipeScore: 5 });
+    await Recipe.findByIdAndUpdate(r2._id, { recipeScore: 20 });
     const res = await app.inject({ method: 'GET', url: '/api/analytics/recipes', headers: authHeader(token) });
     expect(res.statusCode).toBe(200);
     const data = JSON.parse(res.body).data;
     expect(data.length).toBe(2);
-    expect(data[0].likesCount).toBeGreaterThanOrEqual(data[1].likesCount);
+    expect(data[0].recipeScore).toBeGreaterThanOrEqual(data[1].recipeScore);
   });
 
   it('returns daily engagement time-series', async () => {

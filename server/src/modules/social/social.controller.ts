@@ -6,7 +6,6 @@ import {
   RecipeIdParamsSchema,
   UserIdParamsSchema,
   CreateCommentBodySchema,
-  RatingBodySchema,
   BulkStatusBodySchema,
   CommentIdParamsSchema,
   NotificationIdParamsSchema,
@@ -27,37 +26,6 @@ const DEFAULT_NOTIFICATIONS_LIMIT = 30;
 
 /** Social controller — handles HTTP requests for all social features. */
 export const SocialController = {
-  // ---- Likes ----
-
-  /** POST /:recipeId — like a recipe. */
-  async likeRecipe(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { recipeId } = RecipeIdParamsSchema.parse(request.params);
-    // authUser set by authenticate preHandler — safe to assert
-    const result = await SocialService.likeRecipe(request.authUser!.id, recipeId);
-    return reply.status(201).send(result);
-  },
-
-  /** DELETE /:recipeId — unlike a recipe. */
-  async unlikeRecipe(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { recipeId } = RecipeIdParamsSchema.parse(request.params);
-    const result = await SocialService.unlikeRecipe(request.authUser!.id, recipeId);
-    return reply.send(result);
-  },
-
-  /** GET /:recipeId/status — check like status. */
-  async getLikeStatus(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { recipeId } = RecipeIdParamsSchema.parse(request.params);
-    const result = await SocialService.getLikeStatus(request.authUser!.id, recipeId);
-    return reply.send(result);
-  },
-
-  /** POST /bulk-status — check like status for multiple recipes. */
-  async getBulkLikeStatus(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { recipeIds } = BulkStatusBodySchema.parse(request.body);
-    const result = await SocialService.getBulkLikeStatus(request.authUser!.id, recipeIds);
-    return reply.send(result);
-  },
-
   // ---- Comments ----
 
   /** GET /:recipeId — get comments for a recipe. */
@@ -153,7 +121,7 @@ export const SocialController = {
       page,
       limit,
       skip,
-      query.category,
+      query.tag,
     );
     return reply.send(result);
   },
@@ -183,23 +151,6 @@ export const SocialController = {
   async getSaveStatus(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { recipeId } = RecipeIdParamsSchema.parse(request.params);
     const result = await SocialService.getSaveStatus(request.authUser!.id, recipeId);
-    return reply.send(result);
-  },
-
-  // ---- Ratings ----
-
-  /** POST /:recipeId — rate a recipe (1-5 stars, upserts). */
-  async rateRecipe(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { recipeId } = request.params as { recipeId: string };
-    const { stars } = request.body as { stars: number };
-    const result = await SocialService.rateRecipe(request.authUser!.id, recipeId, stars);
-    return reply.send(result);
-  },
-
-  /** GET /:recipeId/me — get the current user's rating for a recipe. */
-  async getMyRating(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { recipeId } = RecipeIdParamsSchema.parse(request.params);
-    const result = await SocialService.getMyRating(request.authUser!.id, recipeId);
     return reply.send(result);
   },
 

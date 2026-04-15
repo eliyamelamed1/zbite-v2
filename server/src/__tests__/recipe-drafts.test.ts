@@ -17,7 +17,7 @@ describe('Recipe Drafts', () => {
     const draft = await Recipe.create({
       title: 'Draft Recipe',
       description: 'Work in progress',
-      category: 'Italian',
+      tags: ['Italian'],
       difficulty: 'easy',
       cookingTime: 20,
       servings: 2,
@@ -38,7 +38,7 @@ describe('Recipe Drafts', () => {
     await Recipe.create({
       title: 'Hidden Draft',
       description: 'Should not appear',
-      category: 'Italian',
+      tags: ['Italian'],
       difficulty: 'easy',
       cookingTime: 20,
       servings: 2,
@@ -63,7 +63,7 @@ describe('Recipe Drafts', () => {
     await Recipe.create({
       title: 'Author Draft',
       description: 'Should not show in following',
-      category: 'Italian',
+      tags: ['Italian'],
       difficulty: 'easy',
       cookingTime: 20,
       servings: 2,
@@ -87,7 +87,7 @@ describe('Recipe Drafts', () => {
     await Recipe.create({
       title: 'My Draft',
       description: 'Visible in drafts',
-      category: 'Italian',
+      tags: ['Italian'],
       difficulty: 'easy',
       cookingTime: 20,
       servings: 2,
@@ -111,7 +111,7 @@ describe('Recipe Drafts', () => {
     const draft = await Recipe.create({
       title: 'Soon Published',
       description: 'Will be published',
-      category: 'Italian',
+      tags: ['Italian'],
       difficulty: 'easy',
       cookingTime: 20,
       servings: 2,
@@ -136,7 +136,7 @@ describe('Recipe Drafts', () => {
     await Recipe.create({
       title: 'Draft No Count',
       description: 'Should not count',
-      category: 'Italian',
+      tags: ['Italian'],
       difficulty: 'easy',
       cookingTime: 20,
       servings: 2,

@@ -1,0 +1,48 @@
+.section {
+  margin-bottom: 32px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.seeAll {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-primary);
+  transition: opacity 0.2s;
+}
+
+.seeAll:hover {
+  opacity: 0.8;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.cardWrapper {
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .row {
+    grid-template-columns: repeat(auto-fill, 160px);
+    gap: 12px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+}

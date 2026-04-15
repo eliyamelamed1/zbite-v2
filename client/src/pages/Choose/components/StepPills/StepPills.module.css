@@ -1,0 +1,30 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--pill-columns, 2), 1fr);
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.pill {
+  padding: 14px 16px;
+  border-radius: var(--radius-btn);
+  border: 2px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-text);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+
+.pill:hover {
+  border-color: var(--color-primary);
+  background: rgba(232, 93, 44, 0.05);
+  transform: translateY(-2px);
+}
+
+.pill:active {
+  transform: scale(0.98);
+}

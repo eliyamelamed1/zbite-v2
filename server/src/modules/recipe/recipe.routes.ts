@@ -5,9 +5,13 @@ import { RecipeController } from './recipe.controller';
 /** Recipe routes -- CRUD, explore feed, following feed, user recipes. */
 export default async function recipeRoutes(fastify: FastifyInstance): Promise<void> {
   /* ---------- Public routes (with optional auth for personalization) ---------- */
+  fastify.get('/home', { preHandler: [fastify.optionalAuth] }, RecipeController.home);
   fastify.get('/explore', { preHandler: [fastify.optionalAuth] }, RecipeController.explore);
+  fastify.get('/search', RecipeController.search);
+  fastify.get('/recommend', { preHandler: [fastify.optionalAuth] }, RecipeController.recommend);
   fastify.get('/user/:userId', RecipeController.userRecipes);
   fastify.get('/:id', RecipeController.getById);
+  fastify.get('/:id/related', RecipeController.related);
 
   /* ---------- Authenticated routes ---------- */
   fastify.post('/', { preHandler: [fastify.authenticate] }, RecipeController.create);

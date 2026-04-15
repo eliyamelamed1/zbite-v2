@@ -3,7 +3,6 @@ import { test, expect } from '../../../e2e/fixtures/auth.fixture';
 import {
   registerUserViaApi,
   createRecipeViaApi,
-  likeRecipeViaApi,
   followUserViaApi,
   commentOnRecipeViaApi,
 } from '../../../e2e/helpers/api-client';
@@ -11,18 +10,6 @@ import { createUserData, createRecipeData } from '../../../e2e/fixtures/test-dat
 import { ActivityPage } from '../../../e2e/pages/ActivityPage';
 
 test.describe('Notifications', () => {
-  test('like generates a notification', async ({ authenticatedPage, userA }) => {
-    const recipeData = createRecipeData('NotifLike');
-    const recipe = await createRecipeViaApi(userA.token, recipeData);
-    const liker = await registerUserViaApi(createUserData('liker'));
-    await likeRecipeViaApi(liker.token, recipe.id);
-    const activity = new ActivityPage(authenticatedPage);
-
-    await activity.goto();
-
-    await activity.expectNotificationFromUser(liker.username);
-  });
-
   test('follow generates a notification', async ({ authenticatedPage, userA }) => {
     const follower = await registerUserViaApi(createUserData('follower'));
     await followUserViaApi(follower.token, userA.id);

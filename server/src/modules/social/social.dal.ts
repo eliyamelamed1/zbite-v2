@@ -1,52 +1,20 @@
 import mongoose from 'mongoose';
 
-import Like from '../../models/Like';
 import Comment from '../../models/Comment';
 import Follow from '../../models/Follow';
 import SavedRecipe from '../../models/SavedRecipe';
-import Rating from '../../models/Rating';
 import Notification from '../../models/Notification';
 import Recipe from '../../models/Recipe';
 import User from '../../models/User';
 
-import type { ILike, IComment, IFollow, ISavedRecipe, IRating, INotification, IRecipe, IUser } from '../../shared/types';
+import type { IComment, IFollow, ISavedRecipe, INotification, IRecipe, IUser } from '../../shared/types';
 
 // ---------------------------------------------------------------------------
-// Like queries
+// Social DAL
 // ---------------------------------------------------------------------------
 
 /** Data Access Layer for all social-domain Mongoose queries. */
 export const SocialDal = {
-  // ---- Likes ----
-
-  /** Create a like record linking a user to a recipe. */
-  async createLike(userId: string, recipeId: string): Promise<ILike> {
-    return Like.create({ user: userId, recipe: recipeId });
-  },
-
-  /** Delete a like by user + recipe pair. Returns the deleted doc or null. */
-  async deleteLike(userId: string, recipeId: string): Promise<ILike | null> {
-    return Like.findOneAndDelete({ user: userId, recipe: recipeId });
-  },
-
-  /** Find whether a specific user-recipe like exists. */
-  async findLikeByUserRecipe(userId: string, recipeId: string): Promise<ILike | null> {
-    return Like.findOne({ user: userId, recipe: recipeId });
-  },
-
-  /** Return a map of recipeId -> boolean for a list of recipes a user may have liked. */
-  async bulkLikeStatusByUser(userId: string, recipeIds: readonly string[]): Promise<Record<string, boolean>> {
-    const likes = await Like.find({ user: userId, recipe: { $in: recipeIds } }).select('recipe');
-    const likedMap: Record<string, boolean> = {};
-    recipeIds.forEach((id) => {
-      likedMap[id] = false;
-    });
-    likes.forEach((like) => {
-      likedMap[like.recipe.toString()] = true;
-    });
-    return likedMap;
-  },
-
   // ---- Comments ----
 
   /** Create a comment on a recipe. */
@@ -202,29 +170,6 @@ export const SocialDal = {
     return savedMap;
   },
 
-  // ---- Ratings ----
-
-  /** Upsert a rating for a user on a recipe. Returns the updated rating. */
-  async upsertRating(userId: string, recipeId: string, stars: number): Promise<IRating> {
-    const rating = await Rating.findOneAndUpdate(
-      { user: userId, recipe: recipeId },
-      { stars },
-      { upsert: true, new: true },
-    );
-    // findOneAndUpdate with upsert always returns a doc
-    return rating!; // safe: upsert guarantees non-null
-  },
-
-  /** Find all ratings for a recipe (for computing averages). */
-  async findRatingsByRecipe(recipeId: string): Promise<IRating[]> {
-    return Rating.find({ recipe: recipeId });
-  },
-
-  /** Find a specific user's rating for a recipe. */
-  async findRatingByUserRecipe(userId: string, recipeId: string): Promise<IRating | null> {
-    return Rating.findOne({ user: userId, recipe: recipeId });
-  },
-
   // ---- Notifications ----
 
   /** Find notifications for a recipient (paginated, newest first). */
@@ -280,11 +225,6 @@ export const SocialDal = {
   /** Increment or decrement a counter field on a Recipe. Returns the updated recipe. */
   async incrementRecipeCounter(recipeId: string, field: string, amount: number): Promise<IRecipe | null> {
     return Recipe.findByIdAndUpdate(recipeId, { $inc: { [field]: amount } }, { new: true });
-  },
-
-  /** Update a recipe's computed rating stats. */
-  async updateRecipeRatingStats(recipeId: string, averageRating: number, ratingsCount: number): Promise<void> {
-    await Recipe.findByIdAndUpdate(recipeId, { averageRating, ratingsCount });
   },
 
   /** Find a recipe by ID (for reading author info, etc.). */

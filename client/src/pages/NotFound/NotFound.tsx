@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
+import SEO from '../../components/(ui)/seo/SEO/SEO';
 import styles from './NotFound.module.css';
 
 /** 404 Not Found page — shown for invalid routes. */
@@ -12,6 +13,7 @@ export default function NotFound() {
 
   return (
     <div className={styles.container}>
+      <SEO title="Page Not Found" description="This page doesn't exist." noindex />
       <div className={styles.content}>
         <span className={styles.emoji}>🍳</span>
         <h1 className={styles.title}>404</h1>

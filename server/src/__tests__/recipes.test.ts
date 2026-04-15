@@ -38,11 +38,11 @@ describe('GET /api/recipes/explore', () => {
     expect(body.pagination.total).toBe(2);
   });
 
-  it('filters by category', async () => {
+  it('filters by tag', async () => {
     const { token } = await registerAndLogin(app);
-    await createTestRecipe(app, token, { category: 'Italian' });
-    await createTestRecipe(app, token, { category: 'Asian' });
-    const res = await app.inject({ method: 'GET', url: '/api/recipes/explore?category=Italian' });
+    await createTestRecipe(app, token, { tags: ['Italian'] });
+    await createTestRecipe(app, token, { tags: ['Asian'] });
+    const res = await app.inject({ method: 'GET', url: '/api/recipes/explore?tag=Italian' });
     expect(JSON.parse(res.body).data).toHaveLength(1);
   });
 
@@ -97,6 +97,65 @@ describe('GET /api/recipes/user/:userId', () => {
     await createTestRecipe(app, user2.token);
     const res = await app.inject({ method: 'GET', url: `/api/recipes/user/${user1.user._id}` });
     expect(JSON.parse(res.body).data).toHaveLength(2);
+  });
+});
+
+describe('GET /api/recipes/:id/related', () => {
+  it('returns recipes with overlapping tags', async () => {
+    const { token } = await registerAndLogin(app);
+    const { recipe: target } = await createTestRecipe(app, token, { title: 'Pasta A', tags: ['Italian', 'Pasta'] });
+    await createTestRecipe(app, token, { title: 'Pasta B', tags: ['Italian'] });
+    await createTestRecipe(app, token, { title: 'Sushi', tags: ['Japanese'] });
+
+    const res = await app.inject({ method: 'GET', url: `/api/recipes/${target._id}/related` });
+    const body = JSON.parse(res.body);
+
+    expect(res.statusCode).toBe(200);
+    expect(body.data.length).toBeGreaterThanOrEqual(1);
+    const titles = body.data.map((r: { title: string }) => r.title);
+    expect(titles).toContain('Pasta B');
+    expect(titles).not.toContain('Sushi');
+  });
+
+  it('excludes the source recipe from results', async () => {
+    const { token } = await registerAndLogin(app);
+    const { recipe: target } = await createTestRecipe(app, token, { title: 'Target', tags: ['Italian'] });
+    await createTestRecipe(app, token, { title: 'Other', tags: ['Italian'] });
+
+    const res = await app.inject({ method: 'GET', url: `/api/recipes/${target._id}/related` });
+    const body = JSON.parse(res.body);
+
+    const ids = body.data.map((r: { _id: string }) => r._id);
+    expect(ids).not.toContain(target._id);
+  });
+
+  it('returns empty array when no tags match', async () => {
+    const { token } = await registerAndLogin(app);
+    const { recipe: target } = await createTestRecipe(app, token, { title: 'Unique', tags: ['Mexican'] });
+    await createTestRecipe(app, token, { title: 'Italian', tags: ['Italian'] });
+
+    const res = await app.inject({ method: 'GET', url: `/api/recipes/${target._id}/related` });
+    const body = JSON.parse(res.body);
+
+    expect(body.data).toHaveLength(0);
+  });
+
+  it('returns 404 for non-existent recipe', async () => {
+    const fakeId = new mongoose.Types.ObjectId().toString();
+    const res = await app.inject({ method: 'GET', url: `/api/recipes/${fakeId}/related` });
+    expect(res.statusCode).toBe(404);
+  });
+
+  it('populates author on related results', async () => {
+    const { token } = await registerAndLogin(app, { username: 'chef_related' });
+    const { recipe: target } = await createTestRecipe(app, token, { title: 'A', tags: ['Italian'] });
+    await createTestRecipe(app, token, { title: 'B', tags: ['Italian'] });
+
+    const res = await app.inject({ method: 'GET', url: `/api/recipes/${target._id}/related` });
+    const body = JSON.parse(res.body);
+
+    expect(body.data[0].author).toHaveProperty('username');
+    expect(body.data[0].author.username).toBe('chef_related');
   });
 });
 

@@ -4,24 +4,37 @@
   --color-primary: #E85D2C;
   --color-primary-hover: #D14D1E;
   --color-secondary: #F5A623;
-  --color-bg: #FFF8F0;
+  --color-bg: #FDF6EC;
   --color-card: #FFFFFF;
   --color-text: #2D1810;
   --color-text-secondary: #7A6558;
   --color-border: #F0E0D0;
+  --color-divider: #F0E0D0;
   --color-success: #4CAF50;
   --color-warning: #F5A623;
   --color-danger: #E85D2C;
 
-  --font-heading: 'Playfair Display', serif;
-  --font-body: 'Inter', sans-serif;
+  /* Difficulty badge colors */
+  --color-easy-bg: #e8f5e9;
+  --color-easy-text: #2e7d32;
+  --color-medium-bg: #fff3e0;
+  --color-medium-text: #e65100;
+  --color-hard-bg: #fbe9e7;
+  --color-hard-text: #c62828;
 
-  --radius-card: 12px;
-  --radius-btn: 12px;
+  /* Skeleton shimmer */
+  --color-skeleton: #f5ebe3;
+
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --radius-card: 16px;
+  --radius-btn: 14px;
+  --radius-pill: 20px;
   --radius-avatar: 50%;
 
-  --shadow-card: 0 2px 8px rgba(45, 24, 16, 0.08);
-  --shadow-hover: 0 4px 16px rgba(45, 24, 16, 0.12);
+  --shadow-card: none;
+  --shadow-hover: 0 2px 12px rgba(45, 24, 16, 0.08);
 
   --max-width: 1200px;
   --gap: 24px;
@@ -40,6 +53,8 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {

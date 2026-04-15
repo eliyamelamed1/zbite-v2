@@ -3,19 +3,19 @@ import { ONE_DAY_HOURS, ONE_WEEK_HOURS } from '../../utils/constants';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getNotifications, markNotificationsRead } from '../../features/social/api/notifications';
-import { imageUrl } from '../../utils/imageUrl';
+import { getAvatarUrl } from '../../utils/getAvatarUrl';
 import { timeAgo } from '../../utils/timeAgo';
 import { Notification } from '../../types';
+import SEO from '../../components/(ui)/seo/SEO/SEO';
 import styles from './Activity.module.css';
 
 function getActionText(n: Notification): string {
   switch (n.type) {
-    case 'like': return `liked your ${n.recipe?.title || 'recipe'}`;
     case 'follow': return 'started following you';
     case 'save': return `saved your ${n.recipe?.title || 'recipe'}`;
-    case 'rate': return `rated your ${n.recipe?.title || 'recipe'}`;
     case 'comment': return `commented on your ${n.recipe?.title || 'recipe'}`;
     case 'mention': return `mentioned you in a comment`;
+    case 'cooking_report': return `cooked your ${n.recipe?.title || 'recipe'}`;
     default: return 'interacted with you';
   }
 }
@@ -62,6 +62,7 @@ export default function Activity() {
 
   return (
     <div className={styles.page}>
+      <SEO title="Activity" description="Your recent notifications and updates." noindex />
       <h1 className={styles.title}>Activity</h1>
       {groups.length === 0 && <div className={styles.empty}>No activity yet</div>}
       {groups.map((group) => (
@@ -69,7 +70,7 @@ export default function Activity() {
           <div className={styles.groupTitle}>{group.label}</div>
           {group.items.map((n) => (
             <div key={n._id} className={`${styles.item} ${n.recipe ? styles.itemClickable : ''}`} onClick={() => n.recipe && navigate(`/recipe/${n.recipe._id}`)}>
-              <img className={styles.avatar} src={imageUrl(n.sender.avatar) || `https://ui-avatars.com/api/?name=${n.sender.username}&background=F0E0D0&color=2D1810`} alt={n.sender.username} />
+              <img className={styles.avatar} src={getAvatarUrl(n.sender.avatar, n.sender.username)} alt={n.sender.username} />
               <div className={styles.text}><strong>@{n.sender.username}</strong> {getActionText(n)}</div>
               <span className={styles.time}>{timeAgo(n.createdAt)}</span>
             </div>

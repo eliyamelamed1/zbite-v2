@@ -1,10 +1,14 @@
+/* ========================================
+   TagChips — Small tag-style selectors
+   ======================================== */
+
 .wrapper {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  padding: 4px 0;
+  padding: 2px 0;
 }
 
 .wrapper::-webkit-scrollbar {
@@ -12,11 +16,11 @@
 }
 
 .chip {
-  padding: 7px 18px;
-  border-radius: 24px;
-  border: 1.5px solid var(--color-border);
-  background: transparent;
-  font-size: 13px;
+  padding: 5px 14px;
+  border-radius: 8px;
+  border: none;
+  background: var(--color-bg);
+  font-size: 12px;
   font-weight: 500;
   color: var(--color-text-secondary);
   white-space: nowrap;
@@ -26,12 +30,12 @@
 }
 
 .chip:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  background: var(--color-border);
+  color: var(--color-text);
 }
 
 .chipActive {
   background: var(--color-primary);
-  border-color: var(--color-primary);
   color: white;
+  font-weight: 600;
 }

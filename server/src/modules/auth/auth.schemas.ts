@@ -17,3 +17,8 @@ export const InterestsBodySchema = z.object({
   interests: z.array(z.string()),
 });
 export type InterestsBody = z.infer<typeof InterestsBodySchema>;
+
+export const GoogleAuthBodySchema = z.object({
+  credential: z.string().min(1),
+});
+export type GoogleAuthBody = z.infer<typeof GoogleAuthBodySchema>;

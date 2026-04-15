@@ -6,7 +6,7 @@
 import { test, expect } from '@playwright/test';
 
 import { createUserData, DEFAULT_INTERESTS, ALTERNATE_INTERESTS, TEST_IMAGE_PATH } from '../fixtures/test-data';
-import { LandingPage } from '../pages/LandingPage';
+import { HomePage } from '../pages/HomePage';
 import { RegisterPage } from '../pages/RegisterPage';
 import { LoginPage } from '../pages/LoginPage';
 import { RecipeWizardPage } from '../pages/RecipeWizardPage';
@@ -23,7 +23,7 @@ test('complete user journey — signup, create, interact, follow, notifications'
   const userA = createUserData('hfa');
   const userB = createUserData('hfb');
 
-  const landing = new LandingPage(page);
+  const home = new HomePage(page);
   const registerPage = new RegisterPage(page);
   const loginPage = new LoginPage(page);
   const wizard = new RecipeWizardPage(page);
@@ -34,9 +34,9 @@ test('complete user journey — signup, create, interact, follow, notifications'
   const navbar = new Navbar(page);
   const actionBar = new ActionBar(page);
 
-  // 1. Landing page
-  await landing.goto();
-  await landing.expectTitleVisible();
+  // 1. Home page
+  await home.goto();
+  await home.expectTitleVisible();
 
   // 2. Sign up as User A
   await registerPage.signUp(userA, DEFAULT_INTERESTS);
@@ -49,7 +49,7 @@ test('complete user journey — signup, create, interact, follow, notifications'
     description: 'A classic Italian pasta dish.',
     difficulty: 'medium',
     cookingTime: 30,
-    category: 'Italian',
+    tags: ['Italian'],
   });
   await wizard.addIngredient('400g', 'Spaghetti', 0);
   await wizard.clickAddIngredient();
@@ -102,11 +102,13 @@ test('complete user journey — signup, create, interact, follow, notifications'
 
   // 12. Check following feed
   await feed.goto();
-  // Feed tab (default) shows recipes from followed users
+  await feed.selectSort('Following');
   await feed.expectRecipeVisible('Pasta Carbonara');
 
   // 13. Logout User B → Login as User A
   await navbar.logout();
+  await page.waitForLoadState('load');
+  await page.waitForTimeout(500);
   await loginPage.login(userA.email, userA.password);
 
   // 14. Check notifications — should see User B's activity

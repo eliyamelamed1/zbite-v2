@@ -14,7 +14,7 @@
 
 .imageWrapper {
   position: relative;
-  padding-top: 62.5%; /* 16:10 ratio */
+  padding-top: 56.25%; /* 16:9 ratio */
   overflow: hidden;
 }
 
@@ -28,7 +28,7 @@
 }
 
 .body {
-  padding: 16px;
+  padding: 14px;
 }
 
 .title {
@@ -57,10 +57,6 @@
   margin-bottom: 8px;
 }
 
-.stars {
-  color: var(--color-secondary);
-}
-
 .bottom {
   display: flex;
   align-items: center;
@@ -70,26 +66,26 @@
 
 .difficulty {
   display: inline-block;
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: capitalize;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .easy {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: var(--color-easy-bg);
+  color: var(--color-easy-text);
 }
 
 .medium {
-  background: #fff3e0;
-  color: #e65100;
+  background: var(--color-medium-bg);
+  color: var(--color-medium-text);
 }
 
 .hard {
-  background: #fbe9e7;
-  color: #c62828;
+  background: var(--color-hard-bg);
+  color: var(--color-hard-text);
 }
 
 .saves {

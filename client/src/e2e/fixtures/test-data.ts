@@ -1,6 +1,7 @@
 /**
  * Concurrency-safe test data factories.
  * Each call produces unique data so parallel tests never collide.
+ * All test data is prefixed with TEST_MARKER for easy identification and cleanup.
  */
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -8,11 +9,20 @@ import { fileURLToPath } from 'url';
 const currentDir = path.dirname(fileURLToPath(import.meta.url));
 export const TEST_IMAGE_PATH = path.join(currentDir, 'test-image.png');
 
+/** Marker prefix for all E2E test data. Used by global cleanup to identify and delete test artifacts. */
+export const TEST_MARKER = '_t_';
+
 const DEFAULT_PASSWORD = 'testpass123';
 
-/** Unique prefix combining timestamp + random suffix to avoid collisions in parallel runs. */
+/**
+ * Unique prefix combining test marker + short timestamp + random suffix.
+ * Total budget: 30-char username limit minus role length (~12 max) = ~18 chars for prefix.
+ * Format: `_t_` (3) + last 8 digits of timestamp (8) + random 4 chars (4) = 15 chars.
+ */
 function createUniquePrefix(): string {
-  return `${Date.now()}${Math.random().toString(36).slice(2, 6)}`;
+  const shortTimestamp = String(Date.now()).slice(-8);
+  const randomSuffix = Math.random().toString(36).slice(2, 6);
+  return `${TEST_MARKER}${shortTimestamp}${randomSuffix}`;
 }
 
 export interface TestUserData {
@@ -34,7 +44,7 @@ export function createUserData(role: string): TestUserData {
 export interface TestRecipeData {
   title: string;
   description: string;
-  category: string;
+  tags: string[];
   difficulty: string;
   cookingTime: number;
   servings: number;
@@ -52,9 +62,9 @@ export interface TestRecipeData {
 export function createRecipeData(titlePrefix = 'Recipe'): TestRecipeData {
   const prefix = createUniquePrefix();
   return {
-    title: `${titlePrefix} ${prefix}`,
+    title: `${TEST_MARKER}${titlePrefix} ${prefix}`,
     description: 'A delicious test recipe created by e2e tests.',
-    category: 'Italian',
+    tags: ['Italian'],
     difficulty: 'medium',
     cookingTime: 30,
     servings: 4,

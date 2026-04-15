@@ -69,7 +69,7 @@ export async function createTestRecipe(
   overrides?: Partial<{
     title: string;
     description: string;
-    category: string;
+    tags: string[];
     difficulty: string;
     cookingTime: number;
     servings: number;
@@ -82,7 +82,7 @@ export async function createTestRecipe(
   const recipe = await Recipe.create({
     title: overrides?.title || 'Test Recipe',
     description: overrides?.description || 'A delicious test recipe',
-    category: overrides?.category || 'Italian',
+    tags: overrides?.tags || ['Italian'],
     difficulty: overrides?.difficulty || 'medium',
     cookingTime: overrides?.cookingTime || 30,
     servings: overrides?.servings || 4,

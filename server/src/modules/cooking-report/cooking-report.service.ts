@@ -1,6 +1,7 @@
 import { MultipartFile } from '@fastify/multipart';
 
 import { CookingReportDal } from './cooking-report.dal';
+import { SocialService } from '../social/social.service';
 import { NotFoundError } from '../../shared/errors';
 import { saveFile } from '../../plugins/upload';
 import { createNotification } from '../../shared/utils/notify';
@@ -38,6 +39,7 @@ export const CookingReportService = {
 
     const report = await CookingReportDal.createReport(userId, recipeId, image, notes);
     await CookingReportDal.incrementRecipeReportsCount(recipeId);
+    await SocialService.recomputeRecipeScore(recipeId);
 
     await createNotification({
       recipient: recipe.author.toString(),

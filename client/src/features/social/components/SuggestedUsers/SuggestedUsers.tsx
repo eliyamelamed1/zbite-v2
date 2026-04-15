@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSuggestedUsers, followUser } from '../../../../features/social/api/users';
-import { imageUrl } from '../../../../utils/imageUrl';
+import { getAvatarUrl } from '../../../../utils/getAvatarUrl';
 import { User } from '../../../../types';
 import toast from 'react-hot-toast';
 import styles from './SuggestedUsers.module.css';
@@ -31,7 +31,7 @@ export default function SuggestedUsers() {
         <div key={u._id} className={styles.item}>
           <img
             className={styles.avatar}
-            src={imageUrl(u.avatar) || `https://ui-avatars.com/api/?name=${u.username}&background=F0E0D0&color=2D1810`}
+            src={getAvatarUrl(u.avatar, u.username)}
             alt={u.username}
             onClick={() => navigate(`/user/${u._id}`)}
           />

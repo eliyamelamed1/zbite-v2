@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { createRecipe } from '../../features/recipes/api/recipes';
 import RecipeForm from '../../features/recipes/components/RecipeForm/RecipeForm';
+import SEO from '../../components/(ui)/seo/SEO/SEO';
 import styles from '../Explore/Explore.module.css';
 
 export default function CreateRecipe() {
@@ -13,6 +14,7 @@ export default function CreateRecipe() {
 
   return (
     <div className={styles.page}>
+      <SEO title="Create Recipe" description="Share a new recipe with the zbite community." />
       <h1 className={styles.title} >Create a Recipe</h1>
       <RecipeForm onSubmit={handleSubmit} />
     </div>

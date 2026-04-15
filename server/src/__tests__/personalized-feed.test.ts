@@ -15,13 +15,13 @@ describe('Personalized Feed', () => {
 
     // Create recipes by another user in different categories
     const author = await registerAndLogin(app);
-    await createTestRecipe(app, author.token, { title: 'Italian Pasta', category: 'Italian' });
-    await createTestRecipe(app, author.token, { title: 'Asian Stir Fry', category: 'Asian' });
+    await createTestRecipe(app, author.token, { title: 'Italian Pasta', tags: ['Italian'] });
+    await createTestRecipe(app, author.token, { title: 'Asian Stir Fry', tags: ['Asian'] });
 
     const res = await app.inject({ method: 'GET', url: '/api/recipes/explore', headers: authHeader(user.token) });
     const data = JSON.parse(res.body).data;
     expect(data.length).toBeGreaterThanOrEqual(2);
-    expect(data[0].category).toBe('Italian');
+    expect(data[0].tags).toContain('Italian');
   });
 
   it('falls back to trending for user with no interests', async () => {

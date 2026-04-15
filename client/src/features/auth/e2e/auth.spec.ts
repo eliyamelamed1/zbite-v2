@@ -2,18 +2,18 @@ import { test, expect } from '@playwright/test';
 
 import { registerUserViaApi } from '../../../e2e/helpers/api-client';
 import { createUserData, DEFAULT_INTERESTS } from '../../../e2e/fixtures/test-data';
-import { LandingPage } from '../../../e2e/pages/LandingPage';
+import { HomePage } from '../../../e2e/pages/HomePage';
 import { RegisterPage } from '../../../e2e/pages/RegisterPage';
 import { LoginPage } from '../../../e2e/pages/LoginPage';
 import { Navbar } from '../../../e2e/pages/components/Navbar';
 
 test.describe('Auth', () => {
-  test('landing page renders title and nav links', async ({ page }) => {
-    const landing = new LandingPage(page);
+  test('home page renders title and nav links', async ({ page }) => {
+    const home = new HomePage(page);
 
-    await landing.goto();
+    await home.goto();
 
-    await landing.expectTitleVisible();
+    await home.expectTitleVisible();
     await expect(page.getByRole('link', { name: 'Log In', exact: true })).toBeVisible();
   });
 

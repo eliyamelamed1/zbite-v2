@@ -1,12 +1,3 @@
-/** Millisecond threshold to detect a double-tap gesture. */
-export const DOUBLE_TAP_THRESHOLD_MS = 400;
-
-/** Duration of the heart burst animation on double-tap like. */
-export const HEART_ANIMATION_MS = 800;
-
-/** Duration of the like button scale bounce animation. */
-export const LIKE_ANIMATION_MS = 350;
-
 /** Default debounce delay for search inputs. */
 export const DEBOUNCE_MS = 300;
 
@@ -42,3 +33,40 @@ export const ONE_WEEK_HOURS = 168;
 
 /** Confetti configuration for recipe publish celebration. */
 export const CONFETTI_CONFIG = { particleCount: 150, spread: 80, origin: { y: 0.6 } };
+
+/** Default number of recipes per page in recommendation results. */
+export const RECOMMEND_PAGE_SIZE = 4;
+
+/** Number of recipe cards shown per row on the Home page. */
+export const HOME_PREVIEW_LIMIT = 4;
+
+/** Time constraint options for the Choose flow. */
+export const TIME_OPTIONS = [
+  { label: 'Under 15 min', value: '0-15' },
+  { label: '15-30 min', value: '15-30' },
+  { label: '30-60 min', value: '30-60' },
+  { label: '60+ min', value: '60-max' },
+] as const;
+
+/** Category options for "Help Me Decide" path. */
+export const CATEGORY_OPTIONS = [
+  { label: 'Pasta', value: 'pasta' },
+  { label: 'Chicken', value: 'chicken' },
+  { label: 'Beef', value: 'beef' },
+  { label: 'Seafood', value: 'seafood' },
+  { label: 'Vegetarian', value: 'vegetarian' },
+  { label: 'Rice & Noodles', value: 'rice-noodles' },
+  { label: 'Soup & Stew', value: 'soup-stew' },
+  { label: 'Salad & Bowl', value: 'salad-bowl' },
+  { label: 'Sandwich & Wrap', value: 'sandwich-wrap' },
+] as const;
+
+/** Preference options for "Help Me Decide" step 3. */
+export const PREFERENCE_OPTIONS = [
+  { label: 'Healthy', value: 'healthy' },
+  { label: 'High Protein', value: 'high-protein' },
+  { label: 'Budget Friendly', value: 'budget' },
+  { label: 'Family Friendly', value: 'family-friendly' },
+  { label: 'One Pan', value: 'one-pan' },
+  { label: 'Meal Prep', value: 'meal-prep' },
+] as const;

@@ -10,8 +10,18 @@
 }
 
 .card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-hover);
+}
+
+.cardMinimal {
+  background: transparent;
+  margin-bottom: 0;
+}
+
+.cardMinimal:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .imageWrapper {
@@ -21,8 +31,27 @@
 
 .image {
   width: 100%;
+  aspect-ratio: 16 / 9;
   display: block;
   object-fit: cover;
+}
+
+.cardMinimal .image {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-card);
+}
+
+.cardMinimal .body {
+  padding: 6px 2px;
+}
+
+.cardMinimal .title {
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.cardMinimal .meta {
+  font-size: 10px;
 }
 
 .difficultyBadge {
@@ -30,7 +59,7 @@
   bottom: 10px;
   left: 10px;
   padding: 3px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-pill);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -38,62 +67,26 @@
 }
 
 .easy {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: var(--color-easy-bg);
+  color: var(--color-easy-text);
 }
 
 .medium {
-  background: #fff3e0;
-  color: #e65100;
+  background: var(--color-medium-bg);
+  color: var(--color-medium-text);
 }
 
 .hard {
-  background: #fbe9e7;
-  color: #c62828;
+  background: var(--color-hard-bg);
+  color: var(--color-hard-text);
 }
 
-.heartBtn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.85);
-  border: none;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.15s;
-}
-
-.heartBtn:active {
-  transform: scale(0.9);
-}
-
-.heartBtnSaved {
-  color: #e53e3e;
-  background: rgba(255, 255, 255, 0.95);
-}
 
 .body {
-  padding: 12px;
+  padding: 14px;
+  text-align: left;
 }
 
-.rating {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  margin-bottom: 6px;
-}
-
-.star {
-  color: var(--color-secondary);
-}
 
 .title {
   font-family: var(--font-heading);
@@ -130,6 +123,25 @@
 .meta {
   display: flex;
   gap: 8px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.metaBold {
+  font-weight: 700;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.tag {
+  padding: 2px 8px;
+  background: var(--color-bg);
+  border-radius: 10px;
   font-size: 11px;
   color: var(--color-text-secondary);
 }

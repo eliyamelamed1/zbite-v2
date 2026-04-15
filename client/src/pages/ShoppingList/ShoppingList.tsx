@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { ShoppingCart, Square, CheckSquare, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import {
@@ -7,6 +8,7 @@ import {
   removeShoppingItem,
   clearShoppingList,
 } from '../../features/shopping-list/api/shopping-list';
+import SEO from '../../components/(ui)/seo/SEO/SEO';
 import styles from './ShoppingList.module.css';
 
 import type { ShoppingItem } from '../../features/shopping-list/api/shopping-list';
@@ -78,6 +80,7 @@ export default function ShoppingListPage() {
 
   return (
     <div className={styles.page}>
+      <SEO title="Shopping List" description="Your ingredient shopping list." noindex />
       <div className={styles.header}>
         <h1 className={styles.title}>Shopping List</h1>
         {items.length > 0 && (
@@ -89,7 +92,7 @@ export default function ShoppingListPage() {
 
       {items.length === 0 ? (
         <div className={styles.empty}>
-          <span className={styles.emptyIcon}>🛒</span>
+          <span className={styles.emptyIcon}><ShoppingCart size={32} /></span>
           <p className={styles.emptyText}>Your shopping list is empty</p>
           <p className={styles.emptyHint}>Add ingredients from any recipe to start building your list</p>
         </div>
@@ -104,7 +107,7 @@ export default function ShoppingListPage() {
                   onClick={() => handleToggle(item._id, true)}
                   aria-label="Mark as bought"
                 >
-                  ☐
+                  <Square size={18} />
                 </button>
                 <div className={styles.itemInfo}>
                   <span className={styles.itemAmount}>{item.amount}</span>
@@ -118,7 +121,7 @@ export default function ShoppingListPage() {
                   onClick={() => handleRemove(item._id)}
                   aria-label="Remove item"
                 >
-                  ✕
+                  <X size={16} />
                 </button>
               </div>
             ))}
@@ -138,7 +141,7 @@ export default function ShoppingListPage() {
                       onClick={() => handleToggle(item._id, false)}
                       aria-label="Uncheck item"
                     >
-                      ☑
+                      <CheckSquare size={18} />
                     </button>
                     <div className={styles.itemInfo}>
                       <span className={styles.itemAmount}>{item.amount}</span>
@@ -149,7 +152,7 @@ export default function ShoppingListPage() {
                       onClick={() => handleRemove(item._id)}
                       aria-label="Remove item"
                     >
-                      ✕
+                      <X size={16} />
                     </button>
                   </div>
                 ))}

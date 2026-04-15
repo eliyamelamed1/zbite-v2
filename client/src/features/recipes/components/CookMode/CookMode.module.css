@@ -75,7 +75,7 @@
 }
 
 .stepText {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 600;
   line-height: 1.5;
   margin-bottom: 24px;
@@ -121,7 +121,7 @@
 }
 
 .bottomBar {
-  padding: 16px 20px;
+  padding: 12px 16px;
   background: var(--color-card);
   border-top: 1px solid var(--color-border);
   display: flex;
@@ -131,11 +131,11 @@
 
 .prevBtn {
   flex: 1;
-  padding: 14px;
+  padding: 10px;
   border: 1.5px solid var(--color-border);
   background: transparent;
   border-radius: var(--radius-btn);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-body);
@@ -144,12 +144,12 @@
 
 .nextBtn {
   flex: 2;
-  padding: 14px;
+  padding: 10px;
   background: var(--color-primary);
   color: white;
   border: none;
   border-radius: var(--radius-btn);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-body);

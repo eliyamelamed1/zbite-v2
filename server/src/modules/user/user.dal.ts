@@ -55,6 +55,20 @@ export const UserDal = {
     return User.findByIdAndUpdate(userId, updates, { new: true });
   },
 
+  /** Compute the total recipeScore across a user's published recipes. */
+  async getTotalRecipeScore(userId: string): Promise<number> {
+    const result = await Recipe.aggregate([
+      {
+        $match: {
+          author: new Types.ObjectId(userId),
+          status: { $ne: 'draft' },
+        },
+      },
+      { $group: { _id: null, total: { $sum: '$recipeScore' } } },
+    ]);
+    return result[0]?.total ?? 0;
+  },
+
   /** Get users not followed by the current user, sorted by popularity. */
   async getSuggestedUsers(currentUserId: string): Promise<IUser[]> {
     const follows = await Follow.find({ follower: currentUserId }).select('following');

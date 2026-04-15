@@ -1,4 +1,4 @@
-import CategoryChips from '../../../../components/(ui)/forms/CategoryChips/CategoryChips';
+import TagChips from '../../../../components/(ui)/forms/CategoryChips/CategoryChips';
 import styles from '../../../../pages/CreateRecipe/RecipeWizard.module.css';
 
 interface BasicsStepProps {
@@ -7,17 +7,17 @@ interface BasicsStepProps {
   difficulty: 'easy' | 'medium' | 'hard';
   cookingTime: string;
   servings: number;
-  category: string;
+  tags: string[];
   onTitleChange: (v: string) => void;
   onDescriptionChange: (v: string) => void;
   onDifficultyChange: (v: 'easy' | 'medium' | 'hard') => void;
   onCookingTimeChange: (v: string) => void;
   onServingsChange: (v: number) => void;
-  onCategoryChange: (v: string) => void;
+  onTagsChange: (v: string[]) => void;
 }
 
 export default function BasicsStep(props: BasicsStepProps): JSX.Element {
-  const { title, description, difficulty, cookingTime, servings, category } = props;
+  const { title, description, difficulty, cookingTime, servings, tags } = props;
 
   return (
     <>
@@ -54,8 +54,8 @@ export default function BasicsStep(props: BasicsStepProps): JSX.Element {
         </div>
       </div>
       <div className={styles.field}>
-        <label className={styles.label}>Category</label>
-        <CategoryChips selected={category} onChange={props.onCategoryChange} showAll={false} />
+        <label className={styles.label}>Tags (1-5)</label>
+        <TagChips multi selected={tags} onChange={props.onTagsChange} showAll={false} />
       </div>
     </>
   );

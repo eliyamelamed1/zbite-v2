@@ -2,28 +2,38 @@
  * Pure utility functions for the social module.
  */
 
-/** Minimum number of ratings before a recipe earns a score. */
-const MIN_RATINGS_FOR_SCORE = 3;
+/** Weight for each save — user wants to cook this recipe. */
+const SAVE_WEIGHT = 2;
+
+/** Weight for each comment — active engagement. */
+const COMMENT_WEIGHT = 1.5;
+
+/** Weight for each cooking report — strongest signal of recipe value. */
+const COOK_WEIGHT = 3;
 
 /** Precision multiplier for rounding scores to 2 decimal places. */
 const SCORE_PRECISION = 100;
 
-/** The neutral star rating — deviations above/below this drive the score. */
-const NEUTRAL_RATING = 3;
+interface EngagementCounts {
+  savesCount: number;
+  commentsCount: number;
+  reportsCount: number;
+}
 
 /**
- * Compute a recipe's score based on its average rating and number of ratings.
+ * Compute a recipe's score based on engagement signals.
  *
- * Formula: ratingsCount × (averageRating - 3) × log₂(1 + ratingsCount)
+ * Formula: saves×2 + comments×1.5 + cooks×3
  *
- * - Recipes with fewer than 3 ratings score 0 (too noisy).
- * - Ratings above 3 stars contribute positively; below 3 contribute negatively.
- * - The log₂ confidence factor rewards well-reviewed recipes without linear scaling.
+ * - Saves indicate intent to cook (moderate signal).
+ * - Comments show active engagement.
+ * - Cooking reports are the strongest signal — someone actually made the dish.
  */
-export function computeRecipeScore(averageRating: number, ratingsCount: number): number {
-  if (ratingsCount < MIN_RATINGS_FOR_SCORE) return 0;
+export function computeRecipeScore(counts: EngagementCounts): number {
+  const raw =
+    counts.savesCount * SAVE_WEIGHT +
+    counts.commentsCount * COMMENT_WEIGHT +
+    counts.reportsCount * COOK_WEIGHT;
 
-  const deviation = averageRating - NEUTRAL_RATING;
-  const confidence = Math.log2(1 + ratingsCount);
-  return Math.round(ratingsCount * deviation * confidence * SCORE_PRECISION) / SCORE_PRECISION;
+  return Math.round(raw * SCORE_PRECISION) / SCORE_PRECISION;
 }

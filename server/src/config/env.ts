@@ -10,6 +10,8 @@ const EnvSchema = z.object({
   JWT_SECRET: z.string().min(10),
   JWT_EXPIRES_IN: z.string().default('7d'),
   CLIENT_URL: z.string().default('http://localhost:5173'),
+  UPLOADS_DIR: z.string().optional(),
+  PRERENDER_TOKEN: z.string().optional(),
 });
 
 /** Validated environment variables. Import this instead of using process.env directly. */

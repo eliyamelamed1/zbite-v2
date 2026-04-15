@@ -17,3 +17,6 @@ export const getMe = () => api.get<{ user: User }>('/auth/me');
 
 export const saveInterests = (interests: string[]) =>
   api.put<{ user: User }>('/auth/interests', { interests });
+
+export const googleLogin = (credential: string) =>
+  api.post<AuthResponse>('/auth/google', { credential });

@@ -26,7 +26,7 @@ test.describe('Follow', () => {
     const feed = new FeedPage(authenticatedPage);
 
     await feed.goto();
-    // Feed tab (default) shows recipes from followed users
+    await feed.selectSort('Following');
     await feed.expectRecipeVisible(recipeData.title);
   });
 

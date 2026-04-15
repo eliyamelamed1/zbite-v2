@@ -13,10 +13,14 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\""
   },
   "dependencies": {
+    "@fastify/compress": "^8.3.1",
+    "@react-oauth/google": "^0.13.5",
     "axios": "^1.14.0",
     "canvas-confetti": "^1.9.4",
+    "lucide-react": "^1.8.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-helmet-async": "^3.0.0",
     "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.14.0",
     "typescript": "^6.0.2"

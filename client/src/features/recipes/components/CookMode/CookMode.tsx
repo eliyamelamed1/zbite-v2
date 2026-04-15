@@ -1,4 +1,8 @@
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
+import { useAuth } from '../../../auth';
+import { recordCook } from '../../../gamification';
 import { imageUrl } from '../../../../utils/imageUrl';
 import { Recipe } from '../../../../types';
 import styles from './CookMode.module.css';
@@ -9,10 +13,21 @@ interface CookModeProps {
 }
 
 export default function CookMode({ recipe, onExit }: CookModeProps) {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const steps = recipe.steps.sort((a, b) => a.order - b.order);
   const step = steps[currentStep];
   const total = steps.length;
+
+  /** Record the cook and exit — fire-and-forget for logged-in users. */
+  const handleFinishCooking = () => {
+    if (user) {
+      recordCook(recipe._id).then(() => {
+        toast.success('Nice cook! Added to your streak 🔥');
+      }).catch(() => { /* Non-blocking — CookMode exits regardless */ });
+    }
+    onExit();
+  };
 
   // Keep screen awake
   useEffect(() => {
@@ -73,7 +88,7 @@ export default function CookMode({ recipe, onExit }: CookModeProps) {
           className={styles.nextBtn}
           onClick={() => {
             if (currentStep < total - 1) setCurrentStep(currentStep + 1);
-            else onExit();
+            else handleFinishCooking();
           }}
         >
           {currentStep < total - 1 ? 'Next Step' : 'Finish Cooking'}

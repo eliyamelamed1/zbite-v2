@@ -10,5 +10,6 @@ import { GamificationController } from './gamification.controller';
 export default async function gamificationRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get('/streaks/me', { preHandler: [fastify.authenticate] }, GamificationController.getStreak);
   fastify.get('/achievements/me', { preHandler: [fastify.authenticate] }, GamificationController.getAchievements);
+  fastify.get('/achievements/:userId', GamificationController.getUserAchievements);
   fastify.post('/cook', { preHandler: [fastify.authenticate] }, GamificationController.recordCook);
 }

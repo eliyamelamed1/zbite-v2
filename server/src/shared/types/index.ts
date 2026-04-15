@@ -4,7 +4,8 @@ export interface IUser extends Document {
   _id: Types.ObjectId;
   username: string;
   email: string;
-  passwordHash: string;
+  passwordHash?: string;
+  googleId?: string;
   avatar: string;
   bio: string;
   interests: string[];
@@ -22,7 +23,8 @@ export interface IRecipe extends Document {
   title: string;
   description: string;
   author: Types.ObjectId | IUser;
-  category: string;
+  tags: string[];
+  systemTags: string[];
   difficulty: 'easy' | 'medium' | 'hard';
   cookingTime: number;
   servings: number;
@@ -30,21 +32,14 @@ export interface IRecipe extends Document {
   steps: { order: number; title: string; instruction: string; image: string }[];
   nutrition: { calories: number; protein: number; carbs: number; fat: number };
   coverImage: string;
-  averageRating: number;
-  ratingsCount: number;
-  likesCount: number;
+  status: 'draft' | 'published';
+  viewsCount: number;
   commentsCount: number;
   savesCount: number;
   reportsCount: number;
   recipeScore: number;
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface IRating extends Document {
-  user: Types.ObjectId;
-  recipe: Types.ObjectId;
-  stars: number;
 }
 
 export interface ISavedRecipe extends Document {
@@ -56,12 +51,6 @@ export interface ISavedRecipe extends Document {
 export interface IFollow extends Document {
   follower: Types.ObjectId;
   following: Types.ObjectId;
-  createdAt: Date;
-}
-
-export interface ILike extends Document {
-  user: Types.ObjectId;
-  recipe: Types.ObjectId;
   createdAt: Date;
 }
 
@@ -78,7 +67,7 @@ export interface IComment extends Document {
 export interface INotification extends Document {
   recipient: Types.ObjectId;
   sender: Types.ObjectId | IUser;
-  type: 'like' | 'follow' | 'save' | 'rate' | 'comment' | 'mention' | 'cooking_report';
+  type: 'follow' | 'save' | 'comment' | 'mention' | 'cooking_report';
   recipe?: Types.ObjectId | IRecipe;
   read: boolean;
   createdAt: Date;

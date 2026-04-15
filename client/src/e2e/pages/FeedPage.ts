@@ -1,6 +1,6 @@
 import { type Page, expect } from '@playwright/test';
 
-/** Page object for the feed page (`/feed`). */
+/** Page object for the unified feed/explore page (`/feed`). */
 export class FeedPage {
   constructor(private readonly page: Page) {}
 
@@ -8,16 +8,19 @@ export class FeedPage {
     await this.page.goto('/feed');
   }
 
-  async switchToFeedTab(): Promise<void> {
-    await this.page.getByRole('button', { name: 'Feed' }).click();
-  }
+  /** Open the sort dropdown and select an option by label (e.g. 'Following', 'Trending'). */
+  async selectSort(label: string): Promise<void> {
+    await this.page.waitForLoadState('networkidle');
 
-  async switchToExploreTab(): Promise<void> {
-    await this.page.getByRole('button', { name: 'Explore' }).click();
-  }
+    // Open the sort dropdown by clicking the trigger button
+    const trigger = this.page.locator('[aria-haspopup="listbox"]');
+    await trigger.click();
 
-  async switchToSavedTab(): Promise<void> {
-    await this.page.getByRole('button', { name: 'Saved' }).click();
+    const endpoint = label === 'Following' ? '/recipes/following' : '/recipes/explore';
+    await Promise.all([
+      this.page.waitForResponse((resp) => resp.url().includes(endpoint)),
+      this.page.getByRole('option').filter({ hasText: label }).click(),
+    ]);
   }
 
   async expectRecipeVisible(title: string): Promise<void> {
@@ -25,9 +28,8 @@ export class FeedPage {
   }
 
   async expectNoRecipes(): Promise<void> {
-    // Verify the feed is empty — wait a reasonable time to confirm nothing loads
     await expect(this.page.getByText('No recipes')).toBeVisible({ timeout: 5_000 }).catch(() => {
-      // Some UIs show an empty state differently — this is acceptable
+      // Some UIs show an empty state differently
     });
   }
 }

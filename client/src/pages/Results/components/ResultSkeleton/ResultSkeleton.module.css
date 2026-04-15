@@ -1,0 +1,81 @@
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.bone {
+  background: linear-gradient(90deg, var(--color-border) 25%, var(--color-skeleton) 50%, var(--color-border) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+  border-radius: 6px;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.cardImage {
+  composes: bone;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 0;
+}
+
+.cardBody {
+  padding: 16px;
+}
+
+.cardTitle {
+  composes: bone;
+  width: 70%;
+  height: 20px;
+  margin-bottom: 12px;
+}
+
+.cardMeta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.cardMetaItem {
+  composes: bone;
+  width: 60px;
+  height: 13px;
+}
+
+.cardAuthor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardAvatar {
+  composes: bone;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.cardName {
+  composes: bone;
+  width: 90px;
+  height: 13px;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+}

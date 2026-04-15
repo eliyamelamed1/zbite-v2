@@ -5,7 +5,7 @@ export class Navbar {
   constructor(private readonly page: Page) {}
 
   async search(query: string): Promise<void> {
-    await this.page.getByPlaceholder('Search curated recipes...').fill(query);
+    await this.page.getByPlaceholder('Search recipes & chefs...').fill(query);
   }
 
   async clickSearchResult(text: string): Promise<void> {

@@ -7,6 +7,14 @@ async function start(): Promise<void> {
   const app = await buildApp();
   await app.listen({ port: env.PORT, host: '0.0.0.0' });
   app.log.info(`Server running on port ${env.PORT}`);
+
+  const shutdown = async (signal: string): Promise<void> => {
+    app.log.info({ signal }, 'Received shutdown signal, closing server');
+    await app.close();
+    process.exit(0);
+  };
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
 start().catch((err) => {

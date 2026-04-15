@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Crown } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getLeaderboard } from '../../features/leaderboard/api/leaderboard';
 import { followUser } from '../../features/social/api/users';
-import { imageUrl } from '../../utils/imageUrl';
+import { getAvatarUrl } from '../../utils/getAvatarUrl';
 import { LeaderboardEntry } from '../../types';
 import { useAuth } from '../../features/auth';
+import SEO from '../../components/(ui)/seo/SEO/SEO';
 import styles from './Leaderboard.module.css';
 
 export default function Leaderboard() {
@@ -28,8 +30,24 @@ export default function Leaderboard() {
   const top3 = entries.slice(0, 3);
   const rest = entries.slice(3);
 
+  const leaderboardJsonLd = useMemo(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Top Chefs on zbite',
+    itemListElement: entries.map((entry, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Person',
+        name: entry.user.username,
+        url: `/user/${entry.user._id}`,
+      },
+    })),
+  }), [entries]);
+
   return (
     <div className={styles.page}>
+      <SEO title="Top Chefs" description="See the highest-ranked chefs on zbite." jsonLd={leaderboardJsonLd} />
       <div className={styles.header}>
         <h1 className={styles.title}>Top Chefs</h1>
         <p className={styles.subtitle}>Celebrating the culinary masters of our digital kitchen. Discover the creators who are redefining flavor and heritage.</p>
@@ -49,7 +67,8 @@ export default function Leaderboard() {
               {top3.length > 1 && (
                 <div className={styles.podiumItem}>
                   <div className={styles.podiumRank}>2</div>
-                  <img className={styles.podiumAvatar} src={imageUrl(top3[1].user.avatar) || `https://ui-avatars.com/api/?name=${top3[1].user.username}&background=F0E0D0&color=2D1810`} alt="" />
+                  <img className={styles.podiumAvatar} src={getAvatarUrl(top3[1].user.avatar, top3[1].user.username)} alt="" />
+                  <div className={`${styles.podiumBar} ${styles.podiumBarSilver}`} />
                   <div className={styles.podiumName}>{top3[1].user.username}</div>
                   <div className={styles.podiumScore}>{Math.round(top3[1].score).toLocaleString()} pts</div>
                   <div className={styles.podiumStats}>{top3[1].user.recipesCount} recipes</div>
@@ -57,8 +76,9 @@ export default function Leaderboard() {
                 </div>
               )}
               <div className={`${styles.podiumItem} ${styles.podiumFirst}`}>
-                <div className={styles.podiumRank}>👑 1</div>
-                <img className={styles.podiumAvatar} src={imageUrl(top3[0].user.avatar) || `https://ui-avatars.com/api/?name=${top3[0].user.username}&background=F0E0D0&color=2D1810`} alt="" />
+                <div className={styles.podiumRank}><Crown size={16} /> 1</div>
+                <img className={styles.podiumAvatar} src={getAvatarUrl(top3[0].user.avatar, top3[0].user.username)} alt="" />
+                <div className={`${styles.podiumBar} ${styles.podiumBarGold}`} />
                 <div className={styles.podiumName}>{top3[0].user.username}</div>
                 <div className={styles.podiumScore}>{Math.round(top3[0].score).toLocaleString()} pts</div>
                 <div className={styles.podiumBio}>{top3[0].user.bio}</div>
@@ -68,7 +88,8 @@ export default function Leaderboard() {
               {top3.length > 2 && (
                 <div className={styles.podiumItem}>
                   <div className={styles.podiumRank}>3</div>
-                  <img className={styles.podiumAvatar} src={imageUrl(top3[2].user.avatar) || `https://ui-avatars.com/api/?name=${top3[2].user.username}&background=F0E0D0&color=2D1810`} alt="" />
+                  <img className={styles.podiumAvatar} src={getAvatarUrl(top3[2].user.avatar, top3[2].user.username)} alt="" />
+                  <div className={`${styles.podiumBar} ${styles.podiumBarBronze}`} />
                   <div className={styles.podiumName}>{top3[2].user.username}</div>
                   <div className={styles.podiumScore}>{Math.round(top3[2].score).toLocaleString()} pts</div>
                   <div className={styles.podiumStats}>{top3[2].user.recipesCount} recipes</div>
@@ -85,7 +106,7 @@ export default function Leaderboard() {
                 {rest.map((entry) => (
                   <div key={entry.user._id} className={styles.row}>
                     <span className={styles.rank}>{entry.rank}</span>
-                    <img className={`${styles.rowAvatar} ${styles.clickable}`} src={imageUrl(entry.user.avatar) || `https://ui-avatars.com/api/?name=${entry.user.username}&background=F0E0D0&color=2D1810`} alt="" onClick={() => navigate(`/user/${entry.user._id}`)} />
+                    <img className={`${styles.rowAvatar} ${styles.clickable}`} src={getAvatarUrl(entry.user.avatar, entry.user.username)} alt="" onClick={() => navigate(`/user/${entry.user._id}`)} />
                     <div className={styles.rowInfo}>
                       <div className={styles.rowName}>{entry.user.username}</div>
                       {entry.user.bio && <div className={styles.rowBio}>{entry.user.bio}</div>}

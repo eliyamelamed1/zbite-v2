@@ -1,6 +1,8 @@
 /**
  * Backfill script — computes recipeScore for every recipe and chefScore for every user.
  *
+ * Uses engagement-based scoring: saves*2 + comments*1.5 + cooks*3
+ *
  * Run once after deploying the scoring schema changes:
  *   npx tsx server/src/scripts/backfill-scores.ts
  */
@@ -8,23 +10,19 @@
 import mongoose from 'mongoose';
 import { connectDB } from '../config/db';
 import Recipe from '../models/Recipe';
-import Rating from '../models/Rating';
 import User from '../models/User';
 import { computeRecipeScore } from '../modules/social/social.utils';
 
 async function backfillRecipeScores(): Promise<number> {
-  const recipes = await Recipe.find({}).select('_id');
+  const recipes = await Recipe.find({}).select('_id savesCount commentsCount reportsCount');
   let updated = 0;
 
   for (const recipe of recipes) {
-    const ratings = await Rating.find({ recipe: recipe._id }).select('stars');
-    const ratingsCount = ratings.length;
-
-    if (ratingsCount === 0) continue;
-
-    const sum = ratings.reduce((acc, r) => acc + r.stars, 0);
-    const averageRating = sum / ratingsCount;
-    const recipeScore = computeRecipeScore(averageRating, ratingsCount);
+    const recipeScore = computeRecipeScore({
+      savesCount: recipe.savesCount ?? 0,
+      commentsCount: recipe.commentsCount ?? 0,
+      reportsCount: recipe.reportsCount ?? 0,
+    });
 
     await Recipe.findByIdAndUpdate(recipe._id, { recipeScore });
     updated += 1;

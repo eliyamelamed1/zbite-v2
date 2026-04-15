@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-import { CATEGORIES } from '../../constants/categories';
+import { ALL_TAGS } from '../../constants/tags';
+import { VALID_CATEGORIES, VALID_PREFERENCES } from './recipe.consts';
 
 const TITLE_MAX_LENGTH = 120;
 const DESCRIPTION_MAX_LENGTH = 500;
@@ -29,7 +30,7 @@ const NutritionSchema = z.object({
 export const CreateRecipeBodySchema = z.object({
   title: z.string().min(1).max(TITLE_MAX_LENGTH),
   description: z.string().min(1).max(DESCRIPTION_MAX_LENGTH),
-  category: z.enum(CATEGORIES).default('Italian'),
+  tags: z.array(z.string().refine((t) => (ALL_TAGS as readonly string[]).includes(t))).min(1).max(5),
   difficulty: z.enum(['easy', 'medium', 'hard']),
   cookingTime: z.number().int().positive(),
   servings: z.number().int().min(MIN_SERVINGS),
@@ -63,7 +64,7 @@ export const ExploreFeedQuerySchema = z.object({
   page: z.string().optional(),
   limit: z.string().optional(),
   sort: z.enum(EXPLORE_SORT_OPTIONS).optional().default('recent'),
-  category: z.string().optional(),
+  tag: z.string().optional(),
 });
 export type ExploreFeedQuery = z.infer<typeof ExploreFeedQuerySchema>;
 
@@ -73,3 +74,43 @@ export const PaginationQuerySchema = z.object({
   limit: z.string().optional(),
 });
 export type PaginationQuery = z.infer<typeof PaginationQuerySchema>;
+
+const SEARCH_QUERY_MIN_LENGTH = 1;
+const SEARCH_QUERY_MAX_LENGTH = 100;
+
+/** Schema for the recipe search query parameters. */
+export const SearchRecipesQuerySchema = z.object({
+  q: z.string().min(SEARCH_QUERY_MIN_LENGTH).max(SEARCH_QUERY_MAX_LENGTH),
+  page: z.string().optional(),
+  limit: z.string().optional(),
+});
+export type SearchRecipesQuery = z.infer<typeof SearchRecipesQuerySchema>;
+
+/** Schema for category-based recommendations (Path A: "Help Me Decide"). */
+export const PickRecommendQuerySchema = z.object({
+  mode: z.literal('pick'),
+  category: z.enum(VALID_CATEGORIES),
+  minTime: z.coerce.number().int().nonnegative().optional(),
+  maxTime: z.coerce.number().int().positive().optional(),
+  preference: z.enum(VALID_PREFERENCES).optional(),
+  page: z.string().optional(),
+  limit: z.string().optional(),
+});
+export type PickRecommendQuery = z.infer<typeof PickRecommendQuerySchema>;
+
+/** Schema for ingredient-based recommendations (Path B: "Use What I Have"). */
+export const PantryRecommendQuerySchema = z.object({
+  mode: z.literal('pantry'),
+  ingredients: z.string().transform((s) => s.split(',').map((i) => i.trim().toLowerCase()).filter(Boolean)),
+  maxTime: z.coerce.number().int().positive().optional(),
+  page: z.string().optional(),
+  limit: z.string().optional(),
+});
+export type PantryRecommendQuery = z.infer<typeof PantryRecommendQuerySchema>;
+
+/** Union schema — dispatches based on the `mode` query param. */
+export const RecommendQuerySchema = z.discriminatedUnion('mode', [
+  PickRecommendQuerySchema,
+  PantryRecommendQuerySchema,
+]);
+export type RecommendQuery = z.infer<typeof RecommendQuerySchema>;

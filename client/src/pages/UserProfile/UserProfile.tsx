@@ -1,14 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Trophy, Flame, CookingPot, UtensilsCrossed, Bookmark } from 'lucide-react';
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../../features/auth';
 import { getProfile, updateProfile } from '../../features/profile/api/profile';
 import { followUser, unfollowUser, getFollowStatus } from '../../features/social/api/users';
 import { getUserRecipes, getSavedRecipes } from '../../features/recipes/api/recipes';
-import { imageUrl } from '../../utils/imageUrl';
+import { getMyStreak, getUserAchievements } from '../../features/gamification';
+import { imageUrl, handleImageError } from '../../utils/imageUrl';
+import { getAvatarUrl } from '../../utils/getAvatarUrl';
 import ImageUpload from '../../components/(ui)/forms/ImageUpload/ImageUpload';
-import { User, Recipe } from '../../types';
-import toast from 'react-hot-toast';
+import SEO from '../../components/(ui)/seo/SEO/SEO';
 import styles from './UserProfile.module.css';
+
+import type { User, Recipe, CookingStreak, Achievement } from '../../types';
+
+/** Maps achievement type keys to human-readable badge labels. */
+const ACHIEVEMENT_LABELS: Record<string, string> = {
+  first_cook: 'First Cook',
+  week_streak: '7-Day Streak',
+  month_streak: '30-Day Streak',
+  '5_cuisines': '5 Cuisines',
+  '10_recipes': '10 Recipes',
+  '50_recipes': '50 Recipes',
+};
 
 export default function UserProfile() {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +39,8 @@ export default function UserProfile() {
   const [editBio, setEditBio] = useState('');
   const [editAvatar, setEditAvatar] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
+  const [streak, setStreak] = useState<CookingStreak | null>(null);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
 
   const isOwner = me && me._id === id;
 
@@ -40,8 +58,14 @@ export default function UserProfile() {
           const f = await getFollowStatus(id).catch(() => ({ data: { following: false } }));
           setIsFollowing(f.data.following);
         }
+        getUserAchievements(id)
+          .then((achievementData) => setAchievements(achievementData))
+          .catch(() => { /* Non-critical — achievements optional */ });
         if (me && me._id === id) {
           getSavedRecipes(1).then((r) => setSavedRecipes(r.data.data)).catch(() => { /* Non-critical */ });
+          getMyStreak()
+            .then((streakData) => setStreak(streakData))
+            .catch(() => { /* Non-critical — streak data optional */ });
         }
       } catch { toast.error('Failed to load profile'); setProfile(null); }
       finally { setLoading(false); }
@@ -72,8 +96,20 @@ export default function UserProfile() {
 
   return (
     <div>
+      <SEO
+        title={`@${profile.username}`}
+        description={profile.bio ?? `Check out ${profile.username}'s recipes on zbite`}
+        image={getAvatarUrl(profile.avatar, profile.username)}
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Person',
+          name: profile.username,
+          description: profile.bio ?? '',
+          image: getAvatarUrl(profile.avatar, profile.username),
+        }}
+      />
       <div className={styles.header}>
-        <img className={styles.avatar} src={imageUrl(profile.avatar) || `https://ui-avatars.com/api/?name=${profile.username}&size=90&background=F0E0D0&color=2D1810`} alt={profile.username} />
+        <img className={styles.avatar} src={getAvatarUrl(profile.avatar, profile.username)} alt={profile.username} />
         <h1 className={styles.username}>@{profile.username}</h1>
         {profile.bio && <p className={styles.bio}>{profile.bio}</p>}
         <div className={styles.stats}>
@@ -81,13 +117,40 @@ export default function UserProfile() {
           <div className={`${styles.stat} ${styles.statClickable}`} onClick={() => navigate(`/user/${id}/followers`)}><span className={styles.statCount}>{profile.followersCount}</span><span className={styles.statLabel}>Followers</span></div>
           <div className={`${styles.stat} ${styles.statClickable}`} onClick={() => navigate(`/user/${id}/following`)}><span className={styles.statCount}>{profile.followingCount}</span><span className={styles.statLabel}>Following</span></div>
         </div>
+        <div className={styles.scoreStats}>
+          <div className={styles.scoreStat}>
+            <span className={styles.scoreIcon}><Trophy size={14} /></span>
+            <span className={styles.scoreValue}>{profile.chefScore > 0 ? Math.round(profile.chefScore) : '&#8212;'}</span>
+            <span className={styles.scoreLabel}>Chef Score</span>
+          </div>
+        </div>
+        {isOwner && streak && (
+          <div className={styles.cookingStats}>
+            <div className={styles.cookingStat}>
+              <span className={styles.cookingStatIcon}><Flame size={14} /></span>
+              <span className={styles.cookingStatValue}>{streak.currentStreak}-day streak</span>
+            </div>
+            <div className={styles.cookingStat}>
+              <span className={styles.cookingStatIcon}><CookingPot size={14} /></span>
+              <span className={styles.cookingStatValue}>{streak.totalCooked} cooked</span>
+            </div>
+          </div>
+        )}
+        {achievements.length > 0 && (
+          <div className={styles.badges}>
+            {achievements.map((a) => (
+              <span key={a._id} className={styles.badge}>
+                {ACHIEVEMENT_LABELS[a.type] ?? a.type}
+              </span>
+            ))}
+          </div>
+        )}
         <div className={styles.actions}>
           {isOwner ? (
             <button className={styles.editBtn} onClick={() => setShowEdit(true)}>Edit Profile</button>
           ) : (
             <>
               {me && <button className={isFollowing ? styles.unfollowBtn : styles.followBtn} onClick={handleFollow}>{isFollowing ? 'Following' : 'Follow'}</button>}
-              <button className={styles.messageBtn}>Message</button>
             </>
           )}
         </div>
@@ -95,15 +158,21 @@ export default function UserProfile() {
 
       <div className={styles.content}>
         <div className={styles.tabs}>
-          <button className={`${styles.tab} ${activeTab === 'recipes' ? styles.tabActive : ''}`} onClick={() => setActiveTab('recipes')}>🍽 Recipes</button>
-          {isOwner && <button className={`${styles.tab} ${activeTab === 'saved' ? styles.tabActive : ''}`} onClick={() => setActiveTab('saved')}>🔖 Saved</button>}
+          <button className={`${styles.tab} ${activeTab === 'recipes' ? styles.tabActive : ''}`} onClick={() => setActiveTab('recipes')}><UtensilsCrossed size={14} /> Recipes</button>
+          {isOwner && <button className={`${styles.tab} ${activeTab === 'saved' ? styles.tabActive : ''}`} onClick={() => setActiveTab('saved')}><Bookmark size={14} /> Saved</button>}
         </div>
 
         {displayRecipes.length > 0 ? (
           <div className={styles.profileGrid}>
             {displayRecipes.map((r) => (
               <div key={r._id} className={styles.profileGridItem} onClick={() => navigate(`/recipe/${r._id}`)}>
-                <img src={imageUrl(r.coverImage)} alt={r.title} />
+                <img src={imageUrl(r.coverImage)} alt={r.title} onError={handleImageError} loading="lazy" />
+                <div className={styles.gridOverlay}>
+                  <span className={styles.gridTitle}>{r.title}</span>
+                </div>
+                <span className={`${styles.gridDifficulty} ${styles[r.difficulty]}`}>
+                  {r.difficulty}
+                </span>
               </div>
             ))}
           </div>

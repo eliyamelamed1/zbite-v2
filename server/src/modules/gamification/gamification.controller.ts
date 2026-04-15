@@ -22,6 +22,15 @@ export const GamificationController = {
     return reply.send(result);
   },
 
+  /** GET /achievements/:userId — get any user's unlocked achievements (public). */
+  async getUserAchievements(
+    request: FastifyRequest<{ Params: { userId: string } }>,
+    reply: FastifyReply,
+  ): Promise<void> {
+    const result = await GamificationService.getAchievements(request.params.userId);
+    return reply.send(result);
+  },
+
   /** POST /cook — record a cook event for the current user. */
   async recordCook(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const result = await GamificationService.recordCook(request.authUser!.id);

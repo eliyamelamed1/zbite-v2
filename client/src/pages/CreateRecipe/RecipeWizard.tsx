@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { createRecipe } from '../../features/recipes/api/recipes';
 import { CONFETTI_CONFIG } from '../../utils/constants';
@@ -25,7 +26,7 @@ export default function RecipeWizard(): JSX.Element | null {
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
   const [cookingTime, setCookingTime] = useState('');
   const [servings, setServings] = useState(4);
-  const [category, setCategory] = useState('Italian');
+  const [tags, setTags] = useState<string[]>(['Italian']);
   const [ingredients, setIngredients] = useState<IngredientData[]>([{ amount: '', name: '' }]);
   const [recipeSteps, setRecipeSteps] = useState<StepData[]>([{ title: 'The Foundation', instruction: '', imageFile: null }]);
   const [calories, setCalories] = useState('');
@@ -41,7 +42,7 @@ export default function RecipeWizard(): JSX.Element | null {
     setLoading(true);
     const formData = new FormData();
     const data = {
-      title, description, difficulty, category,
+      title, description, difficulty, tags,
       cookingTime: Number(cookingTime), servings,
       ingredients: ingredients.filter((i) => i.name.trim() && i.amount.trim()),
       steps: recipeSteps.filter((s) => s.instruction.trim()).map((s, i) => ({ order: i + 1, title: s.title, instruction: s.instruction, image: '' })),
@@ -80,7 +81,7 @@ export default function RecipeWizard(): JSX.Element | null {
   return (
     <div className={styles.page}>
       <div className={styles.topBar}>
-        <button className={styles.closeBtn} onClick={() => navigate(-1)}>✕</button>
+        <button className={styles.closeBtn} onClick={() => navigate(-1)}><X size={18} /></button>
         <span className={styles.logo}>zbite</span>
         <span className={styles.stepLabel}>STEP {step} OF {TOTAL_STEPS - 1}</span>
       </div>
@@ -90,7 +91,7 @@ export default function RecipeWizard(): JSX.Element | null {
         </div>
         {error && <div className={styles.error}>{error}</div>}
         {step === 1 && <PhotoStep coverImage={coverImage} onCoverChange={setCoverImage} />}
-        {step === 2 && <BasicsStep title={title} description={description} difficulty={difficulty} cookingTime={cookingTime} servings={servings} category={category} onTitleChange={setTitle} onDescriptionChange={setDescription} onDifficultyChange={setDifficulty} onCookingTimeChange={setCookingTime} onServingsChange={setServings} onCategoryChange={setCategory} />}
+        {step === 2 && <BasicsStep title={title} description={description} difficulty={difficulty} cookingTime={cookingTime} servings={servings} tags={tags} onTitleChange={setTitle} onDescriptionChange={setDescription} onDifficultyChange={setDifficulty} onCookingTimeChange={setCookingTime} onServingsChange={setServings} onTagsChange={setTags} />}
         {step === 3 && <IngredientsStep ingredients={ingredients} onIngredientsChange={setIngredients} />}
         {step === 4 && <StepsStep steps={recipeSteps} onStepsChange={setRecipeSteps} calories={calories} protein={protein} carbs={carbs} fat={fat} onCaloriesChange={setCalories} onProteinChange={setProtein} onCarbsChange={setCarbs} onFatChange={setFat} />}
       </div>

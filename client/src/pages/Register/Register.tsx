@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth';
+import SEO from '../../components/(ui)/seo/SEO/SEO';
 import styles from '../Login/Login.module.css';
 
 export default function Register() {
@@ -21,7 +22,7 @@ export default function Register() {
     setLoading(true);
     try {
       await register(username, email, password);
-      navigate('/explore');
+      navigate('/feed');
     } catch (err: any) {
       setError(err.response?.data?.error?.message || 'Registration failed');
     } finally {
@@ -31,6 +32,7 @@ export default function Register() {
 
   return (
     <div className={styles.page}>
+      <SEO title="Sign Up" description="Create your zbite account and start cooking." />
       <form className={styles.card} onSubmit={handleSubmit}>
         <h1 className={styles.title}>Join zbite</h1>
         <p className={styles.subtitle}>Create your account</p>

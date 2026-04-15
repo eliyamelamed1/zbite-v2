@@ -39,13 +39,7 @@ export const CreateCommentBodySchema = z.object({
 });
 export type CreateCommentBody = z.infer<typeof CreateCommentBodySchema>;
 
-/** Schema for submitting a rating (1-5 stars). */
-export const RatingBodySchema = z.object({
-  stars: z.number().int().min(1).max(5),
-});
-export type RatingBody = z.infer<typeof RatingBodySchema>;
-
-/** Schema for bulk-checking like/save status on a list of recipe IDs. */
+/** Schema for bulk-checking save status on a list of recipe IDs. */
 export const BulkStatusBodySchema = z.object({
   recipeIds: z.array(z.string().min(1)).min(1).max(100),
 });
@@ -68,8 +62,8 @@ export const PaginationQuerySchema = z.object({
 });
 export type PaginationQuery = z.infer<typeof PaginationQuerySchema>;
 
-/** Schema for saved recipes query (with optional category filter). */
+/** Schema for saved recipes query (with optional tag filter). */
 export const SavedRecipesQuerySchema = PaginationQuerySchema.extend({
-  category: z.string().optional(),
+  tag: z.string().optional(),
 });
 export type SavedRecipesQuery = z.infer<typeof SavedRecipesQuerySchema>;

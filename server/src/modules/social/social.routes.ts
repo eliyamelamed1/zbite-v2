@@ -5,18 +5,10 @@ import { SocialController } from './social.controller';
 // ---------------------------------------------------------------------------
 // Each function below registers routes for a single sub-domain.
 // The parent (e.g. app.ts) mounts each at the appropriate prefix:
-//   fastify.register(likeRoutes, { prefix: '/api/likes' })
 //   fastify.register(commentRoutes, { prefix: '/api/comments' })
+//   fastify.register(followRoutes, { prefix: '/api/follows' })
 //   ...
 // ---------------------------------------------------------------------------
-
-/** Like routes — mounted at /api/likes. */
-export async function likeRoutes(fastify: FastifyInstance): Promise<void> {
-  fastify.post('/:recipeId', { preHandler: [fastify.authenticate] }, SocialController.likeRecipe);
-  fastify.delete('/:recipeId', { preHandler: [fastify.authenticate] }, SocialController.unlikeRecipe);
-  fastify.get('/:recipeId/status', { preHandler: [fastify.authenticate] }, SocialController.getLikeStatus);
-  fastify.post('/bulk-status', { preHandler: [fastify.authenticate] }, SocialController.getBulkLikeStatus);
-}
 
 /** Comment routes — mounted at /api/comments. */
 export async function commentRoutes(fastify: FastifyInstance): Promise<void> {
@@ -42,12 +34,6 @@ export async function savedRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post('/:recipeId', { preHandler: [fastify.authenticate] }, SocialController.saveRecipe);
   fastify.delete('/:recipeId', { preHandler: [fastify.authenticate] }, SocialController.unsaveRecipe);
   fastify.get('/:recipeId/status', { preHandler: [fastify.authenticate] }, SocialController.getSaveStatus);
-}
-
-/** Rating routes — mounted at /api/ratings. */
-export async function ratingRoutes(fastify: FastifyInstance): Promise<void> {
-  fastify.post('/:recipeId', { preHandler: [fastify.authenticate] }, SocialController.rateRecipe);
-  fastify.get('/:recipeId/me', { preHandler: [fastify.authenticate] }, SocialController.getMyRating);
 }
 
 /** Notification routes — mounted at /api/notifications. */

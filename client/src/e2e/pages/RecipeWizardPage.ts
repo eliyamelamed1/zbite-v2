@@ -5,7 +5,7 @@ interface RecipeBasics {
   description: string;
   difficulty: string;
   cookingTime: number;
-  category: string;
+  tags: string[];
 }
 
 interface RecipeNutrition {
@@ -34,14 +34,16 @@ export class RecipeWizardPage {
     await this.page.getByRole('button', { name: 'Next' }).click();
   }
 
-  /** Step 2: Fill in title, description, difficulty, cooking time, category. */
+  /** Step 2: Fill in title, description, difficulty, cooking time, tags. */
   async fillBasics(basics: RecipeBasics): Promise<void> {
     await expect(this.page.getByText('The Basics')).toBeVisible();
     await this.page.getByPlaceholder("e.g. Grandma's Sourdough").fill(basics.title);
     await this.page.getByPlaceholder('Share the story behind').fill(basics.description);
     await this.page.getByRole('button', { name: new RegExp(basics.difficulty, 'i') }).click();
     await this.page.getByPlaceholder('Min').fill(String(basics.cookingTime));
-    await this.page.locator('button').filter({ hasText: basics.category }).click();
+    for (const tag of basics.tags) {
+      await this.page.locator('button').filter({ hasText: tag }).click();
+    }
     await this.page.getByRole('button', { name: 'Next' }).click();
   }
 

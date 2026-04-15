@@ -4,6 +4,7 @@ import { getRecipe, updateRecipe } from '../../features/recipes/api/recipes';
 import { useAuth } from '../../features/auth';
 import RecipeForm from '../../features/recipes/components/RecipeForm/RecipeForm';
 import { Recipe } from '../../types';
+import SEO from '../../components/(ui)/seo/SEO/SEO';
 import styles from '../Explore/Explore.module.css';
 
 export default function EditRecipe() {
@@ -34,6 +35,7 @@ export default function EditRecipe() {
 
   return (
     <div className={styles.page}>
+      <SEO title="Edit Recipe" description="Edit your recipe." noindex />
       <h1 className={styles.title} >Edit Recipe</h1>
       <RecipeForm initialData={recipe} onSubmit={handleSubmit} submitLabel="Save Changes" />
     </div>

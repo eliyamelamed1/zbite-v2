@@ -6,63 +6,37 @@ import { buildPagination } from '../../shared/utils/pagination';
 
 import type { IComment, INotification, PaginatedResult } from '../../shared/types';
 
-const ROUNDING_FACTOR = 10;
-
-/** Computes a rounded average from a list of star values. */
-function computeAverage(ratings: readonly { stars: number }[]): number {
-  if (ratings.length === 0) return 0;
-  const sum = ratings.reduce((acc, rating) => acc + rating.stars, 0);
-  return Math.round((sum / ratings.length) * ROUNDING_FACTOR) / ROUNDING_FACTOR;
-}
-
 // ---------------------------------------------------------------------------
 // Service — business logic with NO HTTP concerns
 // ---------------------------------------------------------------------------
 
-/** Social service — orchestrates all social actions (likes, comments, follows, saves, ratings, notifications). */
+/**
+ * Recompute a recipe's engagement score and update both the recipe and its author's chefScore.
+ * Call after any action that changes savesCount, commentsCount, or reportsCount.
+ */
+async function recomputeRecipeScore(recipeId: string): Promise<void> {
+  const recipe = await SocialDal.findRecipeById(recipeId);
+  if (!recipe) return;
+
+  const newScore = computeRecipeScore({
+    savesCount: recipe.savesCount,
+    commentsCount: recipe.commentsCount,
+    reportsCount: recipe.reportsCount,
+  });
+
+  await SocialDal.updateRecipeScore(recipeId, newScore);
+
+  const authorId = recipe.author.toString();
+  const totalChefScore = await SocialDal.sumRecipeScoresByAuthor(authorId);
+  await SocialDal.updateUserChefScore(authorId, totalChefScore);
+}
+
+/** Social service — orchestrates all social actions (comments, follows, saves, notifications). */
 export const SocialService = {
-  // ---- Likes ----
+  // ---- Score ----
 
-  /** Like a recipe. Throws ConflictError if already liked. */
-  async likeRecipe(userId: string, recipeId: string): Promise<{ liked: boolean }> {
-    const existing = await SocialDal.findLikeByUserRecipe(userId, recipeId);
-    if (existing) throw new ConflictError('Like', recipeId);
-
-    await SocialDal.createLike(userId, recipeId);
-    const recipe = await SocialDal.incrementRecipeCounter(recipeId, 'likesCount', 1);
-
-    if (recipe) {
-      await createNotification({
-        recipient: recipe.author.toString(),
-        sender: userId,
-        type: 'like',
-        recipe: recipeId,
-      });
-    }
-
-    return { liked: true };
-  },
-
-  /** Unlike a recipe. Throws ValidationError if not currently liked. */
-  async unlikeRecipe(userId: string, recipeId: string): Promise<{ liked: boolean }> {
-    const deleted = await SocialDal.deleteLike(userId, recipeId);
-    if (!deleted) throw new ValidationError('Not liked');
-
-    await SocialDal.incrementRecipeCounter(recipeId, 'likesCount', -1);
-    return { liked: false };
-  },
-
-  /** Check whether a user has liked a specific recipe. */
-  async getLikeStatus(userId: string, recipeId: string): Promise<{ liked: boolean }> {
-    const like = await SocialDal.findLikeByUserRecipe(userId, recipeId);
-    return { liked: !!like };
-  },
-
-  /** Bulk-check like status for multiple recipes. */
-  async getBulkLikeStatus(userId: string, recipeIds: readonly string[]): Promise<{ likedMap: Record<string, boolean> }> {
-    const likedMap = await SocialDal.bulkLikeStatusByUser(userId, recipeIds);
-    return { likedMap };
-  },
+  /** Exposed for use by other modules (e.g. cooking-report). */
+  recomputeRecipeScore,
 
   // ---- Comments ----
 
@@ -79,6 +53,7 @@ export const SocialService = {
 
     const comment = await SocialDal.createComment(userId, recipeId, trimmedText, parentCommentId);
     const recipe = await SocialDal.incrementRecipeCounter(recipeId, 'commentsCount', 1);
+    await recomputeRecipeScore(recipeId);
 
     if (recipe) {
       await createNotification({
@@ -165,7 +140,9 @@ export const SocialService = {
     }
 
     await SocialDal.deleteComment(commentId);
-    await SocialDal.incrementRecipeCounter(comment.recipe.toString(), 'commentsCount', -1);
+    const commentRecipeId = comment.recipe.toString();
+    await SocialDal.incrementRecipeCounter(commentRecipeId, 'commentsCount', -1);
+    await recomputeRecipeScore(commentRecipeId);
     return { deleted: true };
   },
 
@@ -235,6 +212,7 @@ export const SocialService = {
 
     await SocialDal.createSavedRecipe(userId, recipeId);
     const recipe = await SocialDal.incrementRecipeCounter(recipeId, 'savesCount', 1);
+    await recomputeRecipeScore(recipeId);
 
     if (recipe) {
       await createNotification({
@@ -254,27 +232,28 @@ export const SocialService = {
     if (!deleted) throw new ValidationError('Recipe not saved');
 
     await SocialDal.incrementRecipeCounter(recipeId, 'savesCount', -1);
+    await recomputeRecipeScore(recipeId);
     return { saved: false };
   },
 
-  /** Get saved recipes for a user with optional category filter (paginated). */
+  /** Get saved recipes for a user with optional tag filter (paginated). */
   async getSavedRecipes(
     userId: string,
     page: number,
     limit: number,
     skip: number,
-    category?: string,
+    tag?: string,
   ): Promise<PaginatedResult<unknown>> {
     const savedDocs = await SocialDal.findSavedByUser(userId);
 
-    // Extract populated recipes, then filter by category after population
+    // Extract populated recipes, then filter by tag after population
     let recipes = savedDocs
       .map((doc) => doc.recipe)
       .filter(Boolean) as unknown[];
 
-    if (category && category !== 'All') {
+    if (tag && tag !== 'All') {
       recipes = recipes.filter(
-        (recipe) => (recipe as { category: string }).category === category,
+        (recipe) => (recipe as { tags: string[] }).tags.includes(tag),
       );
     }
 
@@ -294,54 +273,6 @@ export const SocialService = {
   async getBulkSaveStatus(userId: string, recipeIds: readonly string[]): Promise<{ savedMap: Record<string, boolean> }> {
     const savedMap = await SocialDal.bulkSaveStatusByUser(userId, recipeIds);
     return { savedMap };
-  },
-
-  // ---- Ratings ----
-
-  /** Rate a recipe (upserts). Recomputes the recipe's average rating. */
-  async rateRecipe(
-    userId: string,
-    recipeId: string,
-    stars: number,
-  ): Promise<{ averageRating: number; ratingsCount: number }> {
-    const MIN_STARS = 1;
-    const MAX_STARS = 5;
-    if (!stars || stars < MIN_STARS || stars > MAX_STARS) {
-      throw new ValidationError('Stars must be between 1 and 5');
-    }
-    await SocialDal.upsertRating(userId, recipeId, stars);
-
-    const ratings = await SocialDal.findRatingsByRecipe(recipeId);
-    const averageRating = computeAverage(ratings);
-    const ratingsCount = ratings.length;
-
-    await SocialDal.updateRecipeRatingStats(recipeId, averageRating, ratingsCount);
-
-    // Recompute recipe score and author's chef score
-    const newRecipeScore = computeRecipeScore(averageRating, ratingsCount);
-    await SocialDal.updateRecipeScore(recipeId, newRecipeScore);
-
-    const recipe = await SocialDal.findRecipeById(recipeId);
-    if (recipe) {
-      const authorId = recipe.author.toString();
-      const totalChefScore = await SocialDal.sumRecipeScoresByAuthor(authorId);
-      await SocialDal.updateUserChefScore(authorId, totalChefScore);
-
-      await createNotification({
-        recipient: authorId,
-        sender: userId,
-        type: 'rate',
-        recipe: recipeId,
-      });
-    }
-
-    return { averageRating, ratingsCount };
-  },
-
-  /** Get the current user's rating for a recipe. Returns 0 if not rated. */
-  async getMyRating(userId: string, recipeId: string): Promise<{ rating: number }> {
-    const doc = await SocialDal.findRatingByUserRecipe(userId, recipeId);
-    return { rating: doc ? doc.stars : 0 };
   },
 
   // ---- Notifications ----

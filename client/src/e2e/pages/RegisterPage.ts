@@ -38,7 +38,7 @@ export class RegisterPage {
   async selectInterests(interests: readonly string[]): Promise<void> {
     await expect(this.page.getByText('What do you love to eat?')).toBeVisible();
     for (const interest of interests) {
-      await this.page.getByTestId(`category-${interest}`).click();
+      await this.page.getByTestId(`tag-${interest}`).click();
     }
     await expect(this.page.getByText('✓').first()).toBeVisible();
   }

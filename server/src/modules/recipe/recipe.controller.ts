@@ -10,7 +10,11 @@ import {
   RecipeIdParamsSchema,
   UserIdParamsSchema,
   ExploreFeedQuerySchema,
+  SearchRecipesQuerySchema,
+  PickRecommendQuerySchema,
+  PantryRecommendQuerySchema,
 } from './recipe.schemas';
+import { RECOMMEND_PAGE_SIZE } from './recipe.consts';
 
 const EMPTY_STEP_IMAGE_MAP = '{}';
 
@@ -82,10 +86,18 @@ export const RecipeController = {
     return reply.status(201).send({ recipe });
   },
 
+  /** Handle GET /search -- full-text recipe search. */
+  async search(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { q, page, limit } = SearchRecipesQuerySchema.parse(request.query);
+    const paginationOptions = parsePaginationQuery({ page, limit });
+    const result = await RecipeService.searchRecipes(q, paginationOptions);
+    return reply.send(result);
+  },
+
   /** Handle GET /explore -- public explore feed with optional personalization. */
   async explore(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const query = ExploreFeedQuerySchema.parse(request.query);
-    const { sort, category } = query;
+    const { sort, tag } = query;
     const { page, limit, skip } = parsePaginationQuery(query);
 
     const result = await RecipeService.getExploreFeed({
@@ -93,7 +105,7 @@ export const RecipeController = {
       limit,
       skip,
       sort: sort ?? 'recent',
-      category,
+      tag,
       userId: request.authUser?.id,
     });
 
@@ -173,5 +185,55 @@ export const RecipeController = {
     // authUser is set by the auth preHandler -- safe to assert
     await RecipeService.deleteRecipe(id, request.authUser!.id);
     return reply.send({ message: 'Recipe deleted' });
+  },
+
+  /** Handle GET /:id/related -- recipes with overlapping tags. */
+  async related(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { id } = RecipeIdParamsSchema.parse(request.params);
+    const RELATED_LIMIT = 4;
+    const data = await RecipeService.getRelatedRecipes(id, RELATED_LIMIT);
+    return reply.send({ data });
+  },
+
+  /** Handle GET /home -- personalized home page data. */
+  async home(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const result = await RecipeService.getHomeData(request.authUser?.id);
+    return reply.send(result);
+  },
+
+  /** Handle GET /recommend -- recipe recommendations by category or ingredients. */
+  async recommend(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const rawQuery = request.query as Record<string, string>;
+    const mode = rawQuery.mode;
+    const userId = request.authUser?.id;
+
+    if (mode === 'pantry') {
+      const query = PantryRecommendQuerySchema.parse(rawQuery);
+      const { page, limit, skip } = parsePaginationQuery(query, RECOMMEND_PAGE_SIZE);
+      const result = await RecipeService.getPantryRecommendations({
+        ingredients: query.ingredients,
+        maxTime: query.maxTime,
+        userId,
+        page,
+        limit,
+        skip,
+      });
+      return reply.send(result);
+    }
+
+    // Default: mode=pick (category-based)
+    const query = PickRecommendQuerySchema.parse(rawQuery);
+    const { page, limit, skip } = parsePaginationQuery(query, RECOMMEND_PAGE_SIZE);
+    const result = await RecipeService.getPickRecommendations({
+      category: query.category,
+      minTime: query.minTime,
+      maxTime: query.maxTime,
+      preference: query.preference,
+      userId,
+      page,
+      limit,
+      skip,
+    });
+    return reply.send(result);
   },
 };

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap URL — update domain once deployed
+Sitemap: https://zbite.onrender.com/sitemap.xml

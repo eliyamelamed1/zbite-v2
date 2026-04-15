@@ -1,0 +1,23 @@
+/* ========================================
+   FilterBar — Sort dropdown + Category chips
+   ======================================== */
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.separator {
+  width: 1px;
+  height: 20px;
+  background: var(--color-border);
+  flex-shrink: 0;
+}
+
+.chips {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}

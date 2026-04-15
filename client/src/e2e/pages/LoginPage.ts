@@ -26,7 +26,7 @@ export class LoginPage {
     await this.fillEmail(email);
     await this.fillPassword(password);
     await this.submitForm();
-    await this.page.waitForURL('**/explore', { timeout: 10_000 });
+    await this.page.waitForURL('**/feed', { timeout: 10_000 });
   }
 
   async expectErrorVisible(message: string): Promise<void> {

@@ -2,10 +2,16 @@ import { createContext, useState, useEffect, useCallback, ReactNode } from 'reac
 import * as authApi from '../api/auth';
 import { User } from '../../../types';
 
+interface LoginWithGoogleResult {
+  user: User;
+  isNewUser: boolean;
+}
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<User>;
+  loginWithGoogle: (credential: string) => Promise<LoginWithGoogleResult>;
   register: (username: string, email: string, password: string) => Promise<User>;
   logout: () => void;
   updateUser: (user: User) => void;
@@ -37,6 +43,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return res.data.user;
   }, []);
 
+  const loginWithGoogle = useCallback(async (credential: string): Promise<LoginWithGoogleResult> => {
+    const res = await authApi.googleLogin(credential);
+    localStorage.setItem('token', res.data.token);
+    setUser(res.data.user);
+    return { user: res.data.user, isNewUser: res.data.isNewUser ?? false };
+  }, []);
+
   const register = useCallback(async (username: string, email: string, password: string) => {
     const res = await authApi.register({ username, email, password });
     localStorage.setItem('token', res.data.token);
@@ -54,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, loginWithGoogle, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

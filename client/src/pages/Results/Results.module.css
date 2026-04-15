@@ -1,0 +1,152 @@
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.filterChip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--color-primary);
+  color: white;
+}
+
+.usualsSection {
+  margin-bottom: 28px;
+}
+
+.usualsTitle {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--color-text-secondary);
+}
+
+.usualsRow {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.usualsRow::-webkit-scrollbar {
+  display: none;
+}
+
+.alternatives {
+  margin-top: 24px;
+}
+
+.altTitle {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--color-text-secondary);
+}
+
+.altGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.moreBtn {
+  width: 100%;
+  max-width: 400px;
+  padding: 14px 24px;
+  border-radius: var(--radius-btn);
+  border: 2px solid var(--color-primary);
+  background: white;
+  color: var(--color-primary);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.moreBtn:hover:not(:disabled) {
+  background: rgba(232, 93, 44, 0.06);
+}
+
+.moreBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.startOverBtn {
+  padding: 12px 24px;
+  border-radius: var(--radius-btn);
+  border: 2px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 15px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.startOverBtn:hover {
+  background: rgba(232, 93, 44, 0.08);
+}
+
+.startOverLink {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.startOverLink:hover {
+  color: var(--color-primary);
+}
+
+.loading,
+.empty {
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--color-text-secondary);
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding: 32px 24px 80px;
+  }
+
+  .altGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .title {
+    font-size: 36px;
+  }
+}

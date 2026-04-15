@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../features/auth';
-import { imageUrl } from '../../../../utils/imageUrl';
+import { getAvatarUrl } from '../../../../utils/getAvatarUrl';
 import { User } from '../../../../types';
 import styles from './UserCard.module.css';
 
@@ -18,7 +18,7 @@ export default function UserCard({ user: u, isFollowing, onFollowToggle }: UserC
     <div className={styles.card}>
       <img
         className={styles.avatar}
-        src={imageUrl(u.avatar) || `https://ui-avatars.com/api/?name=${u.username}&background=F0E0D0&color=2D1810`}
+        src={getAvatarUrl(u.avatar, u.username)}
         alt={u.username}
       />
       <div className={styles.info}>

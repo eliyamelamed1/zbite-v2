@@ -3,8 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 import { getFollowing } from '../../features/social/api/users';
-import { imageUrl } from '../../utils/imageUrl';
+import { getAvatarUrl } from '../../utils/getAvatarUrl';
 import { User } from '../../types';
+import SEO from '../../components/(ui)/seo/SEO/SEO';
 import styles from './Following.module.css';
 
 /** Paginated following list for a user. */
@@ -46,6 +47,7 @@ export default function FollowingPage() {
 
   return (
     <div className={styles.container}>
+      <SEO title="Following" description="Chefs this user follows." />
       <div className={styles.header}>
         <button className={styles.backBtn} onClick={() => navigate(`/user/${id}`)}>
           ← Back
@@ -70,7 +72,7 @@ export default function FollowingPage() {
           >
             <img
               className={styles.avatar}
-              src={imageUrl(user.avatar) || `https://ui-avatars.com/api/?name=${user.username}&size=44&background=F0E0D0&color=2D1810`}
+              src={getAvatarUrl(user.avatar, user.username)}
               alt={user.username}
             />
             <div className={styles.info}>

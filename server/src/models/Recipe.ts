@@ -1,13 +1,14 @@
 import mongoose, { Schema } from 'mongoose';
 import { IRecipe } from '../shared/types';
-import { CATEGORIES } from '../constants/categories';
+import { computeSystemTags } from '../modules/recipe/recipe.utils';
 
 const recipeSchema = new Schema<IRecipe>(
   {
     title: { type: String, required: true, trim: true, maxlength: 120 },
     description: { type: String, required: true, maxlength: 500 },
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    category: { type: String, enum: CATEGORIES, default: 'Italian' },
+    tags: { type: [String], default: [] },
+    systemTags: { type: [String], default: [] },
     difficulty: { type: String, enum: ['easy', 'medium', 'hard'], required: true },
     cookingTime: { type: Number, required: true },
     servings: { type: Number, required: true, min: 1 },
@@ -26,9 +27,6 @@ const recipeSchema = new Schema<IRecipe>(
     },
     coverImage: { type: String, required: true },
     status: { type: String, enum: ['draft', 'published'], default: 'published' },
-    averageRating: { type: Number, default: 0 },
-    ratingsCount: { type: Number, default: 0 },
-    likesCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
     savesCount: { type: Number, default: 0 },
     reportsCount: { type: Number, default: 0 },
@@ -40,7 +38,40 @@ const recipeSchema = new Schema<IRecipe>(
 
 recipeSchema.index({ author: 1 });
 recipeSchema.index({ createdAt: -1 });
-recipeSchema.index({ averageRating: -1, ratingsCount: -1 });
-recipeSchema.index({ category: 1, createdAt: -1 });
+recipeSchema.index({ recipeScore: -1, createdAt: -1 });
+recipeSchema.index({ tags: 1, createdAt: -1 });
+recipeSchema.index({ tags: 1, recipeScore: -1 });
+recipeSchema.index({ systemTags: 1 });
+recipeSchema.index(
+  { title: 'text', description: 'text' },
+  { weights: { title: 10, description: 1 } },
+);
+
+/** Auto-compute system tags before every save. */
+recipeSchema.pre('save', function preSaveSystemTags() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Mongoose 'this' in pre-hooks is untyped
+  const doc = this as any;
+  doc.systemTags = computeSystemTags(doc);
+});
+
+/** Recompute system tags when ingredients, cookingTime, nutrition, difficulty, or steps change via update. */
+recipeSchema.pre('findOneAndUpdate', async function preUpdateSystemTags() {
+  const update = this.getUpdate() as Record<string, unknown> | undefined;
+  if (!update) return;
+
+  const fieldsToWatch = ['ingredients', 'cookingTime', 'nutrition', 'difficulty', 'steps'];
+  const hasRelevantChange = fieldsToWatch.some((field) => field in update || (`$set` in update && field in (update.$set as Record<string, unknown>)));
+  if (!hasRelevantChange) return;
+
+  const docId = this.getQuery()._id;
+  if (!docId) return;
+
+  const existing = await mongoose.model('Recipe').findById(docId).lean();
+  if (!existing) return;
+
+  const merged = { ...existing, ...update };
+  const newSystemTags = computeSystemTags(merged as unknown as Parameters<typeof computeSystemTags>[0]);
+  this.set({ systemTags: newSystemTags });
+});
 
 export default mongoose.model<IRecipe>('Recipe', recipeSchema);

@@ -8,17 +8,17 @@ afterAll(async () => { await teardownTestEnvironment(); });
 beforeEach(async () => { await cleanDatabase(); });
 
 describe('Notification creation', () => {
-  it('like creates a notification', async () => {
+  it('save creates a notification', async () => {
     const author = await registerAndLogin(app, { username: 'author' });
-    const actor = await registerAndLogin(app, { username: 'liker' });
+    const actor = await registerAndLogin(app, { username: 'saver' });
     const { recipe } = await createTestRecipe(app, author.token);
-    await app.inject({ method: 'POST', url: `/api/likes/${recipe._id}`, headers: authHeader(actor.token) });
+    await app.inject({ method: 'POST', url: `/api/saved/${recipe._id}`, headers: authHeader(actor.token) });
 
     const res = await app.inject({ method: 'GET', url: '/api/notifications', headers: authHeader(author.token) });
     const data = JSON.parse(res.body).data;
     expect(data).toHaveLength(1);
-    expect(data[0].type).toBe('like');
-    expect(data[0].sender.username).toBe('liker');
+    expect(data[0].type).toBe('save');
+    expect(data[0].sender.username).toBe('saver');
   });
 
   it('follow creates a notification', async () => {
@@ -35,7 +35,7 @@ describe('Notification creation', () => {
   it('self-action creates NO notification', async () => {
     const author = await registerAndLogin(app);
     const { recipe } = await createTestRecipe(app, author.token);
-    await app.inject({ method: 'POST', url: `/api/likes/${recipe._id}`, headers: authHeader(author.token) });
+    await app.inject({ method: 'POST', url: `/api/saved/${recipe._id}`, headers: authHeader(author.token) });
 
     const res = await app.inject({ method: 'GET', url: '/api/notifications', headers: authHeader(author.token) });
     expect(JSON.parse(res.body).data).toHaveLength(0);
@@ -47,7 +47,7 @@ describe('GET /api/notifications/unread-count', () => {
     const author = await registerAndLogin(app);
     const actor = await registerAndLogin(app);
     const { recipe } = await createTestRecipe(app, author.token);
-    await app.inject({ method: 'POST', url: `/api/likes/${recipe._id}`, headers: authHeader(actor.token) });
+    await app.inject({ method: 'POST', url: `/api/saved/${recipe._id}`, headers: authHeader(actor.token) });
     await app.inject({ method: 'POST', url: `/api/follows/${author.user._id}`, headers: authHeader(actor.token) });
 
     const res = await app.inject({ method: 'GET', url: '/api/notifications/unread-count', headers: authHeader(author.token) });
@@ -60,7 +60,7 @@ describe('PUT /api/notifications/read', () => {
     const author = await registerAndLogin(app);
     const actor = await registerAndLogin(app);
     const { recipe } = await createTestRecipe(app, author.token);
-    await app.inject({ method: 'POST', url: `/api/likes/${recipe._id}`, headers: authHeader(actor.token) });
+    await app.inject({ method: 'POST', url: `/api/saved/${recipe._id}`, headers: authHeader(actor.token) });
 
     await app.inject({ method: 'PUT', url: '/api/notifications/read', headers: authHeader(author.token), payload: {} });
 

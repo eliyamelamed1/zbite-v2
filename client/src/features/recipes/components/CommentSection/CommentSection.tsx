@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../../../features/auth';
 import { getComments, createComment } from '../../../../features/social/api/comments';
-import { imageUrl } from '../../../../utils/imageUrl';
+import { getAvatarUrl } from '../../../../utils/getAvatarUrl';
 import { timeAgo } from '../../../../utils/timeAgo';
 import { Comment } from '../../../../types';
 import styles from './CommentSection.module.css';
@@ -70,7 +70,7 @@ export default function CommentSection({ recipeId }: CommentSectionProps) {
           <div key={c._id} className={styles.comment}>
             <img
               className={styles.avatar}
-              src={imageUrl(c.user.avatar) || `https://ui-avatars.com/api/?name=${c.user.username}&size=32&background=F0E0D0&color=2D1810`}
+              src={getAvatarUrl(c.user.avatar, c.user.username)}
               alt={c.user.username}
             />
             <div className={styles.commentBody}>

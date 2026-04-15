@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { Camera, X } from 'lucide-react';
 import styles from './ImageUpload.module.css';
 
 interface ImageUploadProps {
@@ -27,7 +28,7 @@ export default function ImageUpload({ value, onChange, existingUrl }: ImageUploa
     return (
       <div className={styles.preview}>
         <img className={styles.previewImage} src={preview!} alt="Preview" />
-        <button type="button" className={styles.removeBtn} onClick={handleRemove}>&times;</button>
+        <button type="button" className={styles.removeBtn} onClick={handleRemove}><X size={14} /></button>
       </div>
     );
   }
@@ -40,7 +41,7 @@ export default function ImageUpload({ value, onChange, existingUrl }: ImageUploa
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}
       >
-        <div className={styles.icon}>&#128247;</div>
+        <div className={styles.icon}><Camera size={32} /></div>
         <div className={styles.text}>Click or drag to upload image</div>
       </div>
       <input ref={inputRef} type="file" accept="image/*" className={styles.hidden} onChange={(e) => handleFile(e.target.files?.[0])} />

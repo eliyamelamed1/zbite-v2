@@ -1,4 +1,5 @@
 import { useState, FormEvent } from 'react';
+import { X } from 'lucide-react';
 import ImageUpload from '../../../../components/(ui)/forms/ImageUpload/ImageUpload';
 import { Recipe } from '../../../../types';
 import styles from './RecipeForm.module.css';
@@ -144,7 +145,7 @@ export default function RecipeForm({ initialData, onSubmit, submitLabel = 'Publi
             <input className={`${styles.input} ${styles.ingredientAmount}`} placeholder="Amount (e.g. 2 cups)" value={ing.amount} onChange={(e) => updateIngredient(i, 'amount', e.target.value)} />
             <input className={`${styles.input} ${styles.ingredientName}`} placeholder="Ingredient name" value={ing.name} onChange={(e) => updateIngredient(i, 'name', e.target.value)} />
             {ingredients.length > 1 && (
-              <button type="button" className={styles.removeBtn} onClick={() => setIngredients(ingredients.filter((_, j) => j !== i))}>&times;</button>
+              <button type="button" className={styles.removeBtn} onClick={() => setIngredients(ingredients.filter((_, j) => j !== i))}><X size={14} /></button>
             )}
           </div>
         ))}
@@ -157,7 +158,7 @@ export default function RecipeForm({ initialData, onSubmit, submitLabel = 'Publi
           <div key={i} className={styles.stepBlock}>
             <div className={styles.stepHeader}>
               <span className={styles.stepLabel}>Step {i + 1}</span>
-              {steps.length > 1 && <button type="button" className={styles.removeBtn} onClick={() => setSteps(steps.filter((_, j) => j !== i))}>&times;</button>}
+              {steps.length > 1 && <button type="button" className={styles.removeBtn} onClick={() => setSteps(steps.filter((_, j) => j !== i))}><X size={14} /></button>}
             </div>
             <textarea className={styles.textarea} placeholder="Describe this step..." value={step.instruction} onChange={(e) => updateStep(i, 'instruction', e.target.value)} />
             <div className={styles.stepImageWrap}>
