@@ -34,6 +34,14 @@ export default function Home() {
         <SkeletonRow key={i} />
       ))}
 
+      {data.recentlyViewed.length > 0 && (
+        <LeaderboardRow title="Recently Viewed" recipes={data.recentlyViewed} />
+      )}
+
+      {data.cookedBefore.length > 0 && (
+        <LeaderboardRow title="Cooked Before" recipes={data.cookedBefore} />
+      )}
+
       {data.goTo.length > 0 && (
         <LeaderboardRow title="Make It Again" recipes={data.goTo} seeAllLink="/saved" />
       )}

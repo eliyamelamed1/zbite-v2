@@ -17,6 +17,8 @@ interface InterestRow {
 }
 
 interface HomeData {
+  recentlyViewed: IRecipe[];
+  cookedBefore: IRecipe[];
   goTo: IRecipe[];
   interestRows: InterestRow[];
   quickTonight: IRecipe[];
@@ -283,6 +285,7 @@ export const RecipeService = {
   async getHomeData(userId?: string): Promise<HomeData> {
     const HOME_SECTION_LIMIT = 4;
     const GO_TO_LIMIT = 6;
+    const ACTIVITY_ROW_LIMIT = 6;
     const INTEREST_ROWS_COUNT = 2;
 
     // Always fetch generic sections
@@ -294,16 +297,23 @@ export const RecipeService = {
     // Guest path -- no personalization
     if (!userId) {
       const quickTonight = await RecipeDal.findQuickByInterests([], [], HOME_SECTION_LIMIT);
-      return { goTo: [], interestRows: [], quickTonight, trending, newThisWeek };
+      return { recentlyViewed: [], cookedBefore: [], goTo: [], interestRows: [], quickTonight, trending, newThisWeek };
     }
 
     // Authenticated path -- personalized sections
-    const [goTo, interests] = await Promise.all([
+    const [recentlyViewed, goTo, interests] = await Promise.all([
+      RecipeDal.findRecentlyViewed(userId, [], ACTIVITY_ROW_LIMIT),
       RecipeDal.findUserGoToRecipes(userId, GO_TO_LIMIT),
       RecipeDal.getUserInterests(userId),
     ]);
 
-    const shownIds = goTo.map((r) => r._id.toString());
+    const shownIds = [
+      ...recentlyViewed.map((r) => r._id.toString()),
+      ...goTo.map((r) => r._id.toString()),
+    ];
+
+    const cookedBefore = await RecipeDal.findCookedBefore(userId, shownIds, ACTIVITY_ROW_LIMIT);
+    cookedBefore.forEach((r) => shownIds.push(r._id.toString()));
 
     // Build interest rows from the user's top interests
     const topInterests = interests.slice(0, INTEREST_ROWS_COUNT);
@@ -318,6 +328,6 @@ export const RecipeService = {
 
     const quickTonight = await RecipeDal.findQuickByInterests(interests, shownIds, HOME_SECTION_LIMIT);
 
-    return { goTo, interestRows, quickTonight, trending, newThisWeek };
+    return { recentlyViewed, cookedBefore, goTo, interestRows, quickTonight, trending, newThisWeek };
   },
 };

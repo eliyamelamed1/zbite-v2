@@ -5,6 +5,7 @@ import User from '../../models/User';
 import Follow from '../../models/Follow';
 import SavedRecipe from '../../models/SavedRecipe';
 import CookingReport from '../../models/CookingReport';
+import UserActivity from '../../models/UserActivity';
 import { IRecipe, PaginatedResult } from '../../shared/types';
 import { buildPagination } from '../../shared/utils/pagination';
 import {
@@ -512,5 +513,63 @@ export const RecipeDal = {
       .sort({ recipeScore: -1, createdAt: -1 })
       .limit(limit)
       .populate('author', AUTHOR_SUMMARY_FIELDS);
+  },
+
+  /** Find recipes the user recently viewed, deduplicated by recipe, most recent first. */
+  async findRecentlyViewed(userId: string, excludeIds: string[], limit: number): Promise<IRecipe[]> {
+    const activities = await UserActivity.aggregate([
+      { $match: { user: new Types.ObjectId(userId), action: 'view' } },
+      { $sort: { createdAt: -1 } },
+      { $group: { _id: '$recipe', lastViewed: { $first: '$createdAt' } } },
+      { $sort: { lastViewed: -1 } },
+    ]);
+
+    const recipeIds = activities
+      .map((a) => a._id.toString())
+      .filter((id) => !excludeIds.includes(id));
+
+    if (recipeIds.length === 0) return [];
+
+    const recipes = await Recipe.find({
+      _id: { $in: recipeIds.slice(0, limit) },
+      status: { $ne: 'draft' },
+    }).populate('author', AUTHOR_SUMMARY_FIELDS);
+
+    // Preserve the "most recently viewed" order from the aggregation
+    const recipeMap = new Map(recipes.map((r) => [r._id.toString(), r]));
+    return recipeIds.reduce<IRecipe[]>((acc, id) => {
+      const recipe = recipeMap.get(id);
+      if (recipe) acc.push(recipe);
+      return acc;
+    }, []).slice(0, limit);
+  },
+
+  /** Find recipes the user has cooked, deduplicated by recipe, most recently cooked first. */
+  async findCookedBefore(userId: string, excludeIds: string[], limit: number): Promise<IRecipe[]> {
+    const activities = await UserActivity.aggregate([
+      { $match: { user: new Types.ObjectId(userId), action: 'cook' } },
+      { $sort: { createdAt: -1 } },
+      { $group: { _id: '$recipe', lastCooked: { $first: '$createdAt' } } },
+      { $sort: { lastCooked: -1 } },
+    ]);
+
+    const recipeIds = activities
+      .map((a) => a._id.toString())
+      .filter((id) => !excludeIds.includes(id));
+
+    if (recipeIds.length === 0) return [];
+
+    const recipes = await Recipe.find({
+      _id: { $in: recipeIds.slice(0, limit) },
+      status: { $ne: 'draft' },
+    }).populate('author', AUTHOR_SUMMARY_FIELDS);
+
+    // Preserve the "most recently cooked" order from the aggregation
+    const recipeMap = new Map(recipes.map((r) => [r._id.toString(), r]));
+    return recipeIds.reduce<IRecipe[]>((acc, id) => {
+      const recipe = recipeMap.get(id);
+      if (recipe) acc.push(recipe);
+      return acc;
+    }, []).slice(0, limit);
   },
 };
