@@ -19,3 +19,13 @@ export const UpdateProfileBodySchema = z.object({
   bio: z.string().max(300).optional(),
 });
 export type UpdateProfileBody = z.infer<typeof UpdateProfileBodySchema>;
+
+const VALID_ACTIVITY_ACTIONS = ['view', 'save', 'cook'] as const;
+
+/** Query string schema for the user activity feed. */
+export const ActivityQuerySchema = z.object({
+  action: z.enum(VALID_ACTIVITY_ACTIONS).optional(),
+  page: z.string().optional(),
+  limit: z.string().optional(),
+});
+export type ActivityQuery = z.infer<typeof ActivityQuerySchema>;

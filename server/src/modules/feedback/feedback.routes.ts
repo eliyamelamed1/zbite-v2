@@ -4,8 +4,8 @@ import { FeedbackController } from './feedback.controller';
 
 /** Feedback routes — mounted at /api/feedback. */
 export default async function feedbackRoutes(fastify: FastifyInstance): Promise<void> {
-  /* Public routes */
-  fastify.get('/public', FeedbackController.getPublic);
+  /* Public routes — optionalAuth so logged-in users get their vote status */
+  fastify.get('/public', { preHandler: [fastify.optionalAuth] }, FeedbackController.getPublic);
 
   /* Optionally authenticated — guests can submit with email */
   fastify.post('/', { preHandler: [fastify.optionalAuth] }, FeedbackController.submit);
@@ -13,6 +13,11 @@ export default async function feedbackRoutes(fastify: FastifyInstance): Promise<
   /* Authenticated routes */
   fastify.get('/mine', { preHandler: [fastify.authenticate] }, FeedbackController.getMine);
 
-  /* Admin route — uses authenticate; service-level admin check can be added later */
+  /* Voting routes */
+  fastify.post('/:id/vote', { preHandler: [fastify.authenticate] }, FeedbackController.vote);
+  fastify.delete('/:id/vote', { preHandler: [fastify.authenticate] }, FeedbackController.unvote);
+
+  /* Admin routes — service-level admin guard enforced */
+  fastify.get('/all', { preHandler: [fastify.authenticate] }, FeedbackController.getAll);
   fastify.patch('/:id', { preHandler: [fastify.authenticate] }, FeedbackController.adminUpdate);
 }

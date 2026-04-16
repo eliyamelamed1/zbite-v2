@@ -44,6 +44,15 @@ export function useNotificationStream({ onNotification }: UseNotificationStreamO
 
     source.addEventListener('notification', handleMessage);
 
+    source.addEventListener('error', () => {
+      // EventSource handles auto-reconnection natively.
+      // If the connection fails permanently (e.g. expired token),
+      // close to stop retry loop — user will reconnect on next page load.
+      if (source.readyState === EventSource.CLOSED) {
+        source.close();
+      }
+    });
+
     return () => {
       source.close();
     };

@@ -1,0 +1,41 @@
+.page { max-width: 800px; margin: 0 auto; padding: 24px 16px 80px; }
+.title { font-family: var(--font-heading); font-size: 28px; font-weight: 700; margin-bottom: 16px; }
+
+/* Filters */
+.filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab { padding: 6px 16px; border: 1.5px solid var(--color-border); background: transparent; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-body); color: var(--color-text-secondary); }
+.tabActive { border-color: var(--color-primary); background: var(--color-primary); color: white; }
+
+/* Card */
+.card { background: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-card); padding: 16px; margin-bottom: 12px; }
+.cardHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+.cardTitle { font-weight: 600; font-size: 15px; flex: 1; }
+.cardMeta { font-size: 12px; color: var(--color-text-secondary); display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.cardDescription { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 12px; }
+.cardAuthor { font-size: 12px; color: var(--color-text-secondary); }
+
+/* Status badges */
+.statusBadge { padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+.statusNew { background: #e3f2fd; color: #1565c0; }
+.statusPlanned { background: #fff3e0; color: #e65100; }
+.statusInProgress { background: #fce4ec; color: #c62828; }
+.statusShipped { background: #e8f5e9; color: #2e7d32; }
+.statusNotPlanned { background: #f5f5f5; color: #757575; }
+
+/* Controls */
+.controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.select { padding: 6px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-card); font-size: 13px; font-family: var(--font-body); background: var(--color-bg); cursor: pointer; }
+.toggleBtn { padding: 6px 14px; border: 1px solid var(--color-border); border-radius: var(--radius-card); font-size: 12px; font-weight: 500; cursor: pointer; font-family: var(--font-body); background: transparent; color: var(--color-text-secondary); }
+.toggleBtnActive { border-color: var(--color-primary); background: var(--color-primary); color: white; }
+
+/* Response form */
+.responseForm { margin-top: 10px; display: flex; gap: 8px; }
+.responseInput { flex: 1; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-card); font-size: 13px; font-family: var(--font-body); background: var(--color-bg); }
+.responseBtn { padding: 8px 16px; background: var(--color-primary); color: white; border: none; border-radius: var(--radius-card); font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font-body); white-space: nowrap; }
+.responseBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.adminResponse { margin-top: 8px; padding: 8px 12px; background: var(--color-bg); border-radius: var(--radius-card); font-size: 13px; color: var(--color-text-secondary); border-left: 3px solid var(--color-primary); }
+
+.emptyState { text-align: center; padding: 32px; color: var(--color-text-secondary); font-size: 14px; }
+.denied { text-align: center; padding: 60px 24px; color: var(--color-text-secondary); }
+.deniedTitle { font-family: var(--font-heading); font-size: 22px; font-weight: 700; color: var(--color-text); margin-bottom: 8px; }

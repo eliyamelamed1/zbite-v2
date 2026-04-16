@@ -12,9 +12,9 @@ const RANDOM_SUFFIX_BOUND = 10_000;
 const USERNAME_MAX_LENGTH = 30;
 
 /** Generates a signed JWT token for a user. */
-function generateToken(user: { _id: unknown; username: string }): string {
+function generateToken(user: { _id: unknown; username: string; isAdmin?: boolean }): string {
   return jwt.sign(
-    { id: String(user._id), username: user.username },
+    { id: String(user._id), username: user.username, isAdmin: user.isAdmin ?? false },
     env.JWT_SECRET,
     { expiresIn: env.JWT_EXPIRES_IN as unknown as number },
   );

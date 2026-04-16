@@ -6,7 +6,7 @@ const notificationSchema = new Schema<INotification>({
   sender: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   type: {
     type: String,
-    enum: ['like', 'follow', 'save', 'rate', 'comment', 'mention', 'cooking_report'],
+    enum: ['follow', 'save', 'comment', 'mention', 'cooking_report'],
     required: true,
   },
   recipe: { type: Schema.Types.ObjectId, ref: 'Recipe' },

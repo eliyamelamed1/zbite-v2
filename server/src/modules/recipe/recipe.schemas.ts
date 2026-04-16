@@ -1,7 +1,10 @@
 import { z } from 'zod';
 
-import { ALL_TAGS } from '../../constants/tags';
+import { ALL_TAGS, MEAL_TYPE_TAGS } from '../../constants/tags';
 import { VALID_CATEGORIES, VALID_PREFERENCES } from './recipe.consts';
+
+const MAX_MEAL_TYPE_TAGS = 2;
+const mealTypeSet = new Set<string>(MEAL_TYPE_TAGS);
 
 const TITLE_MAX_LENGTH = 120;
 const DESCRIPTION_MAX_LENGTH = 500;
@@ -30,7 +33,18 @@ const NutritionSchema = z.object({
 export const CreateRecipeBodySchema = z.object({
   title: z.string().min(1).max(TITLE_MAX_LENGTH),
   description: z.string().min(1).max(DESCRIPTION_MAX_LENGTH),
-  tags: z.array(z.string().refine((t) => (ALL_TAGS as readonly string[]).includes(t))).min(1).max(7),
+  tags: z.array(z.string().refine((t) => (ALL_TAGS as readonly string[]).includes(t)))
+    .min(1)
+    .max(7)
+    .superRefine((tags, ctx) => {
+      const mealTagCount = tags.filter((t) => mealTypeSet.has(t)).length;
+      if (mealTagCount > MAX_MEAL_TYPE_TAGS) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `At most ${MAX_MEAL_TYPE_TAGS} meal-type tags allowed, got ${mealTagCount}`,
+        });
+      }
+    }),
   difficulty: z.enum(['easy', 'medium', 'hard']),
   cookingTime: z.number().int().positive(),
   servings: z.number().int().min(MIN_SERVINGS),

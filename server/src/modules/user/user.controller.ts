@@ -3,6 +3,8 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 
 import { UserService } from './user.service';
 
+import { ActivityQuerySchema } from './user.schemas';
+
 import type { SearchUsersQuery, ProfileParams } from './user.schemas';
 
 const EMPTY_SEARCH_RESULT = {
@@ -71,5 +73,21 @@ export const UserController = {
     // authUser is set by the authenticate preHandler — safe to assert
     const users = await UserService.getSuggestedUsers(request.authUser!.id);
     return reply.send({ data: users });
+  },
+
+  /** GET /users/activity?action=view|save|cook&page=1&limit=20 */
+  async getActivity(
+    request: FastifyRequest,
+    reply: FastifyReply,
+  ): Promise<void> {
+    const { action, page, limit } = ActivityQuerySchema.parse(request.query);
+    // authUser is set by the authenticate preHandler — safe to assert
+    const result = await UserService.getActivity(
+      request.authUser!.id,
+      action,
+      Number(page),
+      Number(limit),
+    );
+    return reply.send(result);
   },
 };

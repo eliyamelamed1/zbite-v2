@@ -1,8 +1,8 @@
 .bar {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 10px 0;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
 }
 
 .btn {
@@ -10,14 +10,19 @@
   border: none;
   font-size: 22px;
   cursor: pointer;
-  padding: 2px;
+  padding: var(--space-1);
   color: var(--color-text);
-  transition: transform 0.15s;
+  transition: transform var(--duration-fast) var(--ease-spring), color var(--duration-fast);
   line-height: 1;
+  border-radius: var(--radius-sm);
+}
+
+.btn:hover {
+  color: var(--color-primary);
 }
 
 .btn:active {
-  transform: scale(0.9);
+  transform: scale(0.85);
 }
 
 .saved {
@@ -29,7 +34,7 @@
 }
 
 .count {
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--color-text);
   margin-top: -2px;

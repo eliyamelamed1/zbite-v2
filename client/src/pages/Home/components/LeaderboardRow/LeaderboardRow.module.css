@@ -1,35 +1,40 @@
 .section {
-  margin-bottom: 32px;
+  margin-bottom: var(--space-10);
+  animation: fadeInUp var(--duration-slow) var(--ease-out) both;
 }
 
 .header {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: var(--space-4);
 }
 
 .title {
   font-family: var(--font-heading);
-  font-size: 22px;
-  font-weight: 600;
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
 }
 
 .seeAll {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--text-sm);
+  font-weight: 600;
   color: var(--color-primary);
-  transition: opacity 0.2s;
+  transition: gap var(--duration-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
 }
 
 .seeAll:hover {
-  opacity: 0.8;
+  gap: var(--space-2);
 }
 
 .row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .cardWrapper {
@@ -38,11 +43,11 @@
 
 @media (min-width: 768px) {
   .row {
-    grid-template-columns: repeat(auto-fill, 160px);
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, 170px);
+    gap: var(--space-4);
   }
 
   .title {
-    font-size: 26px;
+    font-size: var(--text-3xl);
   }
 }

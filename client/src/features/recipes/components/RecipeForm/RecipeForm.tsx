@@ -1,8 +1,12 @@
 import { useState, FormEvent } from 'react';
-import { X } from 'lucide-react';
+import { X, Info } from 'lucide-react';
 import ImageUpload from '../../../../components/(ui)/forms/ImageUpload/ImageUpload';
-import { Recipe } from '../../../../types';
+import TagChips from '../../../../components/(ui)/forms/CategoryChips/CategoryChips';
+import { MEAL_TYPE_TAGS, Recipe } from '../../../../types';
 import styles from './RecipeForm.module.css';
+
+const MEAL_TAG_SET = new Set<string>(MEAL_TYPE_TAGS);
+const MAX_MEAL_TAGS = 2;
 
 interface StepData {
   instruction: string;
@@ -32,6 +36,12 @@ export default function RecipeForm({ initialData, onSubmit, submitLabel = 'Publi
       ? initialData.steps.map((s) => ({ instruction: s.instruction, imageFile: null, existingImage: s.image || '' }))
       : [{ instruction: '', imageFile: null, existingImage: '' }]
   );
+  const [tags] = useState<string[]>(initialData?.tags ?? []);
+  const initialMealTags = tags.filter((t) => MEAL_TAG_SET.has(t));
+  const [mealTags, setMealTags] = useState<string[]>(initialMealTags);
+  const isEditing = Boolean(initialData);
+  const hasMealTags = mealTags.length > 0 || initialMealTags.length > 0;
+
   const [calories, setCalories] = useState(initialData?.nutrition?.calories?.toString() || '');
   const [protein, setProtein] = useState(initialData?.nutrition?.protein?.toString() || '');
   const [carbs, setCarbs] = useState(initialData?.nutrition?.carbs?.toString() || '');
@@ -66,10 +76,15 @@ export default function RecipeForm({ initialData, onSubmit, submitLabel = 'Publi
     setLoading(true);
 
     const formData = new FormData();
+    // Merge meal tags with existing non-meal tags
+    const nonMealTags = tags.filter((t) => !MEAL_TAG_SET.has(t));
+    const mergedTags = [...nonMealTags, ...mealTags];
+
     const data = {
       title, description, difficulty,
       cookingTime: Number(cookingTime),
       servings: Number(servings),
+      tags: mergedTags.length > 0 ? mergedTags : undefined,
       ingredients: validIngredients,
       steps: validSteps.map((s, i) => ({ order: i + 1, instruction: s.instruction, image: s.existingImage || '' })),
       nutrition: { calories: Number(calories) || 0, protein: Number(protein) || 0, carbs: Number(carbs) || 0, fat: Number(fat) || 0 },
@@ -132,6 +147,28 @@ export default function RecipeForm({ initialData, onSubmit, submitLabel = 'Publi
           </div>
         </div>
       </div>
+
+      {isEditing && !hasMealTags && (
+        <div className={styles.nudgeBanner}>
+          <Info size={16} />
+          <span>Add meal types to help people discover this recipe at the right time of day.</span>
+        </div>
+      )}
+
+      {isEditing && (
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>Best for</h3>
+          <p className={styles.mealSubtitle}>When would someone usually eat this?</p>
+          <TagChips
+            multi
+            tags={MEAL_TYPE_TAGS}
+            selected={mealTags}
+            onChange={setMealTags}
+            maxSelections={MAX_MEAL_TAGS}
+            showAll={false}
+          />
+        </div>
+      )}
 
       <div className={styles.section}>
         <h3 className={styles.sectionTitle}>Cover Image</h3>

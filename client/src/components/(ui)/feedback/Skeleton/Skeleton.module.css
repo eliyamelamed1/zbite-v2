@@ -1,22 +1,17 @@
-@keyframes shimmer {
-  0% { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
-}
-
 .bone {
   background: linear-gradient(90deg, var(--color-border) 25%, var(--color-skeleton) 50%, var(--color-border) 75%);
   background-size: 800px 100%;
-  animation: shimmer 1.5s infinite ease-in-out;
-  border-radius: 6px;
+  animation: shimmer 1.8s infinite ease-in-out;
+  border-radius: var(--radius-sm);
 }
 
 /* ---------- ExploreCard skeleton ---------- */
 
 .card {
   break-inside: avoid;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
   background: var(--color-card);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-card);
 }
@@ -27,13 +22,13 @@
 }
 
 .cardBody {
-  padding: 12px;
+  padding: var(--space-4);
 }
 
 .cardStats {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 
 .cardStatsLeft {
@@ -49,19 +44,19 @@
 .cardTitle {
   width: 85%;
   height: 18px;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-3);
 }
 
 .cardAuthor {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 10px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 .cardAvatar {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
 }
 
@@ -72,7 +67,7 @@
 
 .cardMeta {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .cardMetaItem {

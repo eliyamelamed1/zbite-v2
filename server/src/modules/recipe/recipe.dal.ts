@@ -550,12 +550,13 @@ export const RecipeDal = {
       .sort({ savedAt: -1 })
       .populate({
         path: 'recipe',
+        match: { tags: mealType, status: { $ne: 'draft' } },
         populate: { path: 'author', select: AUTHOR_SUMMARY_FIELDS },
       });
 
     return savedDocs
-      .map((doc) => doc.recipe as unknown as IRecipe)
-      .filter((recipe) => recipe && recipe.tags?.includes(mealType))
+      .map((doc) => doc.recipe as unknown as IRecipe | null)
+      .filter((recipe): recipe is IRecipe => recipe !== null)
       .slice(0, limit);
   },
 
@@ -568,6 +569,49 @@ export const RecipeDal = {
     };
 
     return Recipe.find(filter)
+      .sort({ recipeScore: -1, createdAt: -1 })
+      .limit(limit)
+      .populate('author', AUTHOR_SUMMARY_FIELDS);
+  },
+
+  /** Find recipes the user has cooked that match a meal tag, ordered by most recent cook. */
+  async findCookedByMealType(userId: string, mealType: string, excludeIds: string[], limit: number): Promise<IRecipe[]> {
+    const activities = await UserActivity.aggregate([
+      { $match: { user: new Types.ObjectId(userId), action: 'cook' } },
+      { $sort: { createdAt: -1 } },
+      { $group: { _id: '$recipe', lastCooked: { $first: '$createdAt' } } },
+      { $sort: { lastCooked: -1 } },
+    ]);
+
+    const candidateIds = activities
+      .map((a) => a._id)
+      .filter((id) => !excludeIds.includes(id.toString()));
+
+    if (candidateIds.length === 0) return [];
+
+    const recipes = await Recipe.find({
+      _id: { $in: candidateIds },
+      tags: mealType,
+      status: { $ne: 'draft' },
+    }).populate('author', AUTHOR_SUMMARY_FIELDS);
+
+    // Preserve the aggregation order (most recently cooked first)
+    const recipeMap = new Map(recipes.map((r) => [r._id.toString(), r]));
+    return candidateIds.reduce<IRecipe[]>((acc, id) => {
+      const recipe = recipeMap.get(id.toString());
+      if (recipe) acc.push(recipe);
+      return acc;
+    }, []).slice(0, limit);
+  },
+
+  /** Find quick popular recipes for guests, sorted by score. */
+  async findQuickPopularByMealType(mealType: string, excludeIds: string[], limit: number): Promise<IRecipe[]> {
+    return Recipe.find({
+      tags: mealType,
+      cookingTime: { $lte: QUICK_MEAL_MAX_MINUTES },
+      status: { $ne: 'draft' },
+      _id: { $nin: excludeIds },
+    })
       .sort({ recipeScore: -1, createdAt: -1 })
       .limit(limit)
       .populate('author', AUTHOR_SUMMARY_FIELDS);

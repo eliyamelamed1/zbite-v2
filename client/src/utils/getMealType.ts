@@ -13,8 +13,8 @@ export function getMealType(hour?: number): MealType {
   const currentHour = hour ?? new Date().getHours();
 
   if (currentHour >= BREAKFAST_START && currentHour < BREAKFAST_END) return 'Breakfast';
-  if (currentHour >= LUNCH_START && currentHour < LUNCH_END) return 'Lunch';
-  if (currentHour >= DINNER_START && currentHour < DINNER_END) return 'Dinner';
+  if (currentHour >= LUNCH_START && currentHour <= LUNCH_END) return 'Lunch';
+  if (currentHour >= DINNER_START && currentHour <= DINNER_END) return 'Dinner';
   return 'Snack';
 }
 

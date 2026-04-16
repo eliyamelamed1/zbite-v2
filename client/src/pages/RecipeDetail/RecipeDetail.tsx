@@ -16,7 +16,7 @@ import CookMode from '../../features/recipes/components/CookMode/CookMode';
 import ServingsAdjuster from '../../features/recipes/components/ServingsAdjuster/ServingsAdjuster';
 import { scaleIngredients } from '../../features/recipes/utils/scale-ingredients';
 import { addRecipeToShoppingList } from '../../features/shopping-list/api/shopping-list';
-import { createCookingReport } from '../../features/recipes/api/cooking-reports';
+import { recordCook } from '../../features/gamification';
 import { Recipe } from '../../types';
 import SEO from '../../components/(ui)/seo/SEO/SEO';
 import { buildRecipeJsonLd, buildBreadcrumbJsonLd } from './RecipeDetail.utils';
@@ -130,10 +130,10 @@ export default function RecipeDetail(): JSX.Element | null {
             className={styles.shoppingListBtn}
             onClick={async () => {
               try {
-                await createCookingReport(recipe._id);
+                await recordCook(recipe._id);
                 toast.success('Nice! Cooking streak updated');
               } catch {
-                toast.error('Already reported or failed');
+                toast.error('Could not record cook');
               }
             }}
           >

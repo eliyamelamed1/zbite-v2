@@ -3,8 +3,10 @@ import { Types } from 'mongoose';
 import User from '../../models/User';
 import Recipe from '../../models/Recipe';
 import Follow from '../../models/Follow';
+import UserActivity from '../../models/UserActivity';
 
 import type { IUser, IRecipe } from '../../shared/types';
+import type { IUserActivity } from '../../models/UserActivity';
 
 const PROFILE_RECIPES_LIMIT = 12;
 const SUGGESTED_USERS_LIMIT = 5;
@@ -67,6 +69,32 @@ export const UserDal = {
       { $group: { _id: null, total: { $sum: '$recipeScore' } } },
     ]);
     return result[0]?.total ?? 0;
+  },
+
+  /** Get a user's activity feed, optionally filtered by action, with populated recipe. */
+  async getActivity(
+    userId: string,
+    action: string | undefined,
+    skip: number,
+    limit: number,
+  ): Promise<{ data: IUserActivity[]; total: number }> {
+    const filter: Record<string, unknown> = { user: new Types.ObjectId(userId) };
+    if (action) filter.action = action;
+
+    const [data, total] = await Promise.all([
+      UserActivity.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate({
+          path: 'recipe',
+          select: 'title coverImage cookingTime tags difficulty',
+          populate: { path: 'author', select: 'username avatar' },
+        }),
+      UserActivity.countDocuments(filter),
+    ]);
+
+    return { data, total };
   },
 
   /** Get users not followed by the current user, sorted by popularity. */

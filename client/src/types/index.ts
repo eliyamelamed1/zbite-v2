@@ -9,6 +9,7 @@ export interface User {
   followersCount: number;
   followingCount: number;
   chefScore: number;
+  isAdmin: boolean;
   createdAt: string;
   updatedAt: string;
 }

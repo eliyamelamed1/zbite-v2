@@ -15,6 +15,7 @@ const userSchema = new Schema<IUser>(
     followersCount: { type: Number, default: 0 },
     followingCount: { type: Number, default: 0 },
     chefScore: { type: Number, default: 0 },
+    isAdmin: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

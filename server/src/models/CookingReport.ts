@@ -12,7 +12,7 @@ interface ICookingReport {
 const cookingReportSchema = new Schema<ICookingReport>({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   recipe: { type: Schema.Types.ObjectId, ref: 'Recipe', required: true },
-  image: { type: String, required: true },
+  image: { type: String, default: '' },
   notes: { type: String, default: '', maxlength: 500 },
   createdAt: { type: Date, default: Date.now },
 });

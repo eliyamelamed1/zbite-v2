@@ -16,12 +16,12 @@ export function addConnection(userId: string, reply: FastifyReply): () => void {
   }
   connections.get(userId)!.add(reply); // eslint-disable-line @typescript-eslint/no-non-null-assertion
 
-  // Heartbeat to keep the connection alive through proxies
-  const heartbeat = setInterval(() => {
-    reply.raw.write(':heartbeat\n\n');
-  }, HEARTBEAT_INTERVAL_MS);
+  let isCleanedUp = false;
 
   const cleanup = () => {
+    if (isCleanedUp) return;
+    isCleanedUp = true;
+
     clearInterval(heartbeat);
     const userSet = connections.get(userId);
     if (userSet) {
@@ -32,8 +32,18 @@ export function addConnection(userId: string, reply: FastifyReply): () => void {
     }
   };
 
-  // Auto-cleanup on disconnect
+  // Heartbeat to keep the connection alive through proxies
+  const heartbeat = setInterval(() => {
+    try {
+      reply.raw.write(':heartbeat\n\n');
+    } catch {
+      cleanup();
+    }
+  }, HEARTBEAT_INTERVAL_MS);
+
+  // Auto-cleanup on disconnect or socket error
   reply.raw.on('close', cleanup);
+  reply.raw.on('error', cleanup);
 
   return cleanup;
 }

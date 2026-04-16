@@ -1,20 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 
 :root {
+  /* ── Color: Primary ── */
   --color-primary: #E85D2C;
   --color-primary-hover: #D14D1E;
+  --color-primary-light: #FFF0EB;
+  --color-primary-muted: #F19B7D;
+
+  /* ── Color: Secondary & Accent ── */
   --color-secondary: #F5A623;
+  --color-secondary-light: #FFF8EB;
+  --color-accent: #6B8F71;
+  --color-accent-light: #EEF4EF;
+
+  /* ── Color: Surfaces ── */
   --color-bg: #FDF6EC;
+  --color-bg-elevated: #FFFFFF;
   --color-card: #FFFFFF;
+  --color-overlay: rgba(45, 24, 16, 0.4);
+
+  /* ── Color: Text ── */
   --color-text: #2D1810;
   --color-text-secondary: #7A6558;
-  --color-border: #F0E0D0;
-  --color-divider: #F0E0D0;
-  --color-success: #4CAF50;
-  --color-warning: #F5A623;
-  --color-danger: #E85D2C;
+  --color-text-tertiary: #A89485;
+  --color-text-inverse: #FFFFFF;
 
-  /* Difficulty badge colors */
+  /* ── Color: Borders ── */
+  --color-border: #F0E0D0;
+  --color-border-strong: #E0CFC0;
+  --color-divider: #F0E0D0;
+
+  /* ── Color: Semantic ── */
+  --color-success: #3D8B40;
+  --color-success-light: #E8F5E9;
+  --color-warning: #E8A317;
+  --color-warning-light: #FFF8E1;
+  --color-danger: #D32F2F;
+  --color-danger-light: #FFEBEE;
+
+  /* ── Color: Difficulty badges ── */
   --color-easy-bg: #e8f5e9;
   --color-easy-text: #2e7d32;
   --color-medium-bg: #fff3e0;
@@ -22,22 +46,79 @@
   --color-hard-bg: #fbe9e7;
   --color-hard-text: #c62828;
 
-  /* Skeleton shimmer */
+  /* ── Color: Skeleton shimmer ── */
   --color-skeleton: #f5ebe3;
 
+  /* ── Typography ── */
   --font-heading: 'Playfair Display', serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
+  --text-xs: 0.6875rem;   /* 11px */
+  --text-sm: 0.8125rem;   /* 13px */
+  --text-base: 0.9375rem; /* 15px */
+  --text-lg: 1.0625rem;   /* 17px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.25rem;    /* 36px */
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  --tracking-tight: -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+
+  /* ── Spacing (4px base) ── */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+  --space-16: 4rem;    /* 64px */
+
+  /* ── Border Radius ── */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
   --radius-card: 16px;
-  --radius-btn: 14px;
-  --radius-pill: 20px;
+  --radius-btn: 12px;
+  --radius-pill: 9999px;
   --radius-avatar: 50%;
 
-  --shadow-card: none;
-  --shadow-hover: 0 2px 12px rgba(45, 24, 16, 0.08);
+  /* ── Shadows (warm-tinted) ── */
+  --shadow-xs: 0 1px 2px rgba(45, 24, 16, 0.04);
+  --shadow-sm: 0 2px 4px rgba(45, 24, 16, 0.05);
+  --shadow-card: 0 1px 3px rgba(45, 24, 16, 0.04), 0 1px 2px rgba(45, 24, 16, 0.03);
+  --shadow-md: 0 4px 12px rgba(45, 24, 16, 0.08);
+  --shadow-hover: 0 8px 24px rgba(45, 24, 16, 0.1);
+  --shadow-lg: 0 12px 32px rgba(45, 24, 16, 0.12);
+  --shadow-xl: 0 20px 48px rgba(45, 24, 16, 0.16);
+  --shadow-inner: inset 0 1px 2px rgba(45, 24, 16, 0.06);
 
+  /* ── Transitions ── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  /* ── Layout ── */
   --max-width: 1200px;
   --gap: 24px;
+  --navbar-height: 64px;
+  --mobile-topbar-height: 56px;
+  --bottom-bar-height: 64px;
 }
 
 *,
@@ -52,7 +133,8 @@ body {
   font-family: var(--font-body);
   background-color: var(--color-bg);
   color: var(--color-text);
-  line-height: 1.6;
+  line-height: var(--leading-relaxed);
+  font-size: var(--text-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -70,4 +152,96 @@ button {
 img {
   max-width: 100%;
   display: block;
+}
+
+/* ── Focus ring ── */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* ── Selection ── */
+::selection {
+  background: var(--color-primary-light);
+  color: var(--color-text);
+}
+
+/* ── Scrollbar (subtle) ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+/* ── Global keyframes ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }

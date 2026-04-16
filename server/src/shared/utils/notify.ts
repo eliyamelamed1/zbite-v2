@@ -4,7 +4,7 @@ import { sendToUser } from './sse-connections';
 interface NotifyParams {
   recipient: string;
   sender: string;
-  type: 'like' | 'follow' | 'save' | 'rate' | 'comment' | 'mention' | 'cooking_report';
+  type: 'follow' | 'save' | 'comment' | 'mention' | 'cooking_report';
   recipe?: string;
 }
 

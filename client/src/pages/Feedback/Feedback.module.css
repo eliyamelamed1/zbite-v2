@@ -21,8 +21,21 @@
 .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
 .tab { padding: 6px 16px; border: 1.5px solid var(--color-border); background: transparent; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-body); color: var(--color-text-secondary); }
 .tabActive { border-color: var(--color-primary); background: var(--color-primary); color: white; }
-.card { background: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-card); padding: 14px; margin-bottom: 10px; }
-.cardTitle { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+/* Recently shipped */
+.shippedSection { margin-bottom: 28px; }
+.shippedCard { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 14px; background: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-card); margin-bottom: 8px; }
+.shippedTitle { font-weight: 600; font-size: 14px; }
+
+.card { display: flex; gap: 12px; background: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius-card); padding: 14px; margin-bottom: 10px; }
+.voteBtn { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 8px; border: 1.5px solid var(--color-border); border-radius: var(--radius-card); background: transparent; cursor: pointer; font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--color-text-secondary); min-width: 44px; flex-shrink: 0; transition: all 0.15s; }
+.voteBtn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.voteBtnActive { border-color: var(--color-primary); background: var(--color-primary); color: white; }
+.voteBtnActive:hover { opacity: 0.9; }
+.cardContent { flex: 1; min-width: 0; }
+.cardHeader { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.cardTitle { font-weight: 600; font-size: 15px; }
+.cardAuthor { font-size: 12px; color: var(--color-text-secondary); flex-shrink: 0; }
+.cardDescription { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .cardMeta { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--color-text-secondary); }
 .statusBadge { padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
 .statusNew { background: #e3f2fd; color: #1565c0; }

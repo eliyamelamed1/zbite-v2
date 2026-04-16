@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronUp } from 'lucide-react';
 
 import api from '../../api/axios';
 import { useAuth } from '../../features/auth';
@@ -10,6 +12,7 @@ const STATUS_TABS = [
   { value: 'planned', label: 'Planned' },
   { value: 'in_progress', label: 'In Progress' },
   { value: 'shipped', label: 'Shipped' },
+  { value: 'not_planned', label: 'Not Planned' },
 ] as const;
 
 const CATEGORY_OPTIONS = [
@@ -19,14 +22,23 @@ const CATEGORY_OPTIONS = [
   { value: 'other', label: 'Other' },
 ] as const;
 
+interface FeedbackUser {
+  _id: string;
+  username: string;
+  avatar: string;
+}
+
 interface FeedbackItem {
   _id: string;
   title: string;
   description: string;
   category: string;
   status: string;
-  adminResponse: string;
+  votesCount: number;
+  adminResponse?: string;
+  user?: FeedbackUser;
   createdAt: string;
+  hasVoted?: boolean;
 }
 
 const STATUS_STYLE_MAP: Record<string, string> = {
@@ -47,6 +59,7 @@ const STATUS_LABEL_MAP: Record<string, string> = {
 
 export default function Feedback() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('feature');
@@ -57,6 +70,7 @@ export default function Feedback() {
 
   const [activeTab, setActiveTab] = useState('');
   const [publicItems, setPublicItems] = useState<FeedbackItem[]>([]);
+  const [recentlyShipped, setRecentlyShipped] = useState<FeedbackItem[]>([]);
   const [isLoadingBoard, setIsLoadingBoard] = useState(true);
 
   const fetchPublic = async (status: string) => {
@@ -64,7 +78,12 @@ export default function Feedback() {
     try {
       const params = status ? { status } : {};
       const { data } = await api.get('/feedback/public', { params });
-      setPublicItems(data.data);
+      const votedSet = new Set<string>(data.userVotedIds ?? []);
+      const items = (data.data as FeedbackItem[]).map((item) => ({
+        ...item,
+        hasVoted: votedSet.has(item._id),
+      }));
+      setPublicItems(items);
     } catch {
       // Non-critical — board can fail gracefully
     } finally {
@@ -73,6 +92,44 @@ export default function Feedback() {
   };
 
   useEffect(() => { fetchPublic(activeTab); }, [activeTab]);
+
+  useEffect(() => {
+    api.get('/feedback/public', { params: { status: 'shipped' } })
+      .then(({ data }) => setRecentlyShipped(data.data))
+      .catch(() => { /* Non-critical */ });
+  }, []);
+
+  const handleVote = async (itemId: string, isVoted: boolean) => {
+    if (!user) { navigate('/login'); return; }
+
+    // Optimistic update
+    setPublicItems((prev) => prev.map((item) => {
+      if (item._id !== itemId) return item;
+      return {
+        ...item,
+        hasVoted: !isVoted,
+        votesCount: item.votesCount + (isVoted ? -1 : 1),
+      };
+    }));
+
+    try {
+      if (isVoted) {
+        await api.delete(`/feedback/${itemId}/vote`);
+      } else {
+        await api.post(`/feedback/${itemId}/vote`);
+      }
+    } catch {
+      // Revert on failure
+      setPublicItems((prev) => prev.map((item) => {
+        if (item._id !== itemId) return item;
+        return {
+          ...item,
+          hasVoted: isVoted,
+          votesCount: item.votesCount + (isVoted ? 1 : -1),
+        };
+      }));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,6 +196,21 @@ export default function Feedback() {
         </form>
       )}
 
+      {recentlyShipped.length > 0 && (
+        <div className={styles.shippedSection}>
+          <h2 className={styles.boardTitle}>Recently Shipped</h2>
+          {recentlyShipped.map((item) => (
+            <div key={item._id} className={styles.shippedCard}>
+              <span className={`${styles.statusBadge} ${styles.statusShipped}`}>Shipped</span>
+              <span className={styles.shippedTitle}>{item.title}</span>
+              {item.adminResponse && (
+                <div className={styles.adminResponse}>{item.adminResponse}</div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
       <h2 className={styles.boardTitle}>What we&apos;re working on</h2>
       <div className={styles.tabs}>
         {STATUS_TABS.map((tab) => (
@@ -160,16 +232,33 @@ export default function Feedback() {
 
       {publicItems.map((item) => (
         <div key={item._id} className={styles.card}>
-          <div className={styles.cardTitle}>{item.title}</div>
-          <div className={styles.cardMeta}>
-            <span className={`${styles.statusBadge} ${STATUS_STYLE_MAP[item.status] ?? ''}`}>
-              {STATUS_LABEL_MAP[item.status] ?? item.status}
-            </span>
-            <span>{CATEGORY_OPTIONS.find((c) => c.value === item.category)?.label ?? item.category}</span>
+          <button
+            className={`${styles.voteBtn} ${item.hasVoted ? styles.voteBtnActive : ''}`}
+            onClick={() => handleVote(item._id, Boolean(item.hasVoted))}
+          >
+            <ChevronUp size={20} />
+            <span>{item.votesCount ?? 0}</span>
+          </button>
+          <div className={styles.cardContent}>
+            <div className={styles.cardHeader}>
+              <div className={styles.cardTitle}>{item.title}</div>
+              {item.user && (
+                <span className={styles.cardAuthor}>by {item.user.username}</span>
+              )}
+            </div>
+            {item.description && (
+              <div className={styles.cardDescription}>{item.description}</div>
+            )}
+            <div className={styles.cardMeta}>
+              <span className={`${styles.statusBadge} ${STATUS_STYLE_MAP[item.status] ?? ''}`}>
+                {STATUS_LABEL_MAP[item.status] ?? item.status}
+              </span>
+              <span>{CATEGORY_OPTIONS.find((c) => c.value === item.category)?.label ?? item.category}</span>
+            </div>
+            {item.adminResponse && (
+              <div className={styles.adminResponse}>{item.adminResponse}</div>
+            )}
           </div>
-          {item.adminResponse && (
-            <div className={styles.adminResponse}>{item.adminResponse}</div>
-          )}
         </div>
       ))}
     </div>

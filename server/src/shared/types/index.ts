@@ -13,6 +13,7 @@ export interface IUser extends Document {
   followersCount: number;
   followingCount: number;
   chefScore: number;
+  isAdmin: boolean;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(password: string): Promise<boolean>;
@@ -77,6 +78,7 @@ export interface INotification extends Document {
 export interface AuthUser {
   id: string;
   username: string;
+  isAdmin: boolean;
 }
 
 /** Standard paginated response shape. */

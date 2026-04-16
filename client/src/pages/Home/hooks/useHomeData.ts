@@ -10,8 +10,7 @@ interface InterestRow {
 
 interface HomeData {
   recentlyViewed: Recipe[];
-  cookedBefore: Recipe[];
-  goTo: Recipe[];
+  cookAgain: Recipe[];
   interestRows: InterestRow[];
   quickTonight: Recipe[];
   trending: Recipe[];
@@ -25,8 +24,7 @@ interface UseHomeDataReturn {
 
 const EMPTY_HOME: HomeData = {
   recentlyViewed: [],
-  cookedBefore: [],
-  goTo: [],
+  cookAgain: [],
   interestRows: [],
   quickTonight: [],
   trending: [],

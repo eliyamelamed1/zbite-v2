@@ -15,7 +15,7 @@ const REPORTS_UPLOAD_FOLDER = 'reports';
 interface CreateReportInput {
   userId: string;
   recipeId: string;
-  imageFile: MultipartFile;
+  imageFile: MultipartFile | null;
   notes: string;
 }
 
@@ -35,7 +35,7 @@ export const CookingReportService = {
     const recipe = await Recipe.findById(recipeId);
     if (!recipe) throw new NotFoundError('Recipe', recipeId);
 
-    const image = await saveFile(imageFile, REPORTS_UPLOAD_FOLDER);
+    const image = imageFile ? await saveFile(imageFile, REPORTS_UPLOAD_FOLDER) : '';
 
     const report = await CookingReportDal.createReport(userId, recipeId, image, notes);
     await CookingReportDal.incrementRecipeReportsCount(recipeId);

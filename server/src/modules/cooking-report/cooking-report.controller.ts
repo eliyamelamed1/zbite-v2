@@ -34,10 +34,6 @@ export const CookingReportController = {
     const { recipeId } = RecipeIdParamsSchema.parse(request.params);
     const { imageFile, notes: rawNotes } = await parseReportMultipart(request);
 
-    if (!imageFile) {
-      throw new ValidationError('Image is required');
-    }
-
     const { notes } = CreateReportBodySchema.parse({ notes: rawNotes });
 
     // authUser is set by the auth preHandler -- safe to assert

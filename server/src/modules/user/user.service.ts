@@ -6,6 +6,7 @@ import { buildPagination } from '../../shared/utils/pagination';
 import { UserDal } from './user.dal';
 
 import type { IUser, IRecipe, PaginatedResult } from '../../shared/types';
+import type { IUserActivity } from '../../models/UserActivity';
 
 interface ProfileUpdateFields {
   bio?: string;
@@ -71,5 +72,20 @@ export const UserService = {
   /** Get suggested users the current user does not follow. */
   async getSuggestedUsers(currentUserId: string): Promise<IUser[]> {
     return UserDal.getSuggestedUsers(currentUserId);
+  },
+
+  /** Get the authenticated user's activity feed (views, saves, cooks). */
+  async getActivity(
+    userId: string,
+    action: string | undefined,
+    page: number,
+    limit: number,
+  ): Promise<PaginatedResult<IUserActivity>> {
+    const safeLimit = Math.max(1, Math.min(100, limit || DEFAULT_SEARCH_LIMIT));
+    const safePage = Math.max(1, page || 1);
+    const skip = (safePage - 1) * safeLimit;
+
+    const { data, total } = await UserDal.getActivity(userId, action, skip, safeLimit);
+    return { data, pagination: buildPagination(safePage, safeLimit, total) };
   },
 };

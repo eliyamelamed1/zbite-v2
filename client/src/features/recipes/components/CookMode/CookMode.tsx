@@ -62,6 +62,7 @@ export default function CookMode({ recipe, onExit }: CookModeProps) {
     return (
       <div className={styles.overlay}>
         <CompletionScreen
+          recipeId={recipe._id}
           currentStreak={currentStreak}
           newAchievements={newAchievements}
           isGuest={!user}

@@ -22,6 +22,7 @@ const FollowingPage = lazy(() => import('./pages/Following/Following'));
 const SearchPage = lazy(() => import('./pages/Search/SearchPage'));
 const SavedRecipes = lazy(() => import('./pages/SavedRecipes/SavedRecipes'));
 const Feedback = lazy(() => import('./pages/Feedback/Feedback'));
+const AdminFeedback = lazy(() => import('./pages/AdminFeedback/AdminFeedback'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound'));
 
 export default function App() {
@@ -49,6 +50,8 @@ export default function App() {
           <Route path="/following" element={<Navigate to="/feed" replace />} />
           <Route path="/saved" element={<ProtectedRoute><SavedRecipes /></ProtectedRoute>} />
           <Route path="/feedback" element={<Feedback />} />
+          <Route path="/suggestions" element={<Navigate to="/feedback" replace />} />
+          <Route path="/admin/feedback" element={<ProtectedRoute><AdminFeedback /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

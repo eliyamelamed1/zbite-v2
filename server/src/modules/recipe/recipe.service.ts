@@ -18,8 +18,7 @@ interface InterestRow {
 
 interface HomeData {
   recentlyViewed: IRecipe[];
-  cookedBefore: IRecipe[];
-  goTo: IRecipe[];
+  cookAgain: IRecipe[];
   interestRows: InterestRow[];
   quickTonight: IRecipe[];
   trending: IRecipe[];
@@ -298,7 +297,8 @@ export const RecipeService = {
 
   /**
    * Get meal suggestions based on time of day. Returns 3 recipes with source labels.
-   * Priority: saved > interest-matched > popular fallback.
+   * Auth priority: saved > previously cooked > interest-matched > popular fallback.
+   * Guest priority: popular tagged > quick popular fallback.
    * Shuffles top candidates to avoid repetitive suggestions.
    */
   async getMealSuggestions(mealType: string, userId?: string): Promise<MealSuggestion[]> {
@@ -307,33 +307,53 @@ export const RecipeService = {
     const candidates: MealSuggestion[] = [];
     const shownIds: string[] = [];
 
-    // Tier 1: user's saved recipes matching meal type
     if (userId) {
+      // Tier 1: user's saved recipes matching meal type
       const saved = await RecipeDal.findSavedByMealType(userId, mealType, CANDIDATE_POOL_SIZE);
       for (const recipe of saved) {
         candidates.push({ recipe, source: 'saved' });
         shownIds.push(recipe._id.toString());
       }
-    }
 
-    // Tier 2: interest-matched recipes
-    if (userId && candidates.length < CANDIDATE_POOL_SIZE) {
-      const interests = await RecipeDal.getUserInterests(userId);
-      if (interests.length > 0) {
+      // Tier 2: previously cooked recipes matching meal type
+      if (candidates.length < CANDIDATE_POOL_SIZE) {
         const remaining = CANDIDATE_POOL_SIZE - candidates.length;
-        const interestMatches = await RecipeDal.findByMealTypeAndInterests(mealType, interests, shownIds, remaining);
-        for (const recipe of interestMatches) {
-          candidates.push({ recipe, source: 'interest' });
+        const cooked = await RecipeDal.findCookedByMealType(userId, mealType, shownIds, remaining);
+        for (const recipe of cooked) {
+          candidates.push({ recipe, source: 'saved' });
           shownIds.push(recipe._id.toString());
+        }
+      }
+
+      // Tier 3: interest-matched recipes
+      if (candidates.length < CANDIDATE_POOL_SIZE) {
+        const interests = await RecipeDal.getUserInterests(userId);
+        if (interests.length > 0) {
+          const remaining = CANDIDATE_POOL_SIZE - candidates.length;
+          const interestMatches = await RecipeDal.findByMealTypeAndInterests(mealType, interests, shownIds, remaining);
+          for (const recipe of interestMatches) {
+            candidates.push({ recipe, source: 'interest' });
+            shownIds.push(recipe._id.toString());
+          }
         }
       }
     }
 
-    // Tier 3: popular fallback
+    // Tier 4 (auth) / Tier 1 (guest): popular fallback
     if (candidates.length < CANDIDATE_POOL_SIZE) {
       const remaining = CANDIDATE_POOL_SIZE - candidates.length;
       const popular = await RecipeDal.findPopularByMealType(mealType, shownIds, remaining);
       for (const recipe of popular) {
+        candidates.push({ recipe, source: 'popular' });
+        shownIds.push(recipe._id.toString());
+      }
+    }
+
+    // Guest Tier 2: quick recipes fallback
+    if (!userId && candidates.length < CANDIDATE_POOL_SIZE) {
+      const remaining = CANDIDATE_POOL_SIZE - candidates.length;
+      const quick = await RecipeDal.findQuickPopularByMealType(mealType, shownIds, remaining);
+      for (const recipe of quick) {
         candidates.push({ recipe, source: 'popular' });
       }
     }
@@ -345,9 +365,9 @@ export const RecipeService = {
   /** Build personalized home page data. Falls back to generic sections for guests. */
   async getHomeData(userId?: string): Promise<HomeData> {
     const HOME_SECTION_LIMIT = 4;
-    const GO_TO_LIMIT = 6;
+    const COOK_AGAIN_LIMIT = 8;
     const ACTIVITY_ROW_LIMIT = 6;
-    const INTEREST_ROWS_COUNT = 2;
+    const INTEREST_ROWS_COUNT = 1;
 
     // Always fetch generic sections
     const [trending, newThisWeek] = await Promise.all([
@@ -358,25 +378,22 @@ export const RecipeService = {
     // Guest path -- no personalization
     if (!userId) {
       const quickTonight = await RecipeDal.findQuickByInterests([], [], HOME_SECTION_LIMIT);
-      return { recentlyViewed: [], cookedBefore: [], goTo: [], interestRows: [], quickTonight, trending, newThisWeek };
+      return { recentlyViewed: [], cookAgain: [], interestRows: [], quickTonight, trending, newThisWeek };
     }
 
     // Authenticated path -- personalized sections
-    const [recentlyViewed, goTo, interests] = await Promise.all([
+    const [recentlyViewed, cookAgain, interests] = await Promise.all([
       RecipeDal.findRecentlyViewed(userId, [], ACTIVITY_ROW_LIMIT),
-      RecipeDal.findUserGoToRecipes(userId, GO_TO_LIMIT),
+      RecipeDal.findUserGoToRecipes(userId, COOK_AGAIN_LIMIT),
       RecipeDal.getUserInterests(userId),
     ]);
 
     const shownIds = [
       ...recentlyViewed.map((r) => r._id.toString()),
-      ...goTo.map((r) => r._id.toString()),
+      ...cookAgain.map((r) => r._id.toString()),
     ];
 
-    const cookedBefore = await RecipeDal.findCookedBefore(userId, shownIds, ACTIVITY_ROW_LIMIT);
-    cookedBefore.forEach((r) => shownIds.push(r._id.toString()));
-
-    // Build interest rows from the user's top interests
+    // Build interest rows from the user's top interest
     const topInterests = interests.slice(0, INTEREST_ROWS_COUNT);
     const interestRows: InterestRow[] = [];
     for (const interest of topInterests) {
@@ -389,6 +406,6 @@ export const RecipeService = {
 
     const quickTonight = await RecipeDal.findQuickByInterests(interests, shownIds, HOME_SECTION_LIMIT);
 
-    return { recentlyViewed, cookedBefore, goTo, interestRows, quickTonight, trending, newThisWeek };
+    return { recentlyViewed, cookAgain, interestRows, quickTonight, trending, newThisWeek };
   },
 };

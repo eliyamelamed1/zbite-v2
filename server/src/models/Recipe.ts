@@ -42,6 +42,7 @@ recipeSchema.index({ recipeScore: -1, createdAt: -1 });
 recipeSchema.index({ tags: 1, createdAt: -1 });
 recipeSchema.index({ tags: 1, recipeScore: -1 });
 recipeSchema.index({ systemTags: 1 });
+recipeSchema.index({ tags: 1, cookingTime: 1, recipeScore: -1 });
 recipeSchema.index(
   { title: 'text', description: 'text' },
   { weights: { title: 10, description: 1 } },

@@ -242,6 +242,6 @@ export const RecipeController = {
   async mealSuggestion(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { mealType } = MealSuggestionQuerySchema.parse(request.query);
     const suggestions = await RecipeService.getMealSuggestions(mealType, request.authUser?.id);
-    return reply.send({ suggestions });
+    return reply.send({ suggestions, mealType });
   },
 };

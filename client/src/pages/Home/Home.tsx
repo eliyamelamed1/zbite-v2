@@ -43,16 +43,8 @@ export default function Home() {
         <MealSuggestion mealType={mealType} suggestions={suggestions} />
       )}
 
-      {data.recentlyViewed.length > 0 && (
-        <LeaderboardRow title="Recently Viewed" recipes={data.recentlyViewed} />
-      )}
-
-      {data.cookedBefore.length > 0 && (
-        <LeaderboardRow title="Cooked Before" recipes={data.cookedBefore} />
-      )}
-
-      {data.goTo.length > 0 && (
-        <LeaderboardRow title="Make It Again" recipes={data.goTo} seeAllLink="/saved" />
+      {data.cookAgain.length > 0 && (
+        <LeaderboardRow title="Cook Again" recipes={data.cookAgain} seeAllLink="/saved" />
       )}
 
       {data.interestRows.map((row) => (

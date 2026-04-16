@@ -10,6 +10,7 @@ interface IFeedbackItem {
   status: 'new' | 'planned' | 'in_progress' | 'shipped' | 'not_planned';
   isPublic: boolean;
   adminResponse: string;
+  votesCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,11 +28,13 @@ const feedbackItemSchema = new Schema<IFeedbackItem>(
     status: { type: String, enum: ['new', 'planned', 'in_progress', 'shipped', 'not_planned'], default: 'new' },
     isPublic: { type: Boolean, default: false },
     adminResponse: { type: String, default: '' },
+    votesCount: { type: Number, default: 0 },
   },
   { timestamps: true },
 );
 
 feedbackItemSchema.index({ status: 1, isPublic: 1, createdAt: -1 });
+feedbackItemSchema.index({ isPublic: 1, votesCount: -1 });
 feedbackItemSchema.index({ user: 1, createdAt: -1 });
 
 export default mongoose.model<IFeedbackItem>('FeedbackItem', feedbackItemSchema);
